@@ -107,6 +107,7 @@ package gth_pkg is
   type t_gth_gt_clk_out is record
     rxoutclk : std_logic;
     txoutclk : std_logic;
+    txoutpcs : std_logic;
   end record;
 
   ---------------------------- Channel - DRP Ports  --------------------------

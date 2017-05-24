@@ -38,7 +38,7 @@ entity sca_controller is
         
         -- ADC monitoring
         adc_monitoring_off_i    : in  std_logic;
-        adc_readings_o          : out t_sca_adc_value_arr(SCA_MONITOR_ADC_CHANNELS'range);
+        adc_readings_o          : out t_sca_adc_value_arr;
         
         -- JTAG
         -- General use: first of all make sure jtag_enabled_i is high and set the number of bits for the JTAG command in jtag_cmd_length_i, then shift the TMS and TDO bits by setting the data
@@ -66,6 +66,7 @@ entity sca_controller is
         -- controller monitoring
         ready_o                 : out std_logic;
         critical_error_o        : out std_logic;
+        not_ready_cnt_o         : out std_logic_vector(15 downto 0);
         rx_err_cnt_o            : out std_logic_vector(15 downto 0);
         rx_seq_num_err_cnt_o    : out std_logic_vector(15 downto 0);
         rx_crc_err_cnt_o        : out std_logic_vector(15 downto 0);
@@ -165,6 +166,7 @@ architecture sca_controller_arch of sca_controller is
     signal rx_seq_num           : std_logic_vector(2 downto 0);
     signal rx_sca_reply         : t_sca_reply;
     signal rx_transaction_id    : std_logic_vector(7 downto 0);
+    signal rx_not_ready_pulse   : std_logic;
 
     -- sca tx
     signal tx_command_en        : std_logic;
@@ -766,6 +768,26 @@ begin
             reset_i   => reset_i,
             en_i      => trans_error,
             count_o   => trans_fail_cnt
+        );
+
+    i_rx_not_ready_pulse : entity work.oneshot
+        port map(
+            reset_i   => reset_i,
+            clk_i     => clk_80_i,
+            input_i   => not rx_ready,
+            oneshot_o => rx_not_ready_pulse
+        );
+
+    i_rx_not_ready_cnt : entity work.counter
+        generic map(
+            g_COUNTER_WIDTH  => 16,
+            g_ALLOW_ROLLOVER => false
+        )
+        port map(
+            ref_clk_i => clk_80_i,
+            reset_i   => reset_i,
+            en_i      => rx_not_ready_pulse,
+            count_o   => not_ready_cnt_o
         );
 
     --========= Pulse extend for the reply valid signal =========--

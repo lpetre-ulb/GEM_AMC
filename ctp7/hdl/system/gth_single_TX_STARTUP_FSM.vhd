@@ -143,8 +143,9 @@ architecture RTL of gth_single_TX_STARTUP_FSM is
   constant WAIT_CYCLES       : integer := STARTUP_DELAY / STABLE_CLOCK_PERIOD;  -- Number of Clock-Cycles to wait after configuration
   constant WAIT_MAX          : integer := WAIT_CYCLES + 10;  -- 500 ns plus some additional margin
 
+  constant WAIT_TIMEOUT_250ms : integer := 250000000 / STABLE_CLOCK_PERIOD;  --  2 ms time-out
   constant WAIT_TIMEOUT_2ms   : integer := 2000000 / STABLE_CLOCK_PERIOD;  --  2 ms time-out
-  constant WAIT_TLOCK_MAX     : integer := 100000 / STABLE_CLOCK_PERIOD;  --100 us time-out
+  constant WAIT_TLOCK_MAX     : integer := WAIT_TIMEOUT_250ms;             --100000 / STABLE_CLOCK_PERIOD;  --100 us time-out
   constant WAIT_TIMEOUT_500us : integer := 500000 / STABLE_CLOCK_PERIOD;  --100 us time-out
   constant WAIT_1us_cycles    : integer := 1000 / STABLE_CLOCK_PERIOD;  --1 us time-out
   constant WAIT_1us           : integer := WAIT_1us_cycles+ 10;  -- 1us plus some additional margin
@@ -162,7 +163,7 @@ architecture RTL of gth_single_TX_STARTUP_FSM is
 
   constant MAX_RETRIES     : integer                             := 2**RETRY_COUNTER_BITWIDTH-1;
   signal retry_counter_int : integer range 0 to MAX_RETRIES;
-  signal time_out_counter  : integer range 0 to WAIT_TIMEOUT_2ms := 0;
+  signal time_out_counter  : integer range 0 to WAIT_TIMEOUT_250ms := 0;
 
   signal reset_time_out : std_logic := '0';
   signal time_out_2ms   : std_logic := '0';  --\Flags that the various time-out points 

@@ -69,8 +69,10 @@ entity system is
     ipb_axi_miso_i    : in t_axi_lite_miso;
 
     ----------------- TTC ------------------------
-    ttc_clks_i        : in t_ttc_clks;
-    ttc_status_i      : in t_ttc_status;
+    clk_40_ttc_p_i        : in std_logic;
+    clk_40_ttc_n_i        : in std_logic;
+    ttc_clks_o            : out t_ttc_clks;
+    ttc_clks_locked_o     : out std_logic;
     
     ----------------- GTH ------------------------
     clk_gth_tx_arr_o            : out std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
@@ -269,8 +271,10 @@ architecture system_arch of system is
   signal ipb_axi_bvalid    : STD_LOGIC_VECTOR ( 0 downto 0 );  
   
   ----------------- TTC ------------------------
+  signal ttc_clk_160_clean : std_logic; -- this will be used as the source of all TTC clocks and should come from the jitter-cleaned MGT ref
   signal ttc_clks          : t_ttc_clks;
-  signal ttc_status        : t_ttc_status;
+  signal ttc_clks_reset    : std_logic;
+  signal ttc_clks_locked   : std_logic;
       
   -------------------------- DEBUG ----------------------------------
 --  attribute mark_debug : string;
@@ -318,8 +322,21 @@ begin
   
   clk_50_o   <= s_clk_50;
   clk_200_o  <= s_clk_200;
-  ttc_clks   <= ttc_clks_i;
-  ttc_status <= ttc_status_i;
+  
+  i_ttc_clocks : entity work.ttc_clocks
+      port map(
+          clk_40_ttc_p_i      => clk_40_ttc_p_i,
+          clk_40_ttc_n_i      => clk_40_ttc_n_i,
+          clk_160_ttc_clean_i => ttc_clk_160_clean,
+          mmcm_rst_i          => '0', --ttc_clks_reset,
+          mmcm_locked_o       => ttc_clks_locked,
+          clocks_o            => ttc_clks,
+          pll_lock_time_o     => open,
+          unlock_cnt_o        => open
+      ); 
+  
+  ttc_clks_o <= ttc_clks;
+  ttc_clks_locked_o <= ttc_clks_locked;
   
   i_v7_bd : v7_bd
     port map (
@@ -461,7 +478,8 @@ begin
       gth_cpll_status_arr_o   => s_gth_cpll_status_arr,
 
       ttc_clks_i              => ttc_clks,
-      ttc_status_i            => ttc_status,
+      ttc_clks_locked_i       => ttc_clks_locked,
+      ttc_clks_reset_o        => ttc_clks_reset,
 
       refclk_F_0_p_i          => refclk_F_0_p_i,
       refclk_F_0_n_i          => refclk_F_0_n_i,
@@ -498,8 +516,8 @@ begin
       gth_tx_serial_arr_o   => s_gth_tx_serial_arr,
       gth_rx_serial_arr_i   => s_gth_rx_serial_arr,
 
-      gth_gbt_common_rxusrclk_o => gth_gbt_common_rxusrclk_o
-
+      gth_gbt_common_rxusrclk_o => gth_gbt_common_rxusrclk_o,
+      gth_gbt_common_txoutclk_o => ttc_clk_160_clean
       );
     
   gen_gth_serial : for i in 0 to g_NUM_OF_GTH_GTs-1 generate

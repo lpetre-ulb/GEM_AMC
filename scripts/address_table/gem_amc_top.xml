@@ -11,7 +11,7 @@
                        decoding configuration, clock and data status, bc0 status, command counters and a small spy buffer)"
           fw_is_module="true"
           fw_module_file="../common/hdl/ttc/ttc.vhd"
-          fw_user_clock_signal="clk_40"
+          fw_user_clock_signal="ttc_clks_i.clk_40"
           fw_bus_clock_signal="ipb_clk_i"
           fw_bus_reset_signal="ipb_reset_i"
           fw_master_bus_signal="ipb_mosi_i"
@@ -83,6 +83,9 @@
               description="MMCM locked flag"
               fw_signal="ttc_status.mmcm_locked"
               sw_monitor_error_value="0"/>
+        <node id="MMCM_UNLOCK_CNT" address="0x0" mask="0xffff0000" permission="r" description="MMCM unlock counter"
+              fw_signal="mmcm_unlock_cnt"
+              sw_monitor_warn_min_threshold="1"/>
         <node id="TTC_SINGLE_ERROR_CNT" address="0x1" mask="0x0000ffff" permission="r"
               description="TTC stream single bit error count"
               fw_signal="ttc_status.single_err"
@@ -336,20 +339,6 @@
         <node id="USE_TRIG_LINKS" address="0x0" mask="0x00000200" permission="r"
               description="If 1 then this firmware supports trigger links, if 0 then trigger links are disabled"
               fw_signal="use_trig_links"/>
-      </node>
-
-      <node id="GBT" address="0x100">
-        <node id="TX_SYNC_PATTERN" address="0x0" mask="0x0000ffff" permission="rw"
-              description="GBT TX sync pattern (sent continuously after reset until a valid RX sync pattern
-                           is received for a certain number of clocks)"
-              fw_signal="gbt_tx_sync_pattern" fw_default="0x76BC"/>
-        <node id="RX_SYNC_PATTERN" address="0x1" permission="rw"
-              description="GBT RX sync pattern (TX sync pattern is sent continuously after reset until a valid RX sync pattern
-                           is received for a certain number of clocks)"
-              fw_signal="gbt_rx_sync_pattern" fw_default="0x76BC76BC"/>
-        <node id="RX_SYNC_COUNT_REQUIRED" address="0x2" mask="0x000000ff" permission="rw"
-              description="GBT RX sync pattern has to be received for this number of clock cycles to consider the link synchronized"
-              fw_signal="gbt_rx_sync_count_req" fw_default="0x3"/>
       </node>
 
       <node id="TESTS" address="0x200">
@@ -952,11 +941,6 @@
               fw_signal="tr1_disperr_arr(${OH_IDX})"
               sw_monitor_warn_min_threshold="1000"/>
 
-        <node id="GBT_LINK_SYNC_DONE" address="0x10" mask="0x00000001" permission="r"
-              description="Indicates whether or not the sync procedure has been done on the GBT link
-                           for this OH (if GBT is not enabled, this will be always 0)"
-              fw_signal="gbt_rx_sync_done_arr_i(${OH_IDX})"/>
-
       </node>
     </node>
 
@@ -974,18 +958,31 @@
           fw_reg_addr_lsb="0">
 
       <node id="SCA" address="0x0">
-        <node id="MODULE_RESET" address="0x0" permission="w"
-              description="SCA controller reset (coming out of module reset it will also reset and reconfigure the SCA chip)"
-              fw_write_pulse_signal="sca_reset"/>
+        <node id="CTRL" address="0x0">
+          <node id="MODULE_RESET" address="0x0" permission="w"
+                description="SCA controller reset (coming out of module reset it will also reset and reconfigure the SCA chip)"
+                fw_write_pulse_signal="sca_reset"/>
+          <node id="OH_FPGA_HARD_RESET" address="0x1" permission="w"
+                description="Writing to this register will trigger OH FPGA hard reset"
+                fw_write_pulse_signal="manual_hard_reset"/>
+          <node id="TTC_HARD_RESET_EN" address="0x2" mask="0x00000001" permission="rw"
+                description="When this is set to 1 (default), TTC hard reset commands are forwarded to the SCA to reset the OH FPGA"
+                fw_signal="sca_ttc_hr_enable" fw_default="0b1"/>
+        </node>
 
-        <node id="STATUS" address="0x1">
-          <node id="READY" address="0x0" mask="0x00000001" permission="r"
-                description="Indicates that the SCA controller has good communication with the SCA chip"
-                fw_signal="sca_ready"/>
-          <node id="CRITICAL_ERROR" address="0x0" mask="0x00000002" permission="r"
-                description="Indicates that the SCA controller has encountered a critical error (needs reset)"
-                fw_signal="sca_critical_error"/>
-          <node id="RX_ERR_CNT" address="0x1" mask="0x0000ffff" permission="r"
+        <node id="STATUS" address="0x100">
+          <node id="READY" address="0x0" mask="0xffffffff" permission="r"
+                description="Bits in this register indicate that the SCA controller for the corresponding link has good communication with the SCA chip"
+                fw_signal="sca_ready_arr"/>
+          <node id="CRITICAL_ERROR" address="0x1" mask="0xffffffff" permission="r"
+                description="Bits in this register indicate that the SCA controller for the corresponding link has encountered a critical error (needs reset)"
+                fw_signal="sca_critical_error_arr"/>
+          <node id="NOT_READY_CNT_OH${OH_IDX}" address="0x2" mask="0x0000ffff" permission="r" 
+                description="Counts the number of times that the SCA controller READY signal went to 0 since last SCA reset"
+                generate="true" generate_size="12" generate_address_step="0x00000001" generate_idx_var="OH_IDX"
+                fw_signal="sca_not_ready_cnt_arr(${OH_IDX})"/>
+
+          <!--node id="RX_ERR_CNT" address="0x1" mask="0x0000ffff" permission="r"
                 description="Number of RX errors"
                 fw_signal="sca_rx_err_cnt"/>
           <node id="SEQ_NUM_ERR_CNT" address="0x1" mask="0xffff0000" permission="r"
@@ -1005,117 +1002,136 @@
                 fw_signal="sca_last_sca_error"/>
           <node id="TRANSACTION_DONE_CNT" address="0x4" permission="r"
                 description="Number of transactions successfully executed"
-                fw_signal="sca_tr_done_cnt"/>
+                fw_signal="sca_tr_done_cnt"/-->
         </node>
 
         <node id="MANUAL_CONTROL" address="0x1000">
-          <node id="FPGA_HARD_RESET" address="0x0" permission="w"
-                description="Writing to this register will trigger OH FPGA hard reset"
-                fw_write_pulse_signal="manual_hard_reset"/>
-          <node id="SCA_CMD_CHANNEL" address="0x1" mask="0x000000ff" permission="rw"
-                description="Manual SCA command: channel"
-                fw_signal="sca_user_command.channel" fw_default="0x00"/>
-          <node id="SCA_CMD_COMMAND" address="0x1" mask="0x0000ff00" permission="rw"
-                description="Manual SCA command: command"
-                fw_signal="sca_user_command.command" fw_default="0x00"/>
-          <node id="SCA_CMD_LENGTH" address="0x1" mask="0x00ff0000" permission="rw"
-                description="Manual SCA command: length (range = 0 to 4)"
-                fw_signal="sca_user_command.length" fw_default="0x00"/>
-          <node id="SCA_CMD_DATA" address="0x2" permission="rw"
-                description="Manual SCA command: data"
-                fw_signal="sca_user_command.data" fw_default="0x00000000"/>
-          <node id="SCA_CMD_EXECUTE" address="0x3" permission="w"
-                description="Manual SCA command: writing to this register will trigger the execution of the SCA command"
-                fw_write_pulse_signal="sca_user_command_en" fw_write_done_signal="sca_user_command_done"/>
-          <node id="SCA_RPY_CHANNEL" address="0x4" mask="0x000000ff" permission="r"
-                description="SCA reply to the manual command: channel"
-                fw_signal="sca_user_reply.channel"/>
-          <node id="SCA_RPY_ERROR" address="0x4" mask="0x0000ff00" permission="r"
-                description="SCA reply to the manual command: command"
-                fw_signal="sca_user_reply.error"/>
-          <node id="SCA_RPY_LENGTH" address="0x4" mask="0x00ff0000" permission="r"
-                description="SCA reply to the manual command: length (range = 0 to 4)"
-                fw_signal="sca_user_reply.length"/>
-          <node id="SCA_RPY_DATA" address="0x5" permission="r"
-                description="SCA reply to the manual command: data"
-                fw_signal="sca_user_reply.data"/>
+          <node id="LINK_ENABLE_MASK" address="0x0" mask="0xffffffff" permission="rw"
+                description="This is a bitmask of enabled links for the SCA manual command.
+                             Multiple channels can be enabled at the same time, which will 
+                             result in a broadcast command to these channels when writing to the command registers"
+                fw_signal="sca_user_command_en_mask" fw_default="0x00000000"/>
+ 
+          <node id="SCA_CMD" address="0x1">
+            <node id="SCA_CMD_CHANNEL" address="0x0" mask="0x000000ff" permission="rw"
+                  description="Manual SCA command: channel"
+                  fw_signal="sca_user_command.channel" fw_default="0x00"/>
+            <node id="SCA_CMD_COMMAND" address="0x0" mask="0x0000ff00" permission="rw"
+                  description="Manual SCA command: command"
+                  fw_signal="sca_user_command.command" fw_default="0x00"/>
+            <node id="SCA_CMD_LENGTH" address="0x0" mask="0x00ff0000" permission="rw"
+                  description="Manual SCA command: length (range = 0 to 4)"
+                  fw_signal="sca_user_command.length" fw_default="0x00"/>
+            <node id="SCA_CMD_DATA" address="0x1" permission="rw"
+                  description="Manual SCA command: data"
+                  fw_signal="sca_user_command.data" fw_default="0x00000000"/>
+            <node id="SCA_CMD_EXECUTE" address="0x2" permission="w"
+                  description="Manual SCA command: writing to this register will trigger the execution of the SCA command"
+                  fw_write_pulse_signal="sca_user_command_en" fw_write_done_signal="sca_user_command_done_all"/>
+          </node>
+
+          <node id="SCA_REPLY_OH${OH_IDX}" address="0x4"
+                description="SCA reply for Optohybrid ${OH_IDX}"
+                generate="true" generate_size="12" generate_address_step="0x00000002" generate_idx_var="OH_IDX">
+
+            <node id="SCA_RPY_CHANNEL" address="0x0" mask="0x000000ff" permission="r"
+                  description="SCA reply to the manual command: channel"
+                  fw_signal="sca_user_reply_arr(${OH_IDX}).channel"/>
+            <node id="SCA_RPY_ERROR" address="0x0" mask="0x0000ff00" permission="r"
+                  description="SCA reply to the manual command: command"
+                  fw_signal="sca_user_reply_arr(${OH_IDX}).error"/>
+            <node id="SCA_RPY_LENGTH" address="0x0" mask="0x00ff0000" permission="r"
+                  description="SCA reply to the manual command: length (range = 0 to 4)"
+                  fw_signal="sca_user_reply_arr(${OH_IDX}).length"/>
+            <node id="SCA_RPY_DATA" address="0x1" permission="r"
+                  description="SCA reply to the manual command: data"
+                  fw_signal="sca_user_reply_arr(${OH_IDX}).data"/>
+          </node>
         </node>
 
         <node id="ADC_MONITORING" address="0x2000">
-          <node id="MONITORING_OFF" address="0x0" mask="0x10000000" permission="rw"
-                description="If this is set to 1 then ADC monitoring is turned suspended"
-                fw_signal="sca_adc_monitor_off" fw_default="0b0"/>
-          <node id="AVCCN" address="0x1" mask="0x00000fff" permission="r"
-                description="AVCCN voltage"
-                fw_signal="sca_adc_readings(0)"/>
-          <node id="AVTTN" address="0x1" mask="0x00fff000" permission="r"
-                description="AVTTN voltage"
-                fw_signal="sca_adc_readings(1)"/>
-          <node id="1V0_INT" address="0x2" mask="0x00000fff" permission="r"
-                description="1.0V INT voltage"
-                fw_signal="sca_adc_readings(2)"/>
-          <node id="1V8F" address="0x2" mask="0x00fff000" permission="r"
-                description="1.8V F voltage"
-                fw_signal="sca_adc_readings(3)"/>
-          <node id="1V5" address="0x3" mask="0x00000fff" permission="r"
-                description="1.5V voltage"
-                fw_signal="sca_adc_readings(4)"/>
-          <node id="2V5_IO" address="0x3" mask="0x00fff000" permission="r"
-                description="2.5V IO voltage"
-                fw_signal="sca_adc_readings(5)"/>
-          <node id="3V0" address="0x4" mask="0x00000fff" permission="r"
-                description="3.0V voltage"
-                fw_signal="sca_adc_readings(6)"/>
-          <node id="1V8" address="0x4" mask="0x00fff000" permission="r"
-                description="1.8V voltage"
-                fw_signal="sca_adc_readings(7)"/>
-          <node id="VTRX_RSSI2" address="0x5" mask="0x00000fff" permission="r"
-                description="VTRX RSSI2 voltage"
-                fw_signal="sca_adc_readings(8)"/>
-          <node id="VTRX_RSSI1" address="0x5" mask="0x00fff000" permission="r"
-                description="VTRX RSSI1 voltage"
-                fw_signal="sca_adc_readings(9)"/>
-          <node id="SCA_TEMP" address="0x6" mask="0x00000fff" permission="r"
-                description="SCA Temperature"
-                fw_signal="sca_adc_readings(10)"/>
-          <node id="BOARD_TEMP1" address="0x6" mask="0x00fff000" permission="r"
-                description="Board Temperature Sensor #1"
-                fw_signal="sca_adc_readings(11)"/>
-          <node id="BOARD_TEMP2" address="0x7" mask="0x00000fff" permission="r"
-                description="Board Temperature Sensor #2"
-                fw_signal="sca_adc_readings(12)"/>
-          <node id="BOARD_TEMP3" address="0x7" mask="0x00fff000" permission="r"
-                description="Board Temperature Sensor #3"
-                fw_signal="sca_adc_readings(13)"/>
-          <node id="BOARD_TEMP4" address="0x8" mask="0x00000fff" permission="r"
-                description="Board Temperature Sensor #4"
-                fw_signal="sca_adc_readings(14)"/>
-          <node id="BOARD_TEMP5" address="0x8" mask="0x00fff000" permission="r"
-                description="Board Temperature Sensor #5"
-                fw_signal="sca_adc_readings(15)"/>
-          <node id="BOARD_TEMP6" address="0x9" mask="0x00000fff" permission="r"
-                description="Board Temperature Sensor #6"
-                fw_signal="sca_adc_readings(16)"/>
-          <node id="BOARD_TEMP7" address="0x9" mask="0x00fff000" permission="r"
-                description="Board Temperature Sensor #7"
-                fw_signal="sca_adc_readings(17)"/>
-          <node id="BOARD_TEMP8" address="0xa" mask="0x00000fff" permission="r"
-                description="Board Temperature Sensor #8"
-                fw_signal="sca_adc_readings(18)"/>
-          <node id="BOARD_TEMP9" address="0xa" mask="0x00fff000" permission="r"
-                description="Board Temperature Sensor #9"
-                fw_signal="sca_adc_readings(19)"/>
+          <node id="MONITORING_OFF" address="0x0" mask="0xffffffff" permission="rw"
+                description="Bits corresponding to each link if set to 1 will suspend ADC monitoring on that SCA"
+                fw_signal="sca_adc_monitor_off_arr" fw_default="0x00000000"/>
+
+          <node id="OH${OH_IDX}" address="0x1"
+                description="ADC monitoring of Optohybrid ${OH_IDX}"
+                generate="true" generate_size="12" generate_address_step="0x0000000f" generate_idx_var="OH_IDX">
+
+            <node id="AVCCN" address="0x0" mask="0x00000fff" permission="r"
+                  description="AVCCN voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(0)"/>
+            <node id="AVTTN" address="0x0" mask="0x00fff000" permission="r"
+                  description="AVTTN voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(1)"/>
+            <node id="1V0_INT" address="0x1" mask="0x00000fff" permission="r"
+                  description="1.0V INT voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(2)"/>
+            <node id="1V8F" address="0x1" mask="0x00fff000" permission="r"
+                  description="1.8V F voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(3)"/>
+            <node id="1V5" address="0x2" mask="0x00000fff" permission="r"
+                  description="1.5V voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(4)"/>
+            <node id="2V5_IO" address="0x2" mask="0x00fff000" permission="r"
+                  description="2.5V IO voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(5)"/>
+            <node id="3V0" address="0x3" mask="0x00000fff" permission="r"
+                  description="3.0V voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(6)"/>
+            <node id="1V8" address="0x3" mask="0x00fff000" permission="r"
+                  description="1.8V voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(7)"/>
+            <node id="VTRX_RSSI2" address="0x4" mask="0x00000fff" permission="r"
+                  description="VTRX RSSI2 voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(8)"/>
+            <node id="VTRX_RSSI1" address="0x4" mask="0x00fff000" permission="r"
+                  description="VTRX RSSI1 voltage"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(9)"/>
+            <node id="SCA_TEMP" address="0x5" mask="0x00000fff" permission="r"
+                  description="SCA Temperature"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(10)"/>
+            <node id="BOARD_TEMP1" address="0x5" mask="0x00fff000" permission="r"
+                  description="Board Temperature Sensor #1"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(11)"/>
+            <node id="BOARD_TEMP2" address="0x6" mask="0x00000fff" permission="r"
+                  description="Board Temperature Sensor #2"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(12)"/>
+            <node id="BOARD_TEMP3" address="0x6" mask="0x00fff000" permission="r"
+                  description="Board Temperature Sensor #3"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(13)"/>
+            <node id="BOARD_TEMP4" address="0x7" mask="0x00000fff" permission="r"
+                  description="Board Temperature Sensor #4"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(14)"/>
+            <node id="BOARD_TEMP5" address="0x7" mask="0x00fff000" permission="r"
+                  description="Board Temperature Sensor #5"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(15)"/>
+            <node id="BOARD_TEMP6" address="0x8" mask="0x00000fff" permission="r"
+                  description="Board Temperature Sensor #6"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(16)"/>
+            <node id="BOARD_TEMP7" address="0x8" mask="0x00fff000" permission="r"
+                  description="Board Temperature Sensor #7"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(17)"/>
+            <node id="BOARD_TEMP8" address="0x9" mask="0x00000fff" permission="r"
+                  description="Board Temperature Sensor #8"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(18)"/>
+            <node id="BOARD_TEMP9" address="0x9" mask="0x00fff000" permission="r"
+                  description="Board Temperature Sensor #9"
+                  fw_signal="sca_adc_readings_arr(${OH_IDX})(19)"/>
+          </node>
         </node>
 
-        <node id="JTAG" address="0x2100">
+        <node id="JTAG" address="0x2500">
           <node id="CTRL" address="0x0">
-            <node id="ENABLE" address="0x0" mask="0x00000001" permission="rw"
-                  description="If this is not set to 1 then none of the JTAG registers will work"
-                  fw_signal="jtag_enabled" fw_default="0b0"/>
-            <node id="SHIFT_MSB" address="0x0" mask="0x00000002" permission="rw"
+            <node id="ENABLE_MASK" address="0x0" mask="0xffffffff" permission="rw"
+                  description="This is a bitmask of enabled links for the SCA JTAG commands.
+                               Multiple channels can be enabled at the same time, which will 
+                               result in a broadcast command to these channels when writing to the TDO and TMS registers"
+                  fw_signal="jtag_enabled_mask" fw_default="0x00000000"/>
+            <node id="SHIFT_MSB" address="0x1" mask="0x00000002" permission="rw"
                   description="If this is 1 then SCA will shift out bits MSB to LSB and if this is 0 then LSB to MSB (default)"
                   fw_signal="jtag_shift_msb_first" fw_default="0b0"/>
-            <node id="EXPERT" address="0x0">
+            <node id="EXPERT" address="0x1">
               <node id="EXEC_ON_EVERY_TDO" address="0x0" mask="0x00000004" permission="rw"
                     description="EXPERT ONLY: used to optimize firmware downloading, when set high the controller will execute
                                  JTAG_GO after every TDO shift (even if length is higher than 32)"
@@ -1131,30 +1147,32 @@
                     fw_signal="jtag_shift_tdo_async" fw_default="0b0"/>
             </node>
           </node>
-          <node id="NUM_BITS" address="0x1" mask="0x000007f" permission="rw"
+          <node id="NUM_BITS" address="0x2" mask="0x000007f" permission="rw"
                 description="Number of bits in the JTAG command (0 means 128). Once you shift this number of bits of
                              TDO data, the JTAG command will be executed and TDI is available for reading"
                 fw_signal="jtag_cmd_length" fw_default="0b0000000"/>
-          <node id="TMS" address="0x2" permission="w"
+          <node id="TMS" address="0x3" permission="w"
                 description="TMS bits to shift to the SCA chip. 32 bits are shifted with each write to this register.
                              The write transaction completes once the bit shifting to the SCA is already done and
                              confirmed by the SCA, so there's no need to sleep between the consecutive writes to this register."
-                fw_signal="jtag_tms" fw_write_pulse_signal="jtag_shift_tms_en" fw_write_done_signal="jtag_shift_done"
+                fw_signal="jtag_tms" fw_write_pulse_signal="jtag_shift_tms_en" fw_write_done_signal="jtag_shift_done_all"
                 fw_default="0x00000000"/>
-          <node id="TDO" address="0x3" permission="w"
+          <node id="TDO" address="0x4" permission="w"
                 description="TDO bits to shift to the SCA chip. 32 bits are shifted with each write to this register.
                              Once the number of bits shifted is equal to or greater than the NUM_BITS the JTAG command
                              will be executed. The write transaction completes once the bit shifting to the SCA is
                              already done and confirmed by the SCA, so there's no need to sleep between the consecutive
                              writes to this register."
-                fw_signal="jtag_tdo" fw_write_pulse_signal="jtag_shift_tdo_en" fw_write_done_signal="jtag_shift_done"
+                fw_signal="jtag_tdo" fw_write_pulse_signal="jtag_shift_tdo_en" fw_write_done_signal="jtag_shift_done_all"
                 fw_default="0x00000000"/>
-          <node id="TDI" address="0x4" permission="r"
-                description="When reading this register the TDI bits are shifted from the SCA (32 bits with each read)."
-                fw_signal="jtag_tdi" fw_read_pulse_signal="jtag_shift_tdi_en" fw_read_ready_signal="jtag_shift_done"/>
+
+          <node id="TDI_OH${OH_IDX}" address="0x5" permission="r"
+                description="When reading this register the TDI bits are shifted from the SCA of OH${OH_IDX} (32 bits with each read)."
+                generate="true" generate_size="12" generate_address_step="0x00000001" generate_idx_var="OH_IDX"
+                fw_signal="jtag_tdi_arr(${OH_IDX})" fw_read_pulse_signal="jtag_shift_tdi_en_arr(${OH_IDX})" fw_read_ready_signal="jtag_shift_done_arr(${OH_IDX})"/>
         </node>
 
-        <node id="DEBUG" address="0x3000">
+        <!--node id="DEBUG" address="0x3000">
           <node id="RAW_TX_LAST_CMD_0" address="0x0" permission="r"
                 description="Last raw output on the TX, bits [31:0]"
                 fw_signal="sca_tx_raw_last_cmd(31 downto 0)"/>
@@ -1176,7 +1194,7 @@
           <node id="RX_LAST_CALC_CRC" address="0x6" mask="0x0000ffff" permission="r"
                 description="RX last calculated CRC"
                 fw_signal="sca_rx_last_calc_crc"/>
-        </node>
+        </node-->
 
       </node>
 

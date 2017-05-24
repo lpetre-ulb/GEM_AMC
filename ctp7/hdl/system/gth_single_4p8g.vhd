@@ -807,7 +807,7 @@ begin
       ----------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
       TXOUTCLK                  => gth_gt_clk_o.txoutclk,
       TXOUTCLKFABRIC            => open,
-      TXOUTCLKPCS               => open,
+      TXOUTCLKPCS               => gth_gt_clk_o.txoutpcs,
       TXOUTCLKSEL               => gth_tx_ctrl_i.TXOUTCLKSEL,
       TXRATEDONE                => open,
       --------------------- Transmit Ports - TX Gearbox Ports --------------------

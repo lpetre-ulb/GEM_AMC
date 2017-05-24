@@ -14,7 +14,7 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library work;
+use work.gem_pkg.all;
 
 entity link_gbt_rx is
 port(
@@ -25,18 +25,15 @@ port(
     
     req_en_o                : out std_logic;
     req_data_o              : out std_logic_vector(31 downto 0);
-    
+
     evt_en_o                : out std_logic;
     evt_data_o              : out std_logic_vector(15 downto 0);
-
+    
     tk_error_o              : out std_logic;
     evt_rcvd_o              : out std_logic;
     
     gbt_rx_data_i           : in std_logic_vector(83 downto 0);
-    gbt_rx_ready_i          : in std_logic;
-    gbt_rx_sync_pattern_i   : in std_logic_vector(31 downto 0);
-    gbt_rx_sync_count_req_i : in std_logic_vector(7 downto 0);
-    gbt_rx_sync_done_o      : out std_logic
+    gbt_rx_ready_i          : in std_logic
     
 );
 end link_gbt_rx;
@@ -58,7 +55,7 @@ architecture link_gbt_rx_arch of link_gbt_rx is
         );
     end component;
 
-    type state_t is (SYNC, HEADER, TK_DATA, REG_DATA);
+    type state_t is (HEADER, TK_DATA, REG_DATA);
     
     signal state            : state_t;
     
@@ -68,13 +65,10 @@ architecture link_gbt_rx_arch of link_gbt_rx is
         
     signal evt_valid        : std_logic;
     signal req_valid        : std_logic;
-    signal sync_done        : std_logic := '0';
     
     signal oh_data          : std_logic_vector(31 downto 0);
     
 begin  
-    
-    gbt_rx_sync_done_o <= sync_done;
     
     -- on OH v2b elinks 0, 16, 24, 32 are connected to the FPGA
     oh_data <= gbt_rx_data_i(71 downto 64) & gbt_rx_data_i(55 downto 48) & gbt_rx_data_i(39 downto 32) & gbt_rx_data_i(7 downto 0);
@@ -85,34 +79,26 @@ begin
     begin
         if (rising_edge(ttc_clk_40_i)) then
             if (reset_i = '1') then
-                state <= SYNC;
+                state <= HEADER;
                 tk_counter <= 0;
             else
-                if (gbt_rx_ready_i = '0' or sync_done = '0') then
-                    state <= SYNC;
-                else                
-                    case state is
-                        when SYNC =>
-                            if (sync_done = '1') then
-                                state <= HEADER;
-                            end if;
-                        when HEADER =>
-                            if (oh_data(15 downto 0) = x"BCBC") then
-                                state <= TK_DATA;
-                            end if;
-                            tk_counter <= 0;
-                        when TK_DATA =>
-                            if (tk_counter = 6) then
-                                state <= REG_DATA;
-                            else
-                                tk_counter <= tk_counter + 1;
-                            end if;
-                        when REG_DATA => state <= HEADER;
-                        when others => 
-                            state <= HEADER;
-                            tk_counter <= 0;
-                    end case;
-                end if;
+                case state is
+                    when HEADER =>
+                        if (oh_data(15 downto 0) = x"BCBC") then
+                            state <= TK_DATA;
+                        end if;
+                        tk_counter <= 0;
+                    when TK_DATA =>
+                        if (tk_counter = 6) then
+                            state <= REG_DATA;
+                        else
+                            tk_counter <= tk_counter + 1;
+                        end if;
+                    when REG_DATA => state <= HEADER;
+                    when others => 
+                        state <= HEADER;
+                        tk_counter <= 0;
+                end case;
             end if;
         end if;
     end process;
@@ -129,37 +115,6 @@ begin
                     tk_error_o <= '1';
                 else
                     tk_error_o <= '0';
-                end if;
-            end if;
-        end if;
-    end process;
-
-    --== SYNC ==--
-    
-    process(ttc_clk_40_i)
-        variable sync_word_cnt : unsigned(7 downto 0) := x"00";
-    begin
-        if (rising_edge(ttc_clk_40_i)) then
-            if (reset_i = '1') then
-                sync_done <= '0';
-                sync_word_cnt := x"00";
-            else
-                if (sync_done = '1') then
-                    if (gbt_rx_ready_i = '0') then
-                        sync_done <= '0';
-                        sync_word_cnt := x"00";
-                    else
-                        sync_done <= '1';
-                    end if; 
-                else
-                    if (oh_data = gbt_rx_sync_pattern_i) then
-                        sync_word_cnt := sync_word_cnt + 1;
-                    else
-                        sync_word_cnt := x"00";
-                    end if;
-                end if;
-                if (sync_word_cnt >= unsigned(gbt_rx_sync_count_req_i)) then
-                    sync_done <= '1';
                 end if;
             end if;
         end if;

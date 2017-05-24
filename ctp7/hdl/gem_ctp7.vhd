@@ -84,77 +84,6 @@ end gem_ctp7;
 architecture gem_ctp7_arch of gem_ctp7 is
 
     --============================================================================
-    --                                                      Component declarations
-    --===========================================================================
-    component system is
-        generic(
-            C_DATE_CODE      : std_logic_vector(31 downto 0) := x"00000000";
-            C_GITHASH_CODE   : std_logic_vector(31 downto 0) := x"00000000";
-            C_GIT_REPO_DIRTY : std_logic                     := '0'
-        );
-        port(
-            clk_200_diff_in_clk_p          : in  std_logic;
-            clk_200_diff_in_clk_n          : in  std_logic;
-
-            axi_c2c_v7_to_zynq_data        : out std_logic_vector(14 downto 0);
-            axi_c2c_v7_to_zynq_clk         : out std_logic;
-            axi_c2c_zynq_to_v7_clk         : in  std_logic;
-            axi_c2c_zynq_to_v7_data        : in  std_logic_vector(14 downto 0);
-            axi_c2c_v7_to_zynq_link_status : out std_logic;
-            axi_c2c_zynq_to_v7_reset       : in  std_logic;
-
-            refclk_F_0_p_i                 : in  std_logic_vector(3 downto 0);
-            refclk_F_0_n_i                 : in  std_logic_vector(3 downto 0);
-            refclk_F_1_p_i                 : in  std_logic_vector(3 downto 0);
-            refclk_F_1_n_i                 : in  std_logic_vector(3 downto 0);
-
-            refclk_B_0_p_i                 : in  std_logic_vector(3 downto 1);
-            refclk_B_0_n_i                 : in  std_logic_vector(3 downto 1);
-            refclk_B_1_p_i                 : in  std_logic_vector(3 downto 1);
-            refclk_B_1_n_i                 : in  std_logic_vector(3 downto 1);
-
-            clk_50_o                       : out std_logic;
-            clk_200_o                      : out std_logic;
-
-            ----------------- for GEM ------------------------
-            axi_clk_o                      : out std_logic;
-            axi_reset_o                    : out std_logic;
-            ipb_axi_mosi_o                 : out t_axi_lite_mosi;
-            ipb_axi_miso_i                 : in  t_axi_lite_miso;
-
-            ----------------- TTC ------------------------
-            ttc_clks_i                     : in  t_ttc_clks;
-            ttc_status_i                   : in  t_ttc_status;
-
-            ----------------- GTH ------------------------
-            clk_gth_tx_arr_o               : out std_logic_vector(g_NUM_OF_GTH_GTs - 1 downto 0);
-            clk_gth_rx_arr_o               : out std_logic_vector(g_NUM_OF_GTH_GTs - 1 downto 0);
-            
-            gth_tx_data_arr_i              : in  t_gt_8b10b_tx_data_arr(g_NUM_OF_GTH_GTs - 1 downto 0);
-            gth_rx_data_arr_o              : out t_gt_8b10b_rx_data_arr(g_NUM_OF_GTH_GTs - 1 downto 0);
-            gth_gbt_tx_data_arr_i          : in  t_gt_gbt_tx_data_arr(g_NUM_OF_GTH_GTs-1 downto 0);  
-            gth_gbt_rx_data_arr_o          : out t_gt_gbt_rx_data_arr(g_NUM_OF_GTH_GTs-1 downto 0);
-            
-            gth_gbt_common_rxusrclk_o      : out std_logic;
-            
-            gth_rxreset_arr_o              : out std_logic_vector(g_NUM_OF_GTH_GTs - 1 downto 0);
-            gth_txreset_arr_o              : out std_logic_vector(g_NUM_OF_GTH_GTs - 1 downto 0);
-
-            ----------------- AMC13 DAQLink ------------------------
-            amc13_gth_refclk_p             : in  std_logic;
-            amc13_gth_refclk_n             : in  std_logic;
-            amc_13_gth_rx_n                : in  std_logic;
-            amc_13_gth_rx_p                : in  std_logic;
-            amc13_gth_tx_n                 : out std_logic;
-            amc13_gth_tx_p                 : out std_logic;
-            
-            daq_to_daqlink_i               : in t_daq_to_daqlink;
-            daqlink_to_daq_o               : out t_daqlink_to_daq
-    
-        );
-    end component system;
-
-    --============================================================================
     --                                                         Signal declarations
     --============================================================================
 
@@ -175,8 +104,8 @@ architecture gem_ctp7_arch of gem_ctp7 is
     signal ipb_mosi_arr : ipb_wbus_array(C_NUM_IPB_SLAVES - 1 downto 0);
 
     -------------------------- TTC ---------------------------------
-    signal ttc_clocks   : t_ttc_clks;
-    signal ttc_status   : t_ttc_status;
+    signal ttc_clocks           : t_ttc_clks;
+    signal ttc_clocks_locked    : std_logic;
 
     -------------------------- GTH ---------------------------------
     signal clk_gth_tx_arr       : std_logic_vector(g_NUM_OF_GTH_GTs - 1 downto 0);
@@ -238,7 +167,7 @@ begin
 
     -------------------------- SYSTEM ---------------------------------
 
-    i_system : component system
+    i_system : entity work.system
         --    generic map(
         --      C_DATE_CODE      => C_DATE_CODE,
         --      C_GITHASH_CODE   => C_GITHASH_CODE,
@@ -272,8 +201,10 @@ begin
             ipb_axi_mosi_o                 => ipb_axi_mosi,
             ipb_axi_miso_i                 => ipb_axi_miso,
             
-            ttc_clks_i                     => ttc_clocks,
-            ttc_status_i                   => ttc_status,
+            clk_40_ttc_p_i                 => clk_40_ttc_p_i,
+            clk_40_ttc_n_i                 => clk_40_ttc_n_i,
+            ttc_clks_o                     => ttc_clocks,
+            ttc_clks_locked_o              => ttc_clocks_locked,
             
             clk_gth_tx_arr_o               => clk_gth_tx_arr,
             clk_gth_rx_arr_o               => clk_gth_rx_arr,
@@ -350,12 +281,10 @@ begin
             reset_i                 => '0',
             reset_pwrup_o           => open,
             
-            clk_40_ttc_p_i          => clk_40_ttc_p_i,
-            clk_40_ttc_n_i          => clk_40_ttc_n_i,
             ttc_data_p_i            => ttc_data_p_i,
             ttc_data_n_i            => ttc_data_n_i,
-            ttc_clocks_o            => ttc_clocks,
-            ttc_status_o            => ttc_status,
+            ttc_clocks_i            => ttc_clocks,
+            ttc_clocks_locked_i     => ttc_clocks_locked,
             
             gt_8b10b_rx_clk_arr_i   => gem_gt_8b10b_rx_clk_arr,
             gt_8b10b_tx_clk_arr_i   => gem_gt_8b10b_tx_clk_arr,
@@ -395,7 +324,20 @@ begin
         gem_gt_8b10b_rx_clk_arr(i)  <= clk_gth_rx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).rx);
         gem_gt_8b10b_tx_clk_arr(i)  <= clk_gth_tx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx);
         gem_gt_8b10b_rx_data_arr(i) <= gth_rx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).rx);
-        gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx) <= gem_gt_8b10b_tx_data_arr(i);
+        
+        g_no_gbt_link : if not CFG_USE_GBT generate 
+            gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx) <= gem_gt_8b10b_tx_data_arr(i);
+            gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).tx) <= (others => '0');
+        end generate;
+        
+        g_use_gbt_link : if CFG_USE_GBT generate 
+            gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx).txchardispmode <= (others => '0');
+            gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx).txchardispval <= (others => '0');
+            gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx).txcharisk <= (others => '0');
+            gth_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).track_8b10b_link).tx).txdata <= (others => '0');
+            
+            gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx0data;
+        end generate;
         
         gem_gt_trig0_rx_clk_arr(i)  <= clk_gth_rx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).trig0_rx_link).rx);
         gem_gt_trig0_rx_data_arr(i) <= gth_rx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).trig0_rx_link).rx);
@@ -405,18 +347,21 @@ begin
         gem_gt_gbt_rx_links_arr(i).rx0clk  <= clk_gth_rx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).rx);
         gt_gbt_tx0_clk_arr(i) <= clk_gth_tx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).tx);
         gem_gt_gbt_rx_links_arr(i).rx0data <= gth_gbt_rx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).rx);
-        gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt0_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx0data;
 
         -- the GBT links 1 and 2 only apply for future OH v3 (or test when CFG_USE_3x_GBTs is set to true)
         gem_gt_gbt_rx_links_arr(i).rx1clk  <= clk_gth_rx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt1_link).rx);
         gt_gbt_tx1_clk_arr(i)  <= clk_gth_tx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt1_link).tx);
         gem_gt_gbt_rx_links_arr(i).rx1data <= gth_gbt_rx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt1_link).rx);
-        gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt1_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx1data;
 
         gem_gt_gbt_rx_links_arr(i).rx2clk  <= clk_gth_rx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt2_link).rx);
         gt_gbt_tx2_clk_arr(i)  <= clk_gth_tx_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt2_link).tx);
         gem_gt_gbt_rx_links_arr(i).rx2data <= gth_gbt_rx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt2_link).rx);
-        gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt2_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx2data;
+
+        g_use_fake_3x_gbt : if CFG_USE_3x_GBTs generate
+            gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt1_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx1data;    
+            gth_gbt_tx_data_arr(CFG_CXP_FIBER_TO_GTH_MAP(CFG_OH_LINK_CONFIG_ARR(i).gbt2_link).tx) <= gem_gt_gbt_tx_links_arr(i).tx2data;
+        end generate;
+        
     end generate; 
 
 end gem_ctp7_arch;

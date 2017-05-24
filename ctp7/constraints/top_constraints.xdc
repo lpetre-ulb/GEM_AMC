@@ -482,22 +482,22 @@ create_clock -period 8.333 [get_pins -hier -filter {name=~*gen_gth_single[35].ge
 ############# ############# ############# ############# ############# ############# #############
 ############# ############# False Path Constraints ############# ############# #############
 
-set_clock_groups -asynchronous -group [get_clocks s_clk_40] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
-set_clock_groups -asynchronous -group [get_clocks s_clk_80] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
-set_clock_groups -asynchronous -group [get_clocks s_clk_160] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
-set_clock_groups -asynchronous -group [get_clocks s_clk_120] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
+set_clock_groups -asynchronous -group [get_clocks clk_40] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
+set_clock_groups -asynchronous -group [get_clocks clk_80] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
+set_clock_groups -asynchronous -group [get_clocks clk_160] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
+set_clock_groups -asynchronous -group [get_clocks clk_120] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
 #set_clock_groups -asynchronous -group [get_clocks i_gem/i_ttc/clk_40_ttc_p_i] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
 
 set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/?XOUTCLK}] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0]
-set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/?XOUTCLK}] -group [get_clocks s_clk_160]
-set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/RXOUTCLK}] -group [get_clocks s_clk_40]
+set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/?XOUTCLK}] -group [get_clocks clk_160]
+set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/RXOUTCLK}] -group [get_clocks clk_40]
 set_clock_groups -asynchronous -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/RXOUTCLK}] -group [get_clocks clkout0]
 
 set_clock_groups -asynchronous -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0] -group [get_clocks clkout0]
 
 set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks {i_system/i_gth_wrapper/gen_gth_single[*].*/i_gthe2/?XOUTCLK}]
-#set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks s_clk_160] 
-set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks s_clk_40] 
+#set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks clk_160] 
+set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks clk_40] 
 set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks clk_out2_v7_bd_clk_wiz_0_0] 
 set_clock_groups -asynchronous -group [get_clocks {i_system/i_daqlink/gth_amc13_support_i/gth_amc13_init_i/U0/gth_amc13_1_i/gt0_gth_amc13_1_i/gthe2_i/?XOUTCLK}] -group [get_clocks clkout0]
 
@@ -510,8 +510,8 @@ set_max_delay 16 -from [get_pins -hier -filter {NAME =~ */*/*/scrambler/*/C}] -t
 set_max_delay 16 -from [get_pins -hier -filter {NAME =~ */*/*gbtTx_gen[*].gbtTx/txPhaseMon/DONE*/C}] -to [get_pins -hier -filter {NAME =~ */*/*gbtTx_gen[*].i_sync_gearbox_align*FDE_INST/D}] -datapath_only
 set_max_delay 16 -from [get_pins -hier -filter {NAME =~ */*/*gbtTx_gen[*].gbtTx/txPhaseMon/GOOD*/C}] -to [get_pins -hier -filter {NAME =~ */*/*gbtTx_gen[*].i_sync_gearbox_align*FDE_INST/D}] -datapath_only
 
-#set_clock_groups -asynchronous -group [get_clocks clkout0] -group [get_clocks s_clk_40] #careful with this!
-#set_false_path -from [get_clocks -include_generated_clocks -of_objects [get_pins -hier -filter {i_system/i_gth_wrapper/gen_gth_single[*].gen_gth_4p8g*/i_gthe2*TXOUTCLK}]] -to [get_clocks s_clk_40]
+#set_clock_groups -asynchronous -group [get_clocks clkout0] -group [get_clocks clk_40] #careful with this!
+#set_false_path -from [get_clocks -include_generated_clocks -of_objects [get_pins -hier -filter {i_system/i_gth_wrapper/gen_gth_single[*].gen_gth_4p8g*/i_gthe2*TXOUTCLK}]] -to [get_clocks clk_40]
 
 ############# ############# ############# ############# ############# ############# #############
 ############# ############# AMC13 GTH Constraints ############# ############# #############

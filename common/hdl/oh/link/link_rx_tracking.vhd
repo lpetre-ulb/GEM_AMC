@@ -1,16 +1,12 @@
-----------------------------------------------------------------------------------
--- Company:        IIHE - ULB
--- Engineer:       Thomas Lenzi (thomas.lenzi@cern.ch)
+------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Company: TAMU
+-- Engineer: Evaldas Juska (evaldas.juska@cern.ch, evka85@gmail.com)
 -- 
--- Create Date:    08:37:33 07/07/2015 
--- Design Name:    GLIB v2
--- Module Name:    link_rx_tracking - Behavioral 
--- Project Name:   GLIB v2
--- Target Devices: xc6vlx130t-1ff1156
--- Tool versions:  ISE  P.20131013
--- Description: 
---
-----------------------------------------------------------------------------------
+-- Create Date:    10:43 2017-04-11
+-- Module Name:    LINK_RX_TRACKING
+-- Description:    This module implements the new OHv2 -> backend communication protocol which supports zero suppression.
+--                 More details here: https://indico.cern.ch/event/489183/contributions/1166540/attachments/1233063/1808683/2016-02-23-Mods.pdf
+------------------------------------------------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -18,7 +14,7 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library work;
+use work.gem_pkg.all;
 
 entity link_rx_tracking is
 port(

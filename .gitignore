@@ -10,6 +10,7 @@
 *.o
 .Xil
 
+/bitfiles
 /ctp7/ip/*
 /glib/ip/*
 !*.xcix

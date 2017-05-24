@@ -51,6 +51,7 @@ package sca_pkg is
     end record;
 
     type t_sca_command_array is array(integer range <>) of t_sca_command;
+    type t_sca_reply_array is array(integer range <>) of t_sca_reply;
 
     -- the messages in this array are executed in sequence after SCA CONTOLLER reset followed by SCA chip reset
     constant SCA_CONFIG_SEQUENCE : t_sca_command_array(0 to 6) := (
@@ -88,6 +89,7 @@ package sca_pkg is
         "0" & x"8"  -- Board Temp 9
     );
 
-    type t_sca_adc_value_arr is array(integer range <>) of std_logic_vector(11 downto 0);
+    type t_sca_adc_value_arr is array(SCA_MONITOR_ADC_CHANNELS'range) of std_logic_vector(11 downto 0);
+    type t_sca_adc_value_arr_arr is array(integer range <>) of t_sca_adc_value_arr;
     
 end sca_pkg;

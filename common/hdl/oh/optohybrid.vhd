@@ -40,11 +40,6 @@ entity optohybrid is
         gbt_rx_data_i           : in  std_logic_vector(83 downto 0);
         gbt_tx_data_o           : out std_logic_vector(83 downto 0);
         
-        gbt_tx_sync_pattern_i   : in std_logic_vector(15 downto 0);
-        gbt_rx_sync_pattern_i   : in std_logic_vector(31 downto 0);
-        gbt_rx_sync_count_req_i : in std_logic_vector(7 downto 0);
-        gbt_rx_sync_done_o      : out std_logic;            
-        
         -- Trigger links
         gth_rx_trig_data_i      : in t_gt_8b10b_rx_data_arr(1 downto 0);
         sbit_clusters_o         : out t_oh_sbits;
@@ -84,9 +79,7 @@ architecture optohybrid_arch of optohybrid is
     
     signal evt_en           : std_logic;
     signal evt_data         : std_logic_vector(15 downto 0);
-    
-    --== GBT ==--
-    signal gbt_rx_sync_done  : std_logic := '0';
+
 
     --== debug signals ==--
     
@@ -96,7 +89,6 @@ architecture optohybrid_arch of optohybrid is
 begin
 
     gth_tx_data_o <= gth_tx_data;
-    gbt_rx_sync_done_o <= gbt_rx_sync_done;
 
     g_3g2_fallback_data_clk : if not g_USE_GBT generate
         tk_data_link_o.clk <= ttc_clk_i.clk_160;
@@ -143,9 +135,7 @@ begin
                 req_en_o              => g2o_req_en,
                 req_valid_i           => g2o_req_valid,
                 req_data_i            => g2o_req_data,
-                gbt_tx_data_o         => gbt_tx_data_o,
-                gbt_tx_sync_pattern_i => gbt_tx_sync_pattern_i,
-                gbt_rx_sync_done_i    => gbt_rx_sync_done
+                gbt_tx_data_o         => gbt_tx_data_o
             );
     end generate;
 
@@ -158,16 +148,16 @@ begin
 
         i_link_rx_tracking : entity work.link_rx_tracking
             port map(
-                gtx_clk_i   => ttc_clk_i.clk_160,   
-                reset_i     => reset_i,           
-                req_en_o    => o2g_req_en,   
-                req_data_o  => o2g_req_data,   
-                evt_en_o    => evt_en,
-                evt_data_o  => evt_data,
-                tk_error_o  => tk_error_o,
-                evt_rcvd_o  => tk_evt_received_o,
-                rx_kchar_i  => gth_rx_data_i.rxcharisk(1 downto 0),   
-                rx_data_i   => gth_rx_data_i.rxdata(15 downto 0)        
+                gtx_clk_i       => ttc_clk_i.clk_160,   
+                reset_i         => reset_i,           
+                req_en_o        => o2g_req_en,   
+                req_data_o      => o2g_req_data,   
+                evt_en_o        => evt_en,
+                evt_data_o      => evt_data,
+                tk_error_o      => tk_error_o,
+                evt_rcvd_o      => tk_evt_received_o,
+                rx_kchar_i      => gth_rx_data_i.rxcharisk(1 downto 0),   
+                rx_data_i       => gth_rx_data_i.rxdata(15 downto 0)        
             );
 
     end generate;
@@ -186,10 +176,7 @@ begin
                 tk_error_o              => tk_error_o,
                 evt_rcvd_o              => tk_evt_received_o,
                 gbt_rx_data_i           => gbt_rx_data_i,
-                gbt_rx_ready_i          => gbt_rx_ready_i,
-                gbt_rx_sync_pattern_i   => gbt_rx_sync_pattern_i,
-                gbt_rx_sync_count_req_i => gbt_rx_sync_count_req_i,
-                gbt_rx_sync_done_o      => gbt_rx_sync_done
+                gbt_rx_ready_i          => gbt_rx_ready_i
             );
         
     end generate;    

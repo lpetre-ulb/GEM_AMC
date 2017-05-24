@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="17" Path="/home/evka/code/gem_amc/ctp7/work_dir/gem_amc.xpr">
+<Project Version="7" Minor="17" Path="/home/evka/code/gem_amc.clean_ttc_clk/ctp7/work_dir/gem_amc.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="e1dcef5053524aa7b3f3a5b0dc2878d1"/>
@@ -40,13 +40,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="48"/>
-    <Option Name="WTModelSimExportSim" Val="48"/>
-    <Option Name="WTQuestaExportSim" Val="48"/>
-    <Option Name="WTIesExportSim" Val="48"/>
-    <Option Name="WTVcsExportSim" Val="48"/>
-    <Option Name="WTRivieraExportSim" Val="48"/>
-    <Option Name="WTActivehdlExportSim" Val="48"/>
+    <Option Name="WTXSimExportSim" Val="60"/>
+    <Option Name="WTModelSimExportSim" Val="60"/>
+    <Option Name="WTQuestaExportSim" Val="60"/>
+    <Option Name="WTIesExportSim" Val="60"/>
+    <Option Name="WTVcsExportSim" Val="60"/>
+    <Option Name="WTRivieraExportSim" Val="60"/>
+    <Option Name="WTActivehdlExportSim" Val="60"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -170,26 +170,26 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_bram_ctrl_0_0/v7_bd_axi_bram_ctrl_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_bram_ctrl_drp_0/v7_bd_axi_bram_ctrl_drp_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_clk_wiz_0_0/v7_bd_clk_wiz_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_xbar_0/v7_bd_xbar_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="v7_bd_ooc.xdc"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hdl/v7_bd.vhd"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hw_handoff/v7_bd_bd.tcl"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_proc_sys_reset_0_0/v7_bd_proc_sys_reset_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_chip2chip_0_0/v7_bd_axi_chip2chip_0_0.xci"/>
         <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_interconnect_0_0/v7_bd_axi_interconnect_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_2/v7_bd_auto_pc_2.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_blk_mem_gen_0_0/v7_bd_blk_mem_gen_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_0/v7_bd_auto_pc_0.xci"/>
         <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hdl/v7_bd.hwdef"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_4/v7_bd_auto_pc_4.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hw_handoff/v7_bd.hwh"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_xadc_wiz_0_0/v7_bd_xadc_wiz_0_0.xci"/>
-        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_3/v7_bd_auto_pc_3.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_xbar_0/v7_bd_xbar_0.xci"/>
         <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_bram_ctrl_gth_reg_file_0/v7_bd_axi_bram_ctrl_gth_reg_file_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hw_handoff/v7_bd.hwh"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hw_handoff/v7_bd_bd.tcl"/>
         <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_1/v7_bd_auto_pc_1.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_clk_wiz_0_0/v7_bd_clk_wiz_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_bram_ctrl_drp_0/v7_bd_axi_bram_ctrl_drp_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_xadc_wiz_0_0/v7_bd_xadc_wiz_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_chip2chip_0_0/v7_bd_axi_chip2chip_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_proc_sys_reset_0_0/v7_bd_proc_sys_reset_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_3/v7_bd_auto_pc_3.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_blk_mem_gen_0_0/v7_bd_blk_mem_gen_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_axi_bram_ctrl_0_0/v7_bd_axi_bram_ctrl_0_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_0/v7_bd_auto_pc_0.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="hdl/v7_bd.vhd"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_4/v7_bd_auto_pc_4.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="ip/v7_bd_auto_pc_2/v7_bd_auto_pc_2.xci"/>
+        <CompFileExtendedInfo CompFileName="v7_bd.bd" FileRelPathName="v7_bd_ooc.xdc"/>
       </File>
       <File Path="$PPRDIR/../hdl/ipbus/pkg/ipb_addr_decode.vhd">
         <FileInfo>
@@ -875,6 +875,24 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../common/hdl/utils/clk_phase_check_v7.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../common/hdl/utils/oneshot.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../common/hdl/utils/oneshot_cross_domain.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="gem_ctp7"/>
@@ -1188,26 +1206,6 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="ila_gbt" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_gbt">
-      <File Path="$PPRDIR/../ip/ila_gbt.xcix">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../ip/ila_gbt/ila_gbt.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="ila_gbt"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="gbt_tk_data_fifo" Type="BlockSrcs" RelSrcDir="$PSRCDIR/gbt_tk_data_fifo">
       <File Path="$PPRDIR/../ip/gbt_tk_data_fifo.xcix">
         <FileInfo>
@@ -1285,6 +1283,106 @@
       </File>
       <Config>
         <Option Name="TopModule" Val="daq_input_fifo"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="ila_gbt_clock" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_gbt_clock">
+      <File Path="$PPRDIR/../ip/ila_gbt_clock.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../ip/ila_gbt_clock/ila_gbt_clock.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_gbt_clock"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="ila_clk_phase_check" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_clk_phase_check">
+      <File Path="$PPRDIR/../ip/ila_clk_phase_check.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../ip/ila_clk_phase_check/ila_clk_phase_check.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_clk_phase_check"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="ila_gbt" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_gbt">
+      <File Path="$PPRDIR/../ip/ila_gbt.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../ip/ila_gbt/ila_gbt.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_gbt"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="ila_ttc_clocks" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_ttc_clocks">
+      <File Path="$PPRDIR/../ip/ila_ttc_clocks.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../ip/ila_ttc_clocks/ila_ttc_clocks.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_ttc_clocks"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="vio_ttc_clocks" Type="BlockSrcs" RelSrcDir="$PSRCDIR/vio_ttc_clocks">
+      <File Path="$PPRDIR/../ip/vio_ttc_clocks.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../ip/vio_ttc_clocks/vio_ttc_clocks.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="vio_ttc_clocks"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -1431,14 +1529,6 @@
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="ila_gbt_synth_1" Type="Ft3:Synth" SrcSet="ila_gbt" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_gbt_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
     <Run Id="gbt_tk_data_fifo_synth_1" Type="Ft3:Synth" SrcSet="gbt_tk_data_fifo" Part="xc7vx690tffg1927-2" ConstrsSet="gbt_tk_data_fifo" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/gbt_tk_data_fifo_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
@@ -1464,6 +1554,46 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
     <Run Id="daq_input_fifo_synth_1" Type="Ft3:Synth" SrcSet="daq_input_fifo" Part="xc7vx690tffg1927-2" ConstrsSet="daq_input_fifo" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/daq_input_fifo_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_gbt_clock_synth_1" Type="Ft3:Synth" SrcSet="ila_gbt_clock" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt_clock" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_gbt_clock_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_clk_phase_check_synth_1" Type="Ft3:Synth" SrcSet="ila_clk_phase_check" Part="xc7vx690tffg1927-2" ConstrsSet="ila_clk_phase_check" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_clk_phase_check_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_gbt_synth_1" Type="Ft3:Synth" SrcSet="ila_gbt" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_gbt_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_ttc_clocks_synth_1" Type="Ft3:Synth" SrcSet="ila_ttc_clocks" Part="xc7vx690tffg1927-2" ConstrsSet="ila_ttc_clocks" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_ttc_clocks_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="vio_ttc_clocks_synth_1" Type="Ft3:Synth" SrcSet="vio_ttc_clocks" Part="xc7vx690tffg1927-2" ConstrsSet="vio_ttc_clocks" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/vio_ttc_clocks_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
         <Step Id="synth_design"/>
@@ -1697,21 +1827,6 @@
       </Strategy>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="ila_gbt_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt" Description="Default settings for Implementation." SynthRun="ila_gbt_synth_1" IncludeInArchive="false">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-    </Run>
     <Run Id="gbt_tk_data_fifo_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="gbt_tk_data_fifo" Description="Default settings for Implementation." SynthRun="gbt_tk_data_fifo_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
@@ -1758,6 +1873,81 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
     <Run Id="daq_input_fifo_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="daq_input_fifo" Description="Default settings for Implementation." SynthRun="daq_input_fifo_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_gbt_clock_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt_clock" Description="Default settings for Implementation." SynthRun="ila_gbt_clock_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_clk_phase_check_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_clk_phase_check" Description="Default settings for Implementation." SynthRun="ila_clk_phase_check_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_gbt_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_gbt" Description="Default settings for Implementation." SynthRun="ila_gbt_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_ttc_clocks_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_ttc_clocks" Description="Default settings for Implementation." SynthRun="ila_ttc_clocks_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="vio_ttc_clocks_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="vio_ttc_clocks" Description="Default settings for Implementation." SynthRun="vio_ttc_clocks_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
         <Step Id="init_design"/>

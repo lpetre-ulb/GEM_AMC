@@ -35,10 +35,6 @@ port(
     
     board_id_o                  : out std_logic_vector(15 downto 0);
 
-    gbt_tx_sync_pattern_o       : out std_logic_vector(15 downto 0);
-    gbt_rx_sync_pattern_o       : out std_logic_vector(31 downto 0);
-    gbt_rx_sync_count_req_o     : out std_logic_vector(7 downto 0);
-    
     loopback_gbt_test_en_o      : out std_logic;
     loopback_8b10b_test_en_o    : out std_logic;
     loopback_8b10b_use_trig_o   : out std_logic
@@ -61,20 +57,15 @@ architecture gem_system_regs_arch of gem_system_regs is
     signal use_gbt                  : std_logic;
     signal use_trig_links           : std_logic;
     
-    
-    signal gbt_tx_sync_pattern      : std_logic_vector(15 downto 0);
-    signal gbt_rx_sync_pattern      : std_logic_vector(31 downto 0);
-    signal gbt_rx_sync_count_req    : std_logic_vector(7 downto 0);
-    
     signal loopback_gbt_test_en     : std_logic;
     signal loopback_8b10b_test_en   : std_logic;
     signal loopback_8b10b_use_trig  : std_logic;
     
     --== LEGACY Firmware date and version (taken from GLIB) ==--
     -- TODO: remove legacy firmware date and version once the software is ready 
-    constant c_legacy_sys_ver_year :integer range 0 to 99 :=16;
-    constant c_legacy_sys_ver_month:integer range 0 to 12 :=11;
-    constant c_legacy_sys_ver_day  :integer range 0 to 31 :=11;
+    constant c_legacy_sys_ver_year :integer range 0 to 99 :=17;
+    constant c_legacy_sys_ver_month:integer range 0 to 12 :=05;
+    constant c_legacy_sys_ver_day  :integer range 0 to 31 :=23;
     constant c_legacy_board_id     : std_logic_vector(31 downto 0) := x"474c4942"; -- GLIB
     constant c_legacy_sys_id       : std_logic_vector(31 downto 0) := x"32307631"; -- '2_0_v1'
     
@@ -123,12 +114,7 @@ begin
     --=== TX/RX polarity === --
     tk_rx_polarity_o <= tk_rx_polarity;
     tk_tx_polarity_o <= tk_tx_polarity;
-
-    --=== GBT === --
-    gbt_tx_sync_pattern_o <= gbt_tx_sync_pattern; 
-    gbt_rx_sync_pattern_o <= gbt_rx_sync_pattern;
-    gbt_rx_sync_count_req_o <= gbt_rx_sync_count_req;
-    
+   
     --=== Tests === --
     loopback_gbt_test_en_o <= loopback_gbt_test_en; 
     loopback_8b10b_test_en_o <= loopback_8b10b_test_en;
@@ -171,12 +157,10 @@ begin
     regs_addresses(4)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0004";
     regs_addresses(5)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0005";
     regs_addresses(6)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0100";
-    regs_addresses(7)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0101";
-    regs_addresses(8)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0102";
-    regs_addresses(9)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0200";
-    regs_addresses(10)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0000";
-    regs_addresses(11)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0001";
-    regs_addresses(12)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0002";
+    regs_addresses(7)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '0' & x"0200";
+    regs_addresses(8)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0000";
+    regs_addresses(9)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0001";
+    regs_addresses(10)(REG_GEM_SYSTEM_ADDRESS_MSB downto REG_GEM_SYSTEM_ADDRESS_LSB) <= '1' & x"0002";
 
     -- Connect read signals
     regs_read_arr(0)(REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_MSB downto REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_LSB) <= tk_rx_polarity;
@@ -190,26 +174,20 @@ begin
     regs_read_arr(5)(REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_MSB downto REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_LSB) <= num_of_oh;
     regs_read_arr(5)(REG_GEM_SYSTEM_CONFIG_USE_GBT_BIT) <= use_gbt;
     regs_read_arr(5)(REG_GEM_SYSTEM_CONFIG_USE_TRIG_LINKS_BIT) <= use_trig_links;
-    regs_read_arr(6)(REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_LSB) <= gbt_tx_sync_pattern;
-    regs_read_arr(7)(REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_LSB) <= gbt_rx_sync_pattern;
-    regs_read_arr(8)(REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_LSB) <= gbt_rx_sync_count_req;
-    regs_read_arr(9)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= loopback_gbt_test_en;
-    regs_read_arr(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT) <= loopback_8b10b_test_en;
-    regs_read_arr(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT) <= loopback_8b10b_use_trig;
-    regs_read_arr(10)(REG_GEM_SYSTEM_LEGACY_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_BOARD_ID_LSB) <= legacy_board_id;
-    regs_read_arr(11)(REG_GEM_SYSTEM_LEGACY_SYSTEM_SYSTEM_ID_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_SYSTEM_ID_LSB) <= legacy_sys_id;
-    regs_read_arr(12)(REG_GEM_SYSTEM_LEGACY_SYSTEM_FIRMWARE_VERSION_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_FIRMWARE_VERSION_LSB) <= legacy_fw_version;
+    regs_read_arr(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= loopback_gbt_test_en;
+    regs_read_arr(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT) <= loopback_8b10b_test_en;
+    regs_read_arr(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT) <= loopback_8b10b_use_trig;
+    regs_read_arr(8)(REG_GEM_SYSTEM_LEGACY_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_BOARD_ID_LSB) <= legacy_board_id;
+    regs_read_arr(9)(REG_GEM_SYSTEM_LEGACY_SYSTEM_SYSTEM_ID_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_SYSTEM_ID_LSB) <= legacy_sys_id;
+    regs_read_arr(10)(REG_GEM_SYSTEM_LEGACY_SYSTEM_FIRMWARE_VERSION_MSB downto REG_GEM_SYSTEM_LEGACY_SYSTEM_FIRMWARE_VERSION_LSB) <= legacy_fw_version;
 
     -- Connect write signals
     tk_rx_polarity <= regs_write_arr(0)(REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_MSB downto REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_LSB);
     tk_tx_polarity <= regs_write_arr(1)(REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_MSB downto REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_LSB);
     board_id <= regs_write_arr(2)(REG_GEM_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_BOARD_ID_LSB);
-    gbt_tx_sync_pattern <= regs_write_arr(6)(REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_LSB);
-    gbt_rx_sync_pattern <= regs_write_arr(7)(REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_LSB);
-    gbt_rx_sync_count_req <= regs_write_arr(8)(REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_LSB);
-    loopback_gbt_test_en <= regs_write_arr(9)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT);
-    loopback_8b10b_test_en <= regs_write_arr(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT);
-    loopback_8b10b_use_trig <= regs_write_arr(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT);
+    loopback_gbt_test_en <= regs_write_arr(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT);
+    loopback_8b10b_test_en <= regs_write_arr(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT);
+    loopback_8b10b_use_trig <= regs_write_arr(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT);
 
     -- Connect write pulse signals
     reset_cnt <= regs_write_pulse_arr(6);
@@ -224,21 +202,15 @@ begin
     regs_defaults(0)(REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_MSB downto REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_LSB) <= REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_DEFAULT;
     regs_defaults(1)(REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_MSB downto REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_LSB) <= REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_DEFAULT;
     regs_defaults(2)(REG_GEM_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_BOARD_ID_LSB) <= REG_GEM_SYSTEM_BOARD_ID_DEFAULT;
-    regs_defaults(6)(REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_LSB) <= REG_GEM_SYSTEM_GBT_TX_SYNC_PATTERN_DEFAULT;
-    regs_defaults(7)(REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_LSB) <= REG_GEM_SYSTEM_GBT_RX_SYNC_PATTERN_DEFAULT;
-    regs_defaults(8)(REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_MSB downto REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_LSB) <= REG_GEM_SYSTEM_GBT_RX_SYNC_COUNT_REQUIRED_DEFAULT;
-    regs_defaults(9)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_DEFAULT;
-    regs_defaults(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT) <= REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_DEFAULT;
-    regs_defaults(9)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT) <= REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_DEFAULT;
+    regs_defaults(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_DEFAULT;
+    regs_defaults(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_BIT) <= REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_EN_DEFAULT;
+    regs_defaults(7)(REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_BIT) <= REG_GEM_SYSTEM_TESTS_8B10B_LOOPBACK_USE_TRIG_LINKS_DEFAULT;
 
     -- Define writable regs
     regs_writable_arr(0) <= '1';
     regs_writable_arr(1) <= '1';
     regs_writable_arr(2) <= '1';
-    regs_writable_arr(6) <= '1';
     regs_writable_arr(7) <= '1';
-    regs_writable_arr(8) <= '1';
-    regs_writable_arr(9) <= '1';
 
     --==== Registers end ============================================================================
 

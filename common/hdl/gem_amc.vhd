@@ -36,12 +36,10 @@ entity gem_amc is
         reset_pwrup_o           : out  std_logic;
 
         -- TTC
-        clk_40_ttc_p_i          : in  std_logic;      -- TTC backplane clock signals
-        clk_40_ttc_n_i          : in  std_logic;
+        ttc_clocks_i            : in t_ttc_clks;
+        ttc_clocks_locked_i     : in  std_logic;
         ttc_data_p_i            : in  std_logic;      -- TTC protocol backplane signals
         ttc_data_n_i            : in  std_logic;
-        ttc_clocks_o            : out t_ttc_clks;
-        ttc_status_o            : out t_ttc_status;
         
         -- 8b10b DAQ + Control GTX / GTH links (3.2Gbs, 16bit @ 160MHz w/ 8b10b encoding)
         gt_8b10b_rx_clk_arr_i   : in  std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
@@ -118,7 +116,6 @@ architecture gem_amc_arch of gem_amc is
     signal ipb_reset        : std_logic;
 
     --== TTC signals ==--
-    signal ttc_clocks       : t_ttc_clks;
     signal ttc_cmd          : t_ttc_cmds;
     signal ttc_counters     : t_ttc_daq_cntrs;
     signal ttc_status       : t_ttc_status;
@@ -153,7 +150,6 @@ architecture gem_amc_arch of gem_amc is
     signal gbt_tx_gearbox_align_done_arr: std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
     signal gbt_mgt_tx_data_arr          : t_gt_gbt_tx_data_arr(g_NUM_OF_OHs - 1 downto 0);
     signal gbt_mgt_tx_clk_arr           : std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
-    signal gbt_rx_sync_done_arr         : std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
             
     signal gbt_rx_valid_arr             : std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
     signal gbt_rx_data_arr              : t_gbt_frame_array(g_NUM_OF_OHs - 1 downto 0);
@@ -168,11 +164,6 @@ architecture gem_amc_arch of gem_amc is
     signal gbt_mgt_rx_data_arr          : t_gt_gbt_rx_data_arr(g_NUM_OF_OHs - 1 downto 0);
     signal gbt_mgt_rx_ready_arr         : std_logic_vector(g_NUM_OF_OHs - 1 downto 0);    
     signal gbt_mgt_rx_clk_arr           : std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
-
-    -- GBT communication settings
-    signal gbt_tx_sync_pattern          : std_logic_vector(15 downto 0);
-    signal gbt_rx_sync_pattern          : std_logic_vector(31 downto 0);
-    signal gbt_rx_sync_count_req        : std_logic_vector(7 downto 0);
 
     -- OHv2 GBT links
     signal ohv2_gbt_rx_data_arr         : t_gbt_frame_array(g_NUM_OF_OHs - 1 downto 0);
@@ -221,7 +212,6 @@ begin
     reset_pwrup_o <= reset_pwrup;
     reset <= reset_i or reset_pwrup; -- TODO: Add a global reset from IPbus
     ipb_reset <= ipb_reset_i or reset_pwrup;
-    ttc_clocks_o <= ttc_clocks; 
     ipb_miso_arr_o <= ipb_miso_arr;
 
     g_real_trig_links : if (g_USE_TRIG_LINKS) generate
@@ -244,10 +234,10 @@ begin
     -- Power-on reset  
     --================================--
     
-    process(ttc_clocks.clk_40) -- NOTE: using TTC clock, no nothing will work if there's no TTC clock
+    process(ttc_clocks_i.clk_40) -- NOTE: using TTC clock, no nothing will work if there's no TTC clock
         variable countdown : integer := 40_000_000; -- 1s - probably way too long, but ok for now (this is only used after powerup)
     begin
-        if (rising_edge(ttc_clocks.clk_40)) then
+        if (rising_edge(ttc_clocks_i.clk_40)) then
             if (countdown > 0) then
               reset_pwrup <= '1';
               countdown := countdown - 1;
@@ -263,23 +253,20 @@ begin
 
     i_ttc : entity work.ttc
         port map(
-            reset_i         => reset,
-            clk_40_ttc_p_i  => clk_40_ttc_p_i,
-            clk_40_ttc_n_i  => clk_40_ttc_n_i,
-            ttc_data_p_i    => ttc_data_p_i,
-            ttc_data_n_i    => ttc_data_n_i,
-            ttc_clks_o      => ttc_clocks,
-            ttc_cmds_o      => ttc_cmd,
-            ttc_daq_cntrs_o => ttc_counters,
-            ttc_status_o    => ttc_status,
-            l1a_led_o       => led_l1a_o,
-            ipb_reset_i     => ipb_reset,
-            ipb_clk_i       => ipb_clk_i,
-            ipb_mosi_i      => ipb_mosi_arr_i(C_IPB_SLV.ttc),
-            ipb_miso_o      => ipb_miso_arr(C_IPB_SLV.ttc)
+            reset_i             => reset,
+            ttc_clks_i          => ttc_clocks_i,
+            ttc_clks_locked_i   => ttc_clocks_locked_i,
+            ttc_data_p_i        => ttc_data_p_i,
+            ttc_data_n_i        => ttc_data_n_i,
+            ttc_cmds_o          => ttc_cmd,
+            ttc_daq_cntrs_o     => ttc_counters,
+            ttc_status_o        => ttc_status,
+            l1a_led_o           => led_l1a_o,
+            ipb_reset_i         => ipb_reset,
+            ipb_clk_i           => ipb_clk_i,
+            ipb_mosi_i          => ipb_mosi_arr_i(C_IPB_SLV.ttc),
+            ipb_miso_o          => ipb_miso_arr(C_IPB_SLV.ttc)
         );
-
-    ttc_status_o <= ttc_status;
     
     --================================--
     -- Optohybrids  
@@ -294,7 +281,7 @@ begin
             )
             port map(
                 reset_i                 => reset,
-                ttc_clk_i               => ttc_clocks,
+                ttc_clk_i               => ttc_clocks_i,
                 ttc_cmds_i              => ttc_cmd,
 
                 gth_rx_data_i           => oh_8b10b_rx_data_arr(i),
@@ -304,11 +291,6 @@ begin
                 gbt_rx_data_i           => ohv2_gbt_rx_data_arr(i),
                 gbt_tx_data_o           => ohv2_gbt_tx_data_arr(i),
 
-                gbt_tx_sync_pattern_i   => gbt_tx_sync_pattern,
-                gbt_rx_sync_pattern_i   => gbt_rx_sync_pattern,
-                gbt_rx_sync_count_req_i => gbt_rx_sync_count_req,
-                gbt_rx_sync_done_o      => gbt_rx_sync_done_arr(i),
-                
                 sbit_clusters_o         => sbit_clusters_arr(i), 
                 sbit_links_status_o     => sbit_links_status_arr(i), 
                 gth_rx_trig_data_i      => (oh_trig0_rx_data_arr(i), oh_trig1_rx_data_arr(i)),
@@ -335,7 +317,7 @@ begin
         )
         port map(
             reset_i            => reset,
-            ttc_clk_i          => ttc_clocks,
+            ttc_clk_i          => ttc_clocks_i,
             ttc_cmds_i         => ttc_cmd,
             sbit_clusters_i    => sbit_clusters_arr,
             sbit_link_status_i => sbit_links_status_arr,
@@ -361,7 +343,7 @@ begin
             daq_clk_locked_i => daq_data_clk_locked_i,
             daq_to_daqlink_o => daq_to_daqlink_o,
             daqlink_to_daq_i => daqlink_to_daq_i,
-            ttc_clks_i       => ttc_clocks,
+            ttc_clks_i       => ttc_clocks_i,
             ttc_cmds_i       => ttc_cmd,
             ttc_daq_cntrs_i  => ttc_counters,
             ttc_status_i     => ttc_status,
@@ -384,7 +366,7 @@ begin
 
     i_gem_system : entity work.gem_system_regs
         port map(
-            ttc_clks_i                  => ttc_clocks,            
+            ttc_clks_i                  => ttc_clocks_i,            
             reset_i                     => reset,
             ipb_clk_i                   => ipb_clk_i,
             ipb_reset_i                 => ipb_reset_i,
@@ -393,9 +375,6 @@ begin
             tk_rx_polarity_o            => open,
             tk_tx_polarity_o            => open,
             board_id_o                  => open,
-            gbt_tx_sync_pattern_o       => gbt_tx_sync_pattern,
-            gbt_rx_sync_pattern_o       => gbt_rx_sync_pattern,
-            gbt_rx_sync_count_req_o     => gbt_rx_sync_count_req,       
             loopback_gbt_test_en_o      => loopback_gbt_test_en,
             loopback_8b10b_test_en_o    => loopback_8b10b_test_en,
             loopback_8b10b_use_trig_o   => loopback_8b10b_use_trig
@@ -411,10 +390,9 @@ begin
         )
         port map(
             reset_i                => reset,
-            clk_i                  => ttc_clocks.clk_160,
+            clk_i                  => ttc_clocks_i.clk_160,
 
             oh_link_status_arr_i   => oh_link_status_arr,
-            gbt_rx_sync_done_arr_i => gbt_rx_sync_done_arr,
 
             ipb_reset_i            => ipb_reset_i,
             ipb_clk_i              => ipb_clk_i,
@@ -433,7 +411,7 @@ begin
         )
         port map(
             reset_i                 => reset_i,
-            ttc_clks_i              => ttc_clocks,
+            ttc_clks_i              => ttc_clocks_i,
             gt_8b10b_rx_usrclk_i    => gt_8b10b_rx_clk_arr_i,
             gt_8b10b_tx_usrclk_i    => gt_8b10b_tx_clk_arr_i,
             gt_trig0_rx_usrclk_i    => gt_trig0_rx_clk_arr,
@@ -470,7 +448,7 @@ begin
             )
             port map(
                 reset_i             => reset,
-                ttc_clk_i           => ttc_clocks,
+                ttc_clk_i           => ttc_clocks_i,
                 ttc_cmds_i          => ttc_cmd,
                 gbt_rx_ready_i      => ohv2_gbt_ready_arr,
                 gbt_rx_sca_elinks_i => gbt_rx_sca_data_arr,
@@ -501,8 +479,8 @@ begin
             )
             port map(
                 reset_i                     => reset,
-                tx_frame_clk_i              => ttc_clocks.clk_40,
-                rx_frame_clk_i              => ttc_clocks.clk_40,
+                tx_frame_clk_i              => ttc_clocks_i.clk_40,
+                rx_frame_clk_i              => ttc_clocks_i.clk_40,
                 rx_word_common_clk_i        => gt_gbt_rx_common_clk_i,
                 tx_word_clk_arr_i           => gbt_mgt_tx_clk_arr,
                 rx_word_clk_arr_i           => gbt_mgt_rx_clk_arr,
@@ -541,8 +519,8 @@ begin
                 )
                 port map(
                     reset_i                     => reset,
-                    tx_frame_clk_i              => ttc_clocks.clk_40,
-                    rx_frame_clk_i              => ttc_clocks.clk_40,
+                    tx_frame_clk_i              => ttc_clocks_i.clk_40,
+                    rx_frame_clk_i              => ttc_clocks_i.clk_40,
                     rx_word_common_clk_i        => gt_gbt_rx_common_clk_i,
                     tx_word_clk_arr_i           => gbt_fake_mgt_tx_clk_arr,
                     rx_word_clk_arr_i           => gbt_fake_mgt_rx_clk_arr,
@@ -621,7 +599,7 @@ begin
     
         i_ila_gbt : component ila_gbt
             port map(
-                clk     => ttc_clocks.clk_40,
+                clk     => ttc_clocks_i.clk_40,
                 probe0  => gbt_tx_ic_data_arr(1) & gbt_tx_sca_data_arr(1) & gbt_tx_data_arr(1)(79 downto 0),
                 probe1  => gbt_rx_data_arr(1),
                 probe2  => gbt_tx_gearbox_aligned_arr(1 downto 1),
@@ -648,7 +626,7 @@ begin
         )
         port map(
             reset_i                     => reset_i,
-            ttc_clk_i                   => ttc_clocks,
+            ttc_clk_i                   => ttc_clocks_i,
             ttc_cmds_i                  => ttc_cmd,
             loopback_8b10b_test_en_i    => loopback_8b10b_test_en,
             loopback_gbt_test_en_i      => loopback_gbt_test_en,
@@ -679,14 +657,14 @@ begin
 --
 --    i_8b10b_oh_tx_ila_inst : entity work.gt_tx_link_ila_wrapper
 --        port map(
---            clk_i => ttc_clocks.clk_160,
+--            clk_i => ttc_clocks_i.clk_160,
 --            kchar_i => oh_8b10b_tx_data_arr(0).txcharisk(1 downto 0),
 --            data_i => oh_8b10b_tx_data_arr(0).txdata(15 downto 0)
 --        );    
 --
 --    i_8b10b_test_tx_ila_inst : entity work.gt_tx_link_ila_wrapper
 --        port map(
---            clk_i => ttc_clocks.clk_160,
+--            clk_i => ttc_clocks_i.clk_160,
 --            kchar_i => test_8b10b_tx_data_arr(0).txcharisk(1 downto 0),
 --            data_i => test_8b10b_tx_data_arr(0).txdata(15 downto 0)
 --        );    
@@ -703,7 +681,7 @@ begin
 --           
 --    i_8b10b_oh_rx_ila_inst : entity work.gt_rx_link_ila_wrapper
 --        port map(
---            clk_i => ttc_clocks.clk_160,
+--            clk_i => ttc_clocks_i.clk_160,
 --            kchar_i => oh_8b10b_rx_data_arr(0).rxcharisk(1 downto 0),
 --            comma_i => oh_8b10b_rx_data_arr(0).rxchariscomma(1 downto 0),
 --            not_in_table_i => oh_8b10b_rx_data_arr(0).rxnotintable(1 downto 0),
@@ -713,7 +691,7 @@ begin
 --           
 --    i_8b10b_test_rx_ila_inst : entity work.gt_rx_link_ila_wrapper
 --        port map(
---            clk_i => ttc_clocks.clk_160,
+--            clk_i => ttc_clocks_i.clk_160,
 --            kchar_i => test_8b10b_rx_data_arr(0).rxcharisk(1 downto 0),
 --            comma_i => test_8b10b_rx_data_arr(0).rxchariscomma(1 downto 0),
 --            not_in_table_i => test_8b10b_rx_data_arr(0).rxnotintable(1 downto 0),

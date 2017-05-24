@@ -36,8 +36,8 @@ entity gth_clk_bufs is
     GTH_4p8g_TX_MMCM_reset_i  : in  std_logic;
     GTH_4p8g_TX_MMCM_locked_o : out std_logic;
 
-    ttc_clks_i     : in t_ttc_clks;
-    ttc_status_i   : in t_ttc_status;
+    ttc_clks_i                : in t_ttc_clks;
+    ttc_clks_locked_i         : in std_logic;
 
     refclk_F_0_p_i : in std_logic_vector (3 downto 0);
     refclk_F_0_n_i : in std_logic_vector (3 downto 0);
@@ -58,7 +58,8 @@ entity gth_clk_bufs is
     clk_gth_tx_usrclk_arr_o : out std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
     clk_gth_rx_usrclk_arr_o : out std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
 
-    clk_gth_4p8g_common_rxusrclk_o : out std_logic
+    clk_gth_4p8g_common_rxusrclk_o : out std_logic;
+    clk_gth_4p8g_common_txoutclk_o : out std_logic
 
     );
 end gth_clk_bufs;
@@ -66,43 +67,18 @@ end gth_clk_bufs;
 --============================================================================
 architecture gth_clk_bufs_arch of gth_clk_bufs is
 
-  component GTH_4P8_RAW_CLOCK_MODULE is
-    generic
-      (
-        MULT        : real    := 2.0;
-        DIVIDE      : integer := 2;
-        CLK_PERIOD  : real    := 6.4;
-        OUT0_DIVIDE : real    := 2.0;
-        OUT1_DIVIDE : integer := 2;
-        OUT2_DIVIDE : integer := 2;
-        OUT3_DIVIDE : integer := 2
-        );
-    port
-      (                                 -- Clock in ports
-        CLK_IN          : in  std_logic;
-        -- Clock out ports
-        CLK0_OUT        : out std_logic;
-        CLK1_OUT        : out std_logic;
-        CLK2_OUT        : out std_logic;
-        CLK3_OUT        : out std_logic;
-        -- Status and control signals
-        MMCM_RESET_IN   : in  std_logic;
-        MMCM_LOCKED_OUT : out std_logic
-        );
-  end component;
-
 --============================================================================
 --                                                         Signal declarations
 --============================================================================
 
   signal s_gth_4p8g_txusrclk        : std_logic;
+  signal s_gth_4p8g_txusrclk_90deg  : std_logic;
   signal s_gth_4p8g_txoutclk        : std_logic;
+  signal s_gth_4p8g_txoutclk_bufg   : std_logic;
+  signal s_gth_4p8g_mmcm_locked     : std_logic;
 
   signal s_gth_3p2g_txusrclk        : std_logic;
   signal s_gth_3p2g_txoutclk        : std_logic;
-
-  signal ttc_clks                   : t_ttc_clks;
-  signal ttc_status                 : t_ttc_status;
   
 --============================================================================
 --                                                          Architecture begin
@@ -112,9 +88,10 @@ begin
 
 --============================================================================
 
-  ttc_clks <= ttc_clks_i;
-  ttc_status <= ttc_status_i;
-  GTH_4p8g_TX_MMCM_locked_o <= ttc_status.mmcm_locked;
+  clk_gth_4p8g_common_txoutclk_o <= s_gth_4p8g_txoutclk_bufg;
+  clk_gth_4p8g_common_rxusrclk_o <= ttc_clks_i.clk_120;
+  --GTH_4p8g_TX_MMCM_locked_o <= s_gth_4p8g_mmcm_locked;
+  GTH_4p8g_TX_MMCM_locked_o <= ttc_clks_locked_i;
 
   gen_ibufds_F_clk_gte2 : for i in 0 to 3 generate
 
@@ -171,39 +148,46 @@ begin
 
         s_gth_4p8g_txoutclk <= gth_gt_clk_out_arr_i(n).txoutclk;
 
+        i_bufg_4p8g_tx_outclk : BUFG
+            port map(
+                I => s_gth_4p8g_txoutclk,
+                O => s_gth_4p8g_txoutclk_bufg
+            );
+            
         -- Instantiate a MMCM module to divide the reference clock. Uses internal feedback
         -- for improved jitter performance, and to avoid consuming an additional BUFG
---        txoutclk_mmcm0_i : gth_4p8_raw_CLOCK_MODULE
+--        txoutclk_mmcm0_i : entity work.gth_4p8_raw_CLOCK_MODULE
 --          generic map
 --          (
 --            MULT        => 9.0,
 --            DIVIDE      => 2,
 --            CLK_PERIOD  => 6.25,
 --            OUT0_DIVIDE => 6.0,
---            OUT1_DIVIDE => 1,
+--            OUT1_DIVIDE => 6,
 --            OUT2_DIVIDE => 1,
 --            OUT3_DIVIDE => 1
 --            )
 --          port map
 --          (
---            CLK0_OUT        => s_gth_4p8g_txusrclk,
---            CLK1_OUT        => open,
---            CLK2_OUT        => open,
---            CLK3_OUT        => open,
---            CLK_IN          => s_gth_4p8g_txoutclk,
---            MMCM_LOCKED_OUT => GTH_4p8g_TX_MMCM_locked_o,
---            MMCM_RESET_IN   => GTH_4p8g_TX_MMCM_reset_i
+--            CLK_IN_160          => s_gth_4p8g_txoutclk,
+--            CLK_ALIGN_120       => ttc_clks.clk_120,
+--            CLK_OUT_120         => s_gth_4p8g_txusrclk,
+--            CLK_OUT_120_90deg   => s_gth_4p8g_txusrclk_90deg,
+--            MMCM_LOCKED_OUT     => s_gth_4p8g_mmcm_locked,
+--            MMCM_RESET_IN       => GTH_4p8g_TX_MMCM_reset_i,
+--            MMCM_SHIFT_CNT      => gth_4p8g_mmcm_shift_cnt,
+--            PLL_LOCK_TIME       => gth_4p8_pll_lock_time
 --            );
 
-        i_bufg_4p8g_rx_common_usrclk : BUFG
-            port map(
-                I => gth_gt_clk_out_arr_i(n).rxoutclk,
-                O => clk_gth_4p8g_common_rxusrclk_o
-            );
+--        i_bufg_4p8g_rx_common_usrclk : BUFG
+--            port map(
+--                I => gth_gt_clk_out_arr_i(n).rxoutclk,
+--                O => clk_gth_4p8g_common_rxusrclk_o
+--            );
 
       end generate;
 
-      clk_gth_tx_usrclk_arr_o(n) <= ttc_clks.clk_120; --s_gth_4p8g_txusrclk;
+      clk_gth_tx_usrclk_arr_o(n) <= ttc_clks_i.clk_120; --s_gth_4p8g_txusrclk;
 
     end generate;
 
