@@ -103,8 +103,8 @@ begin
 
     vfat2_t1.lv1a       <= ttc_cmds_i.l1a;
     vfat2_t1.bc0        <= ttc_cmds_i.bc0;
-    vfat2_t1.resync     <= '0';
-    vfat2_t1.calpulse   <= '0';
+    vfat2_t1.resync     <= ttc_cmds_i.resync;
+    vfat2_t1.calpulse   <= ttc_cmds_i.calpulse;
     
     --==========================--
     --==   TX Tracking link   ==--

@@ -30,3 +30,4 @@ Slow control added:
          then lock is never asserted, which will prevent GTH startup from completing and will be clearly visible during FPGA programming.
 -- 1.9.1 using TTC 120MHz as the GBT common RX clock instead of recovered clock from the main link (so all links should work even if link 1 is not connected) 
 -- 1.9.2 separate SCA controlers for each channel implemented. There's also inbuilt ability to broadcast JTAG and custom SCA commands to any set of selected channels
+-- 1.9.3 Added SCA not ready counters (since last SCA reset). This will show if the SCA communication is stable (once established). If yes, we could add an automatic SCA reset + configure after each time the SCA ready goes high after being low.

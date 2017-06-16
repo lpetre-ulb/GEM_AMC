@@ -99,7 +99,7 @@ begin
             else
                 
                 -- whatever the state, the top 4 bits of elink 1 are reserved for TTC
-                gbt_tx_data_o(47 downto 44) <= vfat2_t1_i.lv1a & vfat2_t1_i.bc0 & vfat2_t1_i.resync & vfat2_t1_i.calpulse;
+                gbt_tx_data_o(47 downto 44) <= vfat2_t1_i.lv1a & vfat2_t1_i.calpulse & vfat2_t1_i.resync & vfat2_t1_i.bc0;
                 
                 case state is
                     when FRAME_BEGIN => 

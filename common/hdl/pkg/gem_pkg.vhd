@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20170523";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20170530";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 9;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 4;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -25,7 +25,10 @@ package gem_pkg is
     --       if 0 shifts are applied it's known to result in bad phase, so for now just made that if this happens, 
     --       then lock is never asserted, which will prevent GTH startup from completing and will be clearly visible during FPGA programming.
     -- 1.9.1 using TTC 120MHz as the GBT common RX clock instead of recovered clock from the main link (so all links should work even if link 1 is not connected)
-    -- 1.9.2 separate SCA controlers for each channel implemented. There's also inbuilt ability to broadcast JTAG and custom SCA commands to any set of selected channels 
+    -- 1.9.2 separate SCA controlers for each channel implemented. There's also inbuilt ability to broadcast JTAG and custom SCA commands to any set of selected channels
+    -- 1.9.3 Added SCA not ready counters (since last SCA reset). This will show if the SCA communication is stable (once established). 
+    --       If yes, we could add an automatic SCA reset + configure after each time the SCA ready goes high after being low.
+    -- 1.9.4 Swapped calpulse and bc0 bits in the GBT link because the OH was reading them backwards. Also re-enabled forwarding of resync and calpulse to OH. 
 
     --======================--
     --==      General     ==--
