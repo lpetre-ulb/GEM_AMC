@@ -30,6 +30,7 @@ entity optohybrid is
         -- TTC
         ttc_clk_i               : in  t_ttc_clks;
         ttc_cmds_i              : in  t_ttc_cmds;
+        resync_i                : in  std_logic; -- this is the resync signal that comes from the DAQ module indicating that it's ready to reset (not the initial resync received from the TTC)
         
         -- Control and tracking data link 
         gth_rx_data_i           : in  t_gt_8b10b_rx_data;
@@ -103,7 +104,7 @@ begin
 
     vfat2_t1.lv1a       <= ttc_cmds_i.l1a;
     vfat2_t1.bc0        <= ttc_cmds_i.bc0;
-    vfat2_t1.resync     <= ttc_cmds_i.resync;
+    vfat2_t1.resync     <= resync_i;
     vfat2_t1.calpulse   <= ttc_cmds_i.calpulse;
     
     --==========================--

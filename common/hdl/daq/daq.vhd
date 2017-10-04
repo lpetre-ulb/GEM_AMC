@@ -45,6 +45,8 @@ port(
     ttc_daq_cntrs_i             : in t_ttc_daq_cntrs;
     ttc_status_i                : in t_ttc_status;
 
+    resync_frontend_o           : out std_logic;
+
     -- Track data
     tk_data_links_i             : in t_data_link_array(g_NUM_OF_OHs - 1 downto 0);
     
@@ -144,6 +146,9 @@ architecture Behavioral of daq is
     signal tts_start_cntdwn     : unsigned(7 downto 0) := x"ff";
 
     signal tts_warning_cnt      : std_logic_vector(15 downto 0);
+
+    signal resync_mode          : std_logic := '0'; -- when this signal is asserted it means that we received a resync and we're still processing the L1A fifo and holding TTS in BUSY
+    signal resync_done          : std_logic := '0'; -- when this is asserted it means that L1As have been drained and we're ready to reset the DAQ and tell AMC13 that we're done
 
     -- Error signals transfered to TTS clk domain
     signal tts_chmb_critical_tts_clk    : std_logic := '0'; -- tts_chmb_critical transfered to TTS clock domain
@@ -293,17 +298,15 @@ begin
     -- TODO DAQ main tasks:
     --   * Handle OOS
     --   * Implement buffer status in the AMC header
-    --   * TTS State aggregation
     --   * Check for VFAT and OH BX vs L1A bx mismatches
     --   * Resync handling
-    --   * Stop building events if input fifo is full -- let it drain to some level and only then restart building (otherwise you're pointing to inexisting data). I guess it's better to loose some data than to have something that doesn't make any sense..
 
     --================================--
     -- DAQLink interface
     --================================--
     
     daq_to_daqlink_o.reset <= '0'; -- will need to investigate this later
-    daq_to_daqlink_o.resync <= '0'; -- will need to investigate this later
+    daq_to_daqlink_o.resync <= resync_done;
     daq_to_daqlink_o.trig <= x"00";
     daq_to_daqlink_o.ttc_clk <= ttc_clks_i.clk_40;
     daq_to_daqlink_o.ttc_bc0 <= ttc_cmds_i.bc0;
@@ -315,10 +318,20 @@ begin
     daq_to_daqlink_o.event_trailer <= daqfifo_dout(64);
     daq_to_daqlink_o.event_valid <= daqfifo_valid;
 
+    resync_frontend_o <= resync_done; 
+
     daq_ready <= daqlink_to_daq_i.ready;
     daq_almost_full <= daqlink_to_daq_i.almost_full;
     daq_disper_err_cnt <= daqlink_to_daq_i.disperr_cnt;
     daq_notintable_err_cnt <= daqlink_to_daq_i.notintable_cnt;
+    
+    i_resync_frontend : entity work.oneshot
+        port map(
+            reset_i   => reset_pwrup or reset_global or reset_local,
+            clk_i     => ttc_clks_i.clk_40,
+            input_i   => resync_done,
+            oneshot_o => resync_frontend_o
+        );
     
     --================================--
     -- Resets
@@ -334,7 +347,7 @@ begin
             sync_o  => reset_global
         );
     
-    reset_daq_async <= reset_pwrup or reset_global or reset_local;
+    reset_daq_async <= reset_pwrup or reset_global or reset_local or resync_done;
     reset_daqlink <= reset_pwrup or reset_global or reset_daqlink_ipb;
     
     -- Reset after powerup
@@ -596,12 +609,12 @@ begin
 
     tts_state <= tts_override when (tts_override /= x"0") else
                  x"8" when (daq_enable = '0') else
-                 x"4" when (tts_busy = '1') else
+                 x"4" when (tts_busy = '1' or resync_mode = '1') else
                  x"c" when (tts_critical_error = '1') else
                  x"2" when (tts_out_of_sync = '1') else
                  x"1" when (tts_warning = '1') else
                  x"8"; 
-     
+        
     -- warning counter
     i_tts_warning_counter : entity work.counter
     generic map(
@@ -614,6 +627,25 @@ begin
         en_i      => tts_warning,
         count_o   => tts_warning_cnt
     );
+
+    -- resync handling
+    process(ttc_clks_i.clk_40)
+    begin
+        if (rising_edge(ttc_clks_i.clk_40)) then
+            if (reset_daq = '1') then
+                resync_mode <= '0';
+                resync_done <= '0';
+            else
+                if (ttc_cmds_i.resync = '1') then
+                    resync_mode <= '1';
+                end if;
+                
+                if (resync_mode = '1' and l1afifo_empty = '1' and daq_state = x"0") then
+                    resync_done <= '1';
+                end if;
+            end if;
+        end if;
+    end process;
      
     --================================--
     -- Event shipping to DAQLink

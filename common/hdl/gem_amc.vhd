@@ -119,6 +119,7 @@ architecture gem_amc_arch of gem_amc is
     signal ttc_cmd          : t_ttc_cmds;
     signal ttc_counters     : t_ttc_daq_cntrs;
     signal ttc_status       : t_ttc_status;
+    signal daq_resync_done  : std_logic;
 
     --== DAQ signals ==--    
     signal tk_data_links    : t_data_link_array(g_NUM_OF_OHs - 1 downto 0);
@@ -283,6 +284,7 @@ begin
                 reset_i                 => reset,
                 ttc_clk_i               => ttc_clocks_i,
                 ttc_cmds_i              => ttc_cmd,
+                resync_i                => daq_resync_done,
 
                 gth_rx_data_i           => oh_8b10b_rx_data_arr(i),
                 gth_tx_data_o           => oh_8b10b_tx_data_arr(i),
@@ -338,21 +340,22 @@ begin
             g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ
         )
         port map(
-            reset_i          => reset,
-            daq_clk_i        => daq_data_clk_i,
-            daq_clk_locked_i => daq_data_clk_locked_i,
-            daq_to_daqlink_o => daq_to_daqlink_o,
-            daqlink_to_daq_i => daqlink_to_daq_i,
-            ttc_clks_i       => ttc_clocks_i,
-            ttc_cmds_i       => ttc_cmd,
-            ttc_daq_cntrs_i  => ttc_counters,
-            ttc_status_i     => ttc_status,
-            tk_data_links_i  => tk_data_links,
-            ipb_reset_i      => ipb_reset_i,
-            ipb_clk_i        => ipb_clk_i,
-            ipb_mosi_i       => ipb_mosi_arr_i(C_IPB_SLV.daq),
-            ipb_miso_o       => ipb_miso_arr(C_IPB_SLV.daq),
-            board_sn_i       => board_id_i
+            reset_i             => reset,
+            daq_clk_i           => daq_data_clk_i,
+            daq_clk_locked_i    => daq_data_clk_locked_i,
+            daq_to_daqlink_o    => daq_to_daqlink_o,
+            daqlink_to_daq_i    => daqlink_to_daq_i,
+            ttc_clks_i          => ttc_clocks_i,
+            ttc_cmds_i          => ttc_cmd,
+            ttc_daq_cntrs_i     => ttc_counters,
+            ttc_status_i        => ttc_status,
+            resync_frontend_o   => daq_resync_done,
+            tk_data_links_i     => tk_data_links,
+            ipb_reset_i         => ipb_reset_i,
+            ipb_clk_i           => ipb_clk_i,
+            ipb_mosi_i          => ipb_mosi_arr_i(C_IPB_SLV.daq),
+            ipb_miso_o          => ipb_miso_arr(C_IPB_SLV.daq),
+            board_sn_i          => board_id_i
         );    
 
     ------------ DEBUG - fanout DAQ data from OH1 to all DAQ inputs --------------

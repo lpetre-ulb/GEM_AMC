@@ -13,7 +13,7 @@ mkdir $BASE_DIR/sigasi/gem_ctp7
 
 SCRIPTS_DIR=`pwd`
 cd $BASE_DIR/sigasi/gem_ctp7
-source /opt/Xilinx/Vivado/2016.3/settings64.sh
+source /opt/Xilinx/Vivado/2017.2/settings64.sh
 #generate a list of files in CSV format
 vivado -mode batch -source $HOME/programs/dev/sigasi/SigasiProjectCreator/convertVivadoProjectToCsv.tcl $SCRIPTS_DIR/../ctp7/work_dir/gem_amc.xpr
 
