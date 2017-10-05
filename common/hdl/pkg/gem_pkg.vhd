@@ -12,7 +12,7 @@ package gem_pkg is
 
     constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171005";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 10;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
     constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
     
     ------ Change log ------
@@ -29,7 +29,10 @@ package gem_pkg is
     -- 1.9.3  Added SCA not ready counters (since last SCA reset). This will show if the SCA communication is stable (once established). 
     --        If yes, we could add an automatic SCA reset + configure after each time the SCA ready goes high after being low.
     -- 1.9.4  Swapped calpulse and bc0 bits in the GBT link because the OH was reading them backwards. Also re-enabled forwarding of resync and calpulse to OH.
-    -- 1.10.0 Resync functionality added to the DAQ module. Note that OHs are only sent the resync signal AFTER the DAQ module has drained the buffers and reset. 
+    -- 1.10.0 Resync functionality added to the DAQ module. Note that OHs are only sent the resync signal AFTER the DAQ module has drained the buffers and reset.
+    -- 1.11.0 Added zero suppression option in the DAQ module - it throws away the complete VFAT blocks where channel data is all zero.
+    --        The VFAT payload word count is correctly indicated in the chamber header and trailer, but the zero suppression flags in the chamber header are 
+    --        still not implemented because the VFAT order coming from OH is not guaranteed anyway (so can't tell which VFAT position was skipped anyway)..   
 
     --======================--
     --==      General     ==--
@@ -216,6 +219,7 @@ package gem_pkg is
 
     type t_daq_input_control is record
         eb_timeout_delay        : std_logic_vector(23 downto 0);
+        eb_zero_supression_en   : std_logic;
     end record;
     
     type t_daq_input_control_arr is array(integer range <>) of t_daq_input_control;

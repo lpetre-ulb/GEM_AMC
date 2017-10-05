@@ -898,6 +898,7 @@
         <node id="DAQ_ENABLE" address="0x0" permission="rw" mask="0x1"/>
         <node id="DAQ_LINK_RESET" address="0x0" permission="rw" mask="0x4"/>
         <node id="RESET" address="0x0" permission="rw" mask="0x8"/>
+        <node id="ZERO_SUPPRESSION_EN" address="0x0" permission="rw" mask="0x2"/>
         <node id="TTS_OVERRIDE" address="0x0" permission="rw" mask="0xf0"/>
         <node id="INPUT_ENABLE_MASK" address="0x0" permission="rw" mask="0xffffff00"/>
         <node id="DAV_TIMEOUT" address="0x6" permission="rw" mask="0xffffff"/>

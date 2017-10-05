@@ -2931,6 +2931,10 @@ package registers is
     constant REG_DAQ_CONTROL_DAQ_ENABLE_BIT    : integer := 0;
     constant REG_DAQ_CONTROL_DAQ_ENABLE_DEFAULT : std_logic := '0';
 
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT    : integer := 1;
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_DEFAULT : std_logic := '0';
+
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT    : integer := 2;
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_DEFAULT : std_logic := '0';

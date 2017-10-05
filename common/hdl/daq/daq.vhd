@@ -147,6 +147,7 @@ architecture Behavioral of daq is
 
     signal tts_warning_cnt      : std_logic_vector(15 downto 0);
 
+    -- Resync
     signal resync_mode          : std_logic := '0'; -- when this signal is asserted it means that we received a resync and we're still processing the L1A fifo and holding TTS in BUSY
     signal resync_done          : std_logic := '0'; -- when this is asserted it means that L1As have been drained and we're ready to reset the DAQ and tell AMC13 that we're done
 
@@ -161,6 +162,7 @@ architecture Behavioral of daq is
     signal input_mask           : std_logic_vector(23 downto 0) := x"000000";
     signal run_type             : std_logic_vector(3 downto 0) := x"0"; -- run type (set by software and included in the AMC header)
     signal run_params           : std_logic_vector(23 downto 0) := x"000000"; -- optional run parameters (set by software and included in the AMC header)
+    signal zero_suppression_en  : std_logic;
     
     -- DAQ counters
     signal cnt_sent_events      : unsigned(31 downto 0) := (others => '0');
@@ -547,6 +549,7 @@ begin
             control_i                   => input_control_arr(I)
         );
     
+        input_control_arr(I).eb_zero_supression_en <= zero_suppression_en;
         chmb_evtfifos_empty(I) <= chamber_evtfifos(I).empty;
         chamber_evtfifos(I).rd_en <= chmb_evtfifos_rd_en(I);
         chamber_infifos(I).rd_en <= chmb_infifos_rd_en(I);
@@ -865,8 +868,6 @@ begin
                             e_chmb_mixed_oh_bc                  := chamber_evtfifos(e_input_idx).dout(2);
                             e_chmb_mixed_vfat_bc                := chamber_evtfifos(e_input_idx).dout(1);
                             e_chmb_mixed_vfat_ec                := chamber_evtfifos(e_input_idx).dout(0);
-
-                            daq_curr_vfat_block <= unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) - 3;
                             
                             -- send the data
                             daq_event_data <= x"000000" & -- Zero suppression flags
@@ -895,11 +896,20 @@ begin
                             
                             -- move to the next state
                             e_word_count <= e_word_count + 1;
-                            daq_state <= x"5";
+                            
+                            -- if we do have any VFAT data in this event then go on to send that, otherwise just jump to the chamber trailer
+                            if (unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) /= x"000") then
+                                daq_curr_vfat_block <= unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) - 3;
 
-                            -- read a block from the input fifo
-                            chmb_infifos_rd_en(e_input_idx) <= '1';
-                            daq_curr_block_word <= 2;
+                                -- read a block from the input fifo
+                                chmb_infifos_rd_en(e_input_idx) <= '1';
+                                daq_curr_block_word <= 2;
+                                
+                                daq_state <= x"5";                                
+                            else
+                                daq_state <= x"6";
+                            end if;
+                            
                         
                         else
                         
@@ -1367,6 +1377,7 @@ begin
 
     -- Connect read signals
     regs_read_arr(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT) <= daq_enable;
+    regs_read_arr(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT) <= zero_suppression_en;
     regs_read_arr(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT) <= reset_daqlink_ipb;
     regs_read_arr(0)(REG_DAQ_CONTROL_RESET_BIT) <= reset_local;
     regs_read_arr(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB) <= tts_override;
@@ -1858,6 +1869,7 @@ begin
 
     -- Connect write signals
     daq_enable <= regs_write_arr(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT);
+    zero_suppression_en <= regs_write_arr(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT);
     reset_daqlink_ipb <= regs_write_arr(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT);
     reset_local <= regs_write_arr(0)(REG_DAQ_CONTROL_RESET_BIT);
     tts_override <= regs_write_arr(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB);
@@ -1888,6 +1900,7 @@ begin
 
     -- Defaults
     regs_defaults(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT) <= REG_DAQ_CONTROL_DAQ_ENABLE_DEFAULT;
+    regs_defaults(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT) <= REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT) <= REG_DAQ_CONTROL_DAQ_LINK_RESET_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_RESET_BIT) <= REG_DAQ_CONTROL_RESET_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB) <= REG_DAQ_CONTROL_TTS_OVERRIDE_DEFAULT;
