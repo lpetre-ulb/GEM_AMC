@@ -13,7 +13,7 @@ package gem_pkg is
     constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171005";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 2;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -34,6 +34,7 @@ package gem_pkg is
     --        The VFAT payload word count is correctly indicated in the chamber header and trailer, but the zero suppression flags in the chamber header are 
     --        still not implemented because the VFAT order coming from OH is not guaranteed anyway (so can't tell which VFAT position was skipped anyway)..
     -- 1.11.1 Changed the default value of TTC_HARD_RESET_EN from 1 to 0 (TTC hard resets are not forwarded to OH by default)
+    -- 1.11.2 Fixed a mismatched width bug when checking VFAT data for zero suppression. Extended reset_daq pulse for resync. Debug probes added for resync debugging.
 
     --======================--
     --==      General     ==--

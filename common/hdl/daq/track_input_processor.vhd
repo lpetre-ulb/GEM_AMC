@@ -386,7 +386,7 @@ begin
                     end if;
 
                     -- channel data - check if they're all zero (for zero suppression later on)                    
-                    if ((ep_vfat_word < 12) and (ep_vfat_word > 3) and (tk_data_link_i.data /= x"00")) then
+                    if ((ep_vfat_word < 12) and (ep_vfat_word > 3) and (tk_data_link_i.data /= x"0000")) then
                         ep_zero_packet <= '0';
                     end if;
                     

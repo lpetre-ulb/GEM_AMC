@@ -24,7 +24,8 @@ use work.registers.all;
 entity daq is
 generic(
     g_NUM_OF_OHs         : integer;
-    g_DAQ_CLK_FREQ       : integer
+    g_DAQ_CLK_FREQ       : integer;
+    g_DEBUG              : boolean := false
 );
 port(
 
@@ -83,26 +84,42 @@ architecture Behavioral of daq is
             valid         : out std_logic;
             underflow     : out std_logic;
             prog_full     : out std_logic;
-            rd_data_count : OUT std_logic_vector(12 DOWNTO 0)
+            rd_data_count : out std_logic_vector(12 DOWNTO 0)
         );
     end component daq_l1a_fifo;  
 
     component daq_output_fifo
         port(
-            clk           : IN  STD_LOGIC;
-            rst           : IN  STD_LOGIC;
-            din           : IN  STD_LOGIC_VECTOR(65 DOWNTO 0);
-            wr_en         : IN  STD_LOGIC;
-            rd_en         : IN  STD_LOGIC;
-            dout          : OUT STD_LOGIC_VECTOR(65 DOWNTO 0);
-            full          : OUT STD_LOGIC;
-            empty         : OUT STD_LOGIC;
-            valid         : OUT STD_LOGIC;
-            prog_full     : OUT STD_LOGIC;
-            data_count    : OUT STD_LOGIC_VECTOR(12 DOWNTO 0)
+            clk           : in  std_logic;
+            rst           : in  std_logic;
+            din           : in  std_logic_vector(65 DOWNTO 0);
+            wr_en         : in  std_logic;
+            rd_en         : in  std_logic;
+            dout          : out std_logic_vector(65 DOWNTO 0);
+            full          : out std_logic;
+            empty         : out std_logic;
+            valid         : out std_logic;
+            prog_full     : out std_logic;
+            data_count    : out std_logic_vector(12 DOWNTO 0)
         );
     end component;
 
+    component ila_daq
+        port(
+            clk    : in std_logic;
+            probe0 : in std_logic_vector(3 DOWNTO 0);
+            probe1 : in std_logic_vector(3 DOWNTO 0);
+            probe2 : in std_logic;
+            probe3 : in std_logic;
+            probe4 : in std_logic;
+            probe5 : in std_logic;
+            probe6 : in std_logic;
+            probe7 : in std_logic;
+            probe8 : in std_logic;
+            probe9 : in std_logic
+        );
+    end component;
+    
     --================== SIGNALS ==================--
 
     -- Reset
@@ -320,8 +337,6 @@ begin
     daq_to_daqlink_o.event_trailer <= daqfifo_dout(64);
     daq_to_daqlink_o.event_valid <= daqfifo_valid;
 
-    resync_frontend_o <= resync_done; 
-
     daq_ready <= daqlink_to_daq_i.ready;
     daq_almost_full <= daqlink_to_daq_i.almost_full;
     daq_disper_err_cnt <= daqlink_to_daq_i.disperr_cnt;
@@ -367,12 +382,17 @@ begin
         end if;
     end process;
 
-    process(ttc_clks_i.clk_40)
-    begin
-        if (rising_edge(ttc_clks_i.clk_40)) then
-            reset_daq <= reset_daq_async;
-        end if;
-    end process;
+    i_rst_extend : entity work.pulse_extend
+        generic map(
+            DELAY_CNT_LENGTH => 3
+        )
+        port map(
+            clk_i          => ttc_clks_i.clk_40,
+            rst_i          => '0',
+            pulse_length_i => "111",
+            pulse_i        => reset_daq_async,
+            pulse_o        => reset_daq
+        );
 
     --================================--
     -- DAQ output FIFO
@@ -1038,105 +1058,27 @@ begin
         end if;        
     end process;
 
-    --================================--
-    -- Monitoring & Control
-    --================================--
-    
---    --== DAQ control ==--
---    ipb_read_reg_data(0)(0) <= daq_enable;
---    ipb_read_reg_data(0)(2) <= reset_daqlink_ipb;
---    ipb_read_reg_data(0)(3) <= reset_local;
---    ipb_read_reg_data(0)(7 downto 4) <= tts_override;
---    ipb_read_reg_data(0)(31 downto 8) <= input_mask;
---    
---    daq_enable <= ipb_write_reg_data(0)(0);
---    reset_daqlink_ipb <= ipb_write_reg_data(0)(2);
---    reset_local <= ipb_write_reg_data(0)(3);
---    tts_override <= ipb_write_reg_data(0)(7 downto 4);
---    input_mask <= ipb_write_reg_data(0)(31 downto 8);
---
---    --== DAQ and TTS state ==--
---    ipb_read_reg_data(1) <= tts_state &
---                            l1afifo_empty &
---                            l1afifo_near_full &
---                            l1afifo_full &
---                            l1afifo_underflow &
---                            err_l1afifo_full &
---                            x"0000" & "00" &
---                            ttc_status_i.bc0_status.locked &
---                            daq_almost_full &
---                            ttc_status_i.mmcm_locked & 
---                            daq_clk_locked_i & 
---                            daq_ready;
---
---    --== DAQLink error counters ==--
---    ipb_read_reg_data(2)(15 downto 0) <= daq_notintable_err_cnt;
---    ipb_read_reg_data(3)(15 downto 0) <= daq_disper_err_cnt;
---    
---    --== Number of received triggers (L1A ID) ==--
---    ipb_read_reg_data(4) <= x"00" & ttc_daq_cntrs_i.l1id;
---
---    --== Number of sent events ==--
---    ipb_read_reg_data(5) <= std_logic_vector(cnt_sent_events);
---    
---    --== DAV Timeout ==--
---    ipb_read_reg_data(6)(23 downto 0) <= std_logic_vector(dav_timeout);
---    dav_timeout <= ipb_write_reg_data(6)(23 downto 0);
---
---    --== DAV Timing stats ==--    
---    ipb_read_reg_data(7)(23 downto 0) <= std_logic_vector(max_dav_timer);
---    ipb_read_reg_data(8)(23 downto 0) <= std_logic_vector(last_dav_timer);
---    
---    --== Software settable run type and run parameters ==--
---    ipb_read_reg_data(15)(27 downto 24) <= run_type;
---    ipb_read_reg_data(15)(23 downto 0) <= run_params;
---
---    run_type <= ipb_write_reg_data(15)(27 downto 24);
---    run_params <= ipb_write_reg_data(15)(23 downto 0);    
---
---    --================================--
---    -- IPbus
---    --================================--
---
---    process(ipb_clk_i)       
---    begin    
---        if (rising_edge(ipb_clk_i)) then      
---            if (ipb_reset_i = '1') then    
---                ipb_miso_o <= (ipb_ack => '0', ipb_err => '0', ipb_rdata => (others => '0'));    
---                ipb_state <= IDLE;
---                ipb_reg_sel <= 0;
---                
---                ipb_write_reg_data <= (others => (others => '0'));
---                ipb_write_reg_data(0)(31 downto 8) <= x"000001"; -- enable the first input by default
---                ipb_write_reg_data(6)(23 downto 0) <= x"03d090"; -- default DAV timeout of 10ms
---                
---                for I in 0 to (g_NUM_OF_OHs - 1) loop
---                    ipb_write_reg_data((I+1)*16 + 3)(23 downto 0) <= x"000c35"; -- default DAV timeout of 10ms
---                end loop;
---            else         
---                case ipb_state is
---                    when IDLE =>                    
---                        ipb_reg_sel <= to_integer(unsigned(ipb_mosi_i.ipb_addr(8 downto 0)));
---                        if (ipb_mosi_i.ipb_strobe = '1') then
---                            ipb_state <= RSPD;
---                        end if;
---                    when RSPD =>
---                        ipb_miso_o <= (ipb_ack => '1', ipb_err => '0', ipb_rdata => ipb_read_reg_data(ipb_reg_sel));
---                        if (ipb_mosi_i.ipb_write = '1') then
---                            ipb_write_reg_data(ipb_reg_sel) <= ipb_mosi_i.ipb_wdata;
---                        end if;
---                        ipb_state <= RST;
---                    when RST =>
---                        ipb_miso_o.ipb_ack <= '0';
---                        ipb_state <= IDLE;
---                    when others => 
---                        ipb_miso_o <= (ipb_ack => '0', ipb_err => '0', ipb_rdata => (others => '0'));    
---                        ipb_state <= IDLE;
---                        ipb_reg_sel <= 0;
---                    end case;
---            end if;        
---        end if;        
---    end process;
+    ------------------------- DEBUG -----------------------
+    gen_debug:
+    if g_DEBUG generate
+        
+        i_daq_ila : ila_daq
+            port map(
+                clk    => ttc_clks_i.clk_40,
+                probe0 => std_logic_vector(daq_state),
+                probe1 => tts_state,
+                probe2 => ttc_cmds_i.resync,
+                probe3 => resync_mode,
+                probe4 => resync_done,
+                probe5 => reset_daq_async,
+                probe6 => reset_daq,
+                probe7 => l1afifo_empty,
+                probe8 => daq_almost_full,
+                probe9 => daq_ready
+            );
+        
+    end generate;
+    -------------------------------------------------------
 
     --===============================================================================================
     -- this section is generated by <gem_amc_repo_root>/scripts/generate_registers.py (do not edit) 

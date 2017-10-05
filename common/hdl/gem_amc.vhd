@@ -337,7 +337,8 @@ begin
     i_daq : entity work.daq
         generic map(
             g_NUM_OF_OHs => g_NUM_OF_OHs,
-            g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ
+            g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ,
+            g_DEBUG => true
         )
         port map(
             reset_i             => reset,
