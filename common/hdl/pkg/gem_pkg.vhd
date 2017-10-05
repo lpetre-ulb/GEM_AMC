@@ -13,7 +13,7 @@ package gem_pkg is
     constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171005";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -32,7 +32,8 @@ package gem_pkg is
     -- 1.10.0 Resync functionality added to the DAQ module. Note that OHs are only sent the resync signal AFTER the DAQ module has drained the buffers and reset.
     -- 1.11.0 Added zero suppression option in the DAQ module - it throws away the complete VFAT blocks where channel data is all zero.
     --        The VFAT payload word count is correctly indicated in the chamber header and trailer, but the zero suppression flags in the chamber header are 
-    --        still not implemented because the VFAT order coming from OH is not guaranteed anyway (so can't tell which VFAT position was skipped anyway)..   
+    --        still not implemented because the VFAT order coming from OH is not guaranteed anyway (so can't tell which VFAT position was skipped anyway)..
+    -- 1.11.1 Changed the default value of TTC_HARD_RESET_EN from 1 to 0 (TTC hard resets are not forwarded to OH by default)
 
     --======================--
     --==      General     ==--
