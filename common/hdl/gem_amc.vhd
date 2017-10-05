@@ -338,7 +338,7 @@ begin
         generic map(
             g_NUM_OF_OHs => g_NUM_OF_OHs,
             g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ,
-            g_DEBUG => true
+            g_DEBUG => false
         )
         port map(
             reset_i             => reset,
