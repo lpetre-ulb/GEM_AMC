@@ -596,7 +596,9 @@ def printNodeToUHALFile(node, file, level, baseAddress, baseName, addrOffset, nu
         "GEM_AMC.TRIGGER.STATUS",
         "GEM_AMC.GEM_SYSTEM",
         "GEM_AMC.GEM_TESTS",
-        "GEM_AMC.DAQ",
+        # "GEM_AMC.DAQ.CTRL", # keep this
+        # "GEM_AMC.DAQ.OH<num>", # keep this
+        # "GEM_AMC.DAQ",
         "GEM_AMC.OH_LINKS.CTRL",
         "GEM_AMC.SLOW_CONTROL",
         "GEM_AMC.GLIB_SYSTEM",

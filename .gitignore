@@ -24,4 +24,7 @@ zamiacad
 sigasi*
 scratch
 
+*.pyc
+*.log
+*.xml
 .idea
