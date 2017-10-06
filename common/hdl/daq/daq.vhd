@@ -167,6 +167,7 @@ architecture Behavioral of daq is
     -- Resync
     signal resync_mode          : std_logic := '0'; -- when this signal is asserted it means that we received a resync and we're still processing the L1A fifo and holding TTS in BUSY
     signal resync_done          : std_logic := '0'; -- when this is asserted it means that L1As have been drained and we're ready to reset the DAQ and tell AMC13 that we're done
+    signal resync_done_delayed  : std_logic := '0';
 
     -- Error signals transfered to TTS clk domain
     signal tts_chmb_critical_tts_clk    : std_logic := '0'; -- tts_chmb_critical transfered to TTS clock domain
@@ -325,7 +326,7 @@ begin
     --================================--
     
     daq_to_daqlink_o.reset <= '0'; -- will need to investigate this later
-    daq_to_daqlink_o.resync <= resync_done;
+    daq_to_daqlink_o.resync <= resync_done_delayed;
     daq_to_daqlink_o.trig <= x"00";
     daq_to_daqlink_o.ttc_clk <= ttc_clks_i.clk_40;
     daq_to_daqlink_o.ttc_bc0 <= ttc_cmds_i.bc0;
@@ -346,8 +347,18 @@ begin
         port map(
             reset_i   => reset_pwrup or reset_global or reset_local,
             clk_i     => ttc_clks_i.clk_40,
-            input_i   => resync_done,
+            input_i   => resync_done_delayed,
             oneshot_o => resync_frontend_o
+        );
+    
+    i_resync_delay : entity work.synchronizer
+        generic map(
+            N_STAGES => 4
+        )
+        port map(
+            async_i => resync_done,
+            clk_i   => ttc_clks_i.clk_40,
+            sync_o  => resync_done_delayed
         );
     
     --================================--
@@ -364,7 +375,7 @@ begin
             sync_o  => reset_global
         );
     
-    reset_daq_async <= reset_pwrup or reset_global or reset_local or resync_done;
+    reset_daq_async <= reset_pwrup or reset_global or reset_local or resync_done_delayed;
     reset_daqlink <= reset_pwrup or reset_global or reset_daqlink_ipb;
     
     -- Reset after powerup
@@ -663,7 +674,8 @@ begin
                     resync_mode <= '1';
                 end if;
                 
-                if (resync_mode = '1' and l1afifo_empty = '1' and daq_state = x"0") then
+                -- wait for all L1As to be processed and output buffer drained and then reset everything (resync_done triggers the reset_daq)
+                if (resync_mode = '1' and l1afifo_empty = '1' and daq_state = x"0" and daqfifo_empty = '1') then
                     resync_done <= '1';
                 end if;
             end if;
@@ -1069,7 +1081,7 @@ begin
                 probe1 => tts_state,
                 probe2 => ttc_cmds_i.resync,
                 probe3 => resync_mode,
-                probe4 => resync_done,
+                probe4 => resync_done_delayed,
                 probe5 => reset_daq_async,
                 probe6 => reset_daq,
                 probe7 => l1afifo_empty,
