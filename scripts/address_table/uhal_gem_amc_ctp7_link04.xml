@@ -965,13 +965,15 @@
         <node id="ScanController" address="0x2000" >
           <node id="THLAT" address="0x0" permission="rw" >
             <node id="START" address="0x0" permission="w" />
-            <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
-            <node id="CHIP" address="0x2" permission="rw" mask="0x1f"/>
-            <node id="CHAN" address="0x3" permission="rw" mask="0xff"/>
-            <node id="MIN" address="0x4" permission="rw" mask="0xff"/>
-            <node id="MAX" address="0x5" permission="rw" mask="0xff"/>
-            <node id="STEP" address="0x6" permission="rw" mask="0xff"/>
-            <node id="NTRIGS" address="0x7" permission="rw" mask="0xffffff"/>
+            <node id="CONF" address="0x0" >
+              <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
+              <node id="CHIP" address="0x2" permission="rw" mask="0x1f"/>
+              <node id="CHAN" address="0x3" permission="rw" mask="0xff"/>
+              <node id="MIN" address="0x4" permission="rw" mask="0xff"/>
+              <node id="MAX" address="0x5" permission="rw" mask="0xff"/>
+              <node id="STEP" address="0x6" permission="rw" mask="0xff"/>
+              <node id="NTRIGS" address="0x7" permission="rw" mask="0xffffff"/>
+            </node>
             <node id="RESULTS" address="0x8" permission="r" mode="non-incremental"/>
             <node id="MONITOR" address="0x9" >
               <node id="STATUS" address="0x0" permission="r" mask="0xf"/>
@@ -983,13 +985,15 @@
           </node>
           <node id="ULTRA" address="0xb000" permission="rw" >
             <node id="START" address="0x0" permission="w" />
-            <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
-            <node id="MASK" address="0x2" permission="rw" mask="0xffffff"/>
-            <node id="CHAN" address="0x3" permission="rw" mask="0xff"/>
-            <node id="MIN" address="0x4" permission="rw" mask="0xff"/>
-            <node id="MAX" address="0x5" permission="rw" mask="0xff"/>
-            <node id="STEP" address="0x6" permission="rw" mask="0xff"/>
-            <node id="NTRIGS" address="0x7" permission="rw" mask="0xffffff"/>
+            <node id="CONF" address="0x0" >
+              <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
+              <node id="MASK" address="0x2" permission="rw" mask="0xffffff"/>
+              <node id="CHAN" address="0x3" permission="rw" mask="0xff"/>
+              <node id="MIN" address="0x4" permission="rw" mask="0xff"/>
+              <node id="MAX" address="0x5" permission="rw" mask="0xff"/>
+              <node id="STEP" address="0x6" permission="rw" mask="0xff"/>
+              <node id="NTRIGS" address="0x7" permission="rw" mask="0xffffff"/>
+            </node>
             <node id="RESULTS" address="0x8" >
               <node id="VFAT0" address="0x0" permission="r" mode="non-incremental"/>
               <node id="VFAT1" address="0x1" permission="r" mode="non-incremental"/>
@@ -1026,12 +1030,14 @@
           </node>
           <node id="DAC" address="0x2000" permission="rw" >
             <node id="START" address="0x0" permission="w" />
-            <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
-            <node id="CHIP" address="0x2" permission="rw" mask="0x1f"/>
-            <node id="MIN" address="0x3" permission="rw" mask="0xff"/>
-            <node id="MAX" address="0x4" permission="rw" mask="0xff"/>
-            <node id="STEP" address="0x5" permission="rw" mask="0xff"/>
-            <node id="NTRIGS" address="0x6" permission="rw" mask="0xffffff"/>
+            <node id="CONF" address="0x0" >
+              <node id="MODE" address="0x1" permission="rw" mask="0xf"/>
+              <node id="CHIP" address="0x2" permission="rw" mask="0x1f"/>
+              <node id="MIN" address="0x3" permission="rw" mask="0xff"/>
+              <node id="MAX" address="0x4" permission="rw" mask="0xff"/>
+              <node id="STEP" address="0x5" permission="rw" mask="0xff"/>
+              <node id="NTRIGS" address="0x6" permission="rw" mask="0xffffff"/>
+            </node>
             <node id="RESULTS" address="0x7" permission="r" mode="non-incremental"/>
             <node id="MONITOR" address="0x8" permission="rw" mask="0x1"/>
             <node id="RESET" address="0x9" permission="w" />

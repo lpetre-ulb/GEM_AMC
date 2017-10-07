@@ -563,7 +563,7 @@
                            inserted and timeout flag will be set there, though no VFAT
                            payload will be present). Units = clock cycles @ 25MHz
                            (current DAQLink clk frequency)"
-              fw_signal="dav_timeout" fw_default="0x3d090"/>
+              fw_signal="dav_timeout" fw_default="0x00500"/>
       </node>
 
       <node id="STATUS"  address="0x1"
@@ -691,7 +691,7 @@
                              will close the current event and report it to DAQ. This is one
                              of the two ways to close an event, the other is to get new
                              data with different BX number"
-                fw_signal="input_control_arr(${OH_IDX}).eb_timeout_delay" fw_default="0x0030d4"/>
+                fw_signal="input_control_arr(${OH_IDX}).eb_timeout_delay" fw_default="0x000100"/>
         </node>
 
         <node id="STATUS"  address="0x0">
