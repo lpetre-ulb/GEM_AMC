@@ -145,12 +145,14 @@ architecture Behavioral of track_input_processor is
     signal ep_vfat_block_data       : std_logic_vector(223 downto 0) := (others => '0');
     signal ep_vfat_block_en         : std_logic := '0';
     signal ep_vfat_word             : integer range 0 to 14 := 14;
+    signal ep_zero_packet           : std_logic;
     signal ep_last_ec               : std_logic_vector(7 downto 0) := (others => '0');
     signal ep_last_bc               : std_logic_vector(11 downto 0) := (others => '0');
     signal ep_first_ever_block      : std_logic := '1'; -- it's the first ever event
     signal ep_end_of_event          : std_logic := '0';
     signal ep_last_rx_data          : std_logic_vector(223 downto 0) := (others => '0');
     signal ep_last_rx_data_valid    : std_logic := '0';
+    signal ep_last_rx_data_suppress : std_logic := '0';
     signal ep_invalid_vfat_block    : std_logic := '0';
     
     -- Event builder
@@ -366,6 +368,7 @@ begin
                 ep_vfat_word <= 14;
                 err_vfat_block_too_big <= '0';
                 err_vfat_block_too_small <= '0';
+                ep_zero_packet <= '1';
             else
                 if (tk_data_link_i.data_en = '1') then
                 
@@ -381,6 +384,11 @@ begin
                     else
                         err_vfat_block_too_big <= '1';
                     end if;
+
+                    -- channel data - check if they're all zero (for zero suppression later on)                    
+                    if ((ep_vfat_word < 12) and (ep_vfat_word > 3) and (tk_data_link_i.data /= x"0000")) then
+                        ep_zero_packet <= '0';
+                    end if;
                     
                     -- the last word
                     if (ep_vfat_word = 1) then
@@ -394,6 +402,7 @@ begin
                     -- get ready to read a new block
                     ep_vfat_word <= 14;
                     ep_vfat_block_en <= '0';
+                    ep_zero_packet <= '1';
                 
                     -- if the strobe is off and the vfat word pointer is not at 0 and not at 14 it means that it didn't finish transmitting all 14 VFAT words - not good
                     if ((ep_vfat_word /= 0) and (ep_vfat_word /= 14)) then
@@ -428,11 +437,13 @@ begin
                 ep_last_ec <= (others => '0');
                 ep_last_bc <= (others => '0');
                 ep_first_ever_block <= '1';
+                ep_last_rx_data_suppress <= '0';
             else
 
                 -- fill in last data
                 ep_last_rx_data <= ep_vfat_block_data; -- TOTO Optimization: instead of duplicating all the data you could only retain the OH 32bits, others you can get form infifo_din
                 ep_last_rx_data_valid <= ep_vfat_block_en;
+                ep_last_rx_data_suppress <= ep_zero_packet and control_i.eb_zero_supression_en;
             
                 if (eb_timeout_flag = '1') then
                     ep_first_ever_block <= '1';
@@ -445,8 +456,8 @@ begin
                         err_infifo_full <= '1';
                     end if;
                     
-                    -- push to input FIFO
-                    if (infifo_full = '0') then
+                    -- push to input FIFO if it's not full and we don't zero suppress it
+                    if ((infifo_full = '0') and (ep_zero_packet = '0' or control_i.eb_zero_supression_en = '0')) then
                         infifo_din <= ep_vfat_block_data(191 downto 0);
                         infifo_wr_en <= '1';
                     end if;
@@ -546,8 +557,8 @@ begin
                         eb_invalid_vfat_block <= '1';
                     end if;
                     
-                    -- increment the word counter if the counter is not full yet
-                    if (eb_vfat_words_64 < x"fff") then
+                    -- increment the word counter if the counter is not full yet and we didn't zero suppress this data
+                    if (eb_vfat_words_64 < x"fff") and (ep_last_rx_data_suppress = '0') then
                         eb_vfat_words_64 <= eb_vfat_words_64 + 3;
                     else
                         eb_event_too_big <= '1';
@@ -618,7 +629,11 @@ begin
                         eb_oh_bc <= ep_last_rx_data(223 downto 192);
                         eb_vfat_ec <= ep_last_rx_data(171 downto 164);
                         eb_counters_valid <= '1';
-                        eb_vfat_words_64 <= x"003"; -- minimum number of VFAT blocks = 1 block (3 64bit words)
+                        if (ep_last_rx_data_suppress = '0') then
+                            eb_vfat_words_64 <= x"003"; -- we already have one VFAT block in the next event (that's the one that marked the end of the previous event)
+                        else
+                            eb_vfat_words_64 <= x"000"; -- the current VFAT block which belongs to the next event is zero suppressed
+                        end if;
                     else
                         eb_counters_valid <= '0';
                         eb_vfat_words_64 <= x"000"; -- no data yet after timeout

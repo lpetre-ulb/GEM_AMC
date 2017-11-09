@@ -10,25 +10,32 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20170530";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171006";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 9;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 4;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
     
     ------ Change log ------
-    -- 1.8.6 no gbt sync procedure with oh
-    -- 1.8.7 advanced ILA trigger for gbt link
-    -- 1.8.8 tied unused 8b10b or gbt links to 0
-    -- 1.8.9 disable automatic phase shifting, just use unknown phase from 160MHz ref clock, also use bufg for the MMCM feedback clock
-    -- 1.8.9 special version with 8b10b main link moved to OH2 and longer IPBusBridge timeout (comms with OH are perfect, but can't read VFATs at all)
-    -- 1.9.0 fixed TX phase alignment, removed MMCM reset (was driven by the GTH startup FSM and messing things up).
-    --       if 0 shifts are applied it's known to result in bad phase, so for now just made that if this happens, 
-    --       then lock is never asserted, which will prevent GTH startup from completing and will be clearly visible during FPGA programming.
-    -- 1.9.1 using TTC 120MHz as the GBT common RX clock instead of recovered clock from the main link (so all links should work even if link 1 is not connected)
-    -- 1.9.2 separate SCA controlers for each channel implemented. There's also inbuilt ability to broadcast JTAG and custom SCA commands to any set of selected channels
-    -- 1.9.3 Added SCA not ready counters (since last SCA reset). This will show if the SCA communication is stable (once established). 
-    --       If yes, we could add an automatic SCA reset + configure after each time the SCA ready goes high after being low.
-    -- 1.9.4 Swapped calpulse and bc0 bits in the GBT link because the OH was reading them backwards. Also re-enabled forwarding of resync and calpulse to OH. 
+    -- 1.8.6  no gbt sync procedure with oh
+    -- 1.8.7  advanced ILA trigger for gbt link
+    -- 1.8.8  tied unused 8b10b or gbt links to 0
+    -- 1.8.9  disable automatic phase shifting, just use unknown phase from 160MHz ref clock, also use bufg for the MMCM feedback clock
+    -- 1.8.9  special version with 8b10b main link moved to OH2 and longer IPBusBridge timeout (comms with OH are perfect, but can't read VFATs at all)
+    -- 1.9.0  fixed TX phase alignment, removed MMCM reset (was driven by the GTH startup FSM and messing things up).
+    --        if 0 shifts are applied it's known to result in bad phase, so for now just made that if this happens, 
+    --        then lock is never asserted, which will prevent GTH startup from completing and will be clearly visible during FPGA programming.
+    -- 1.9.1  using TTC 120MHz as the GBT common RX clock instead of recovered clock from the main link (so all links should work even if link 1 is not connected)
+    -- 1.9.2  separate SCA controlers for each channel implemented. There's also inbuilt ability to broadcast JTAG and custom SCA commands to any set of selected channels
+    -- 1.9.3  Added SCA not ready counters (since last SCA reset). This will show if the SCA communication is stable (once established). 
+    --        If yes, we could add an automatic SCA reset + configure after each time the SCA ready goes high after being low.
+    -- 1.9.4  Swapped calpulse and bc0 bits in the GBT link because the OH was reading them backwards. Also re-enabled forwarding of resync and calpulse to OH.
+    -- 1.10.0 Resync functionality added to the DAQ module. Note that OHs are only sent the resync signal AFTER the DAQ module has drained the buffers and reset.
+    -- 1.11.0 Added zero suppression option in the DAQ module - it throws away the complete VFAT blocks where channel data is all zero.
+    --        The VFAT payload word count is correctly indicated in the chamber header and trailer, but the zero suppression flags in the chamber header are 
+    --        still not implemented because the VFAT order coming from OH is not guaranteed anyway (so can't tell which VFAT position was skipped anyway)..
+    -- 1.11.1 Changed the default value of TTC_HARD_RESET_EN from 1 to 0 (TTC hard resets are not forwarded to OH by default)
+    -- 1.11.2 Fixed a mismatched width bug when checking VFAT data for zero suppression. Extended reset_daq pulse for resync. Debug probes added for resync debugging.
+    -- 1.11.3 Fixed a bug in resync procedure - has to also wait for DAQ output FIFO to drain before doing the reset
 
     --======================--
     --==      General     ==--
@@ -215,6 +222,7 @@ package gem_pkg is
 
     type t_daq_input_control is record
         eb_timeout_delay        : std_logic_vector(23 downto 0);
+        eb_zero_supression_en   : std_logic;
     end record;
     
     type t_daq_input_control_arr is array(integer range <>) of t_daq_input_control;

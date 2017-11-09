@@ -24,7 +24,8 @@ use work.registers.all;
 entity daq is
 generic(
     g_NUM_OF_OHs         : integer;
-    g_DAQ_CLK_FREQ       : integer
+    g_DAQ_CLK_FREQ       : integer;
+    g_DEBUG              : boolean := false
 );
 port(
 
@@ -44,6 +45,8 @@ port(
     ttc_cmds_i                  : in t_ttc_cmds;
     ttc_daq_cntrs_i             : in t_ttc_daq_cntrs;
     ttc_status_i                : in t_ttc_status;
+
+    resync_frontend_o           : out std_logic;
 
     -- Track data
     tk_data_links_i             : in t_data_link_array(g_NUM_OF_OHs - 1 downto 0);
@@ -81,26 +84,42 @@ architecture Behavioral of daq is
             valid         : out std_logic;
             underflow     : out std_logic;
             prog_full     : out std_logic;
-            rd_data_count : OUT std_logic_vector(12 DOWNTO 0)
+            rd_data_count : out std_logic_vector(12 DOWNTO 0)
         );
     end component daq_l1a_fifo;  
 
     component daq_output_fifo
         port(
-            clk           : IN  STD_LOGIC;
-            rst           : IN  STD_LOGIC;
-            din           : IN  STD_LOGIC_VECTOR(65 DOWNTO 0);
-            wr_en         : IN  STD_LOGIC;
-            rd_en         : IN  STD_LOGIC;
-            dout          : OUT STD_LOGIC_VECTOR(65 DOWNTO 0);
-            full          : OUT STD_LOGIC;
-            empty         : OUT STD_LOGIC;
-            valid         : OUT STD_LOGIC;
-            prog_full     : OUT STD_LOGIC;
-            data_count    : OUT STD_LOGIC_VECTOR(12 DOWNTO 0)
+            clk           : in  std_logic;
+            rst           : in  std_logic;
+            din           : in  std_logic_vector(65 DOWNTO 0);
+            wr_en         : in  std_logic;
+            rd_en         : in  std_logic;
+            dout          : out std_logic_vector(65 DOWNTO 0);
+            full          : out std_logic;
+            empty         : out std_logic;
+            valid         : out std_logic;
+            prog_full     : out std_logic;
+            data_count    : out std_logic_vector(12 DOWNTO 0)
         );
     end component;
 
+    component ila_daq
+        port(
+            clk    : in std_logic;
+            probe0 : in std_logic_vector(3 DOWNTO 0);
+            probe1 : in std_logic_vector(3 DOWNTO 0);
+            probe2 : in std_logic;
+            probe3 : in std_logic;
+            probe4 : in std_logic;
+            probe5 : in std_logic;
+            probe6 : in std_logic;
+            probe7 : in std_logic;
+            probe8 : in std_logic;
+            probe9 : in std_logic
+        );
+    end component;
+    
     --================== SIGNALS ==================--
 
     -- Reset
@@ -145,6 +164,11 @@ architecture Behavioral of daq is
 
     signal tts_warning_cnt      : std_logic_vector(15 downto 0);
 
+    -- Resync
+    signal resync_mode          : std_logic := '0'; -- when this signal is asserted it means that we received a resync and we're still processing the L1A fifo and holding TTS in BUSY
+    signal resync_done          : std_logic := '0'; -- when this is asserted it means that L1As have been drained and we're ready to reset the DAQ and tell AMC13 that we're done
+    signal resync_done_delayed  : std_logic := '0';
+
     -- Error signals transfered to TTS clk domain
     signal tts_chmb_critical_tts_clk    : std_logic := '0'; -- tts_chmb_critical transfered to TTS clock domain
     signal tts_chmb_warning_tts_clk     : std_logic := '0'; -- tts_chmb_warning transfered to TTS clock domain
@@ -156,6 +180,7 @@ architecture Behavioral of daq is
     signal input_mask           : std_logic_vector(23 downto 0) := x"000000";
     signal run_type             : std_logic_vector(3 downto 0) := x"0"; -- run type (set by software and included in the AMC header)
     signal run_params           : std_logic_vector(23 downto 0) := x"000000"; -- optional run parameters (set by software and included in the AMC header)
+    signal zero_suppression_en  : std_logic;
     
     -- DAQ counters
     signal cnt_sent_events      : unsigned(31 downto 0) := (others => '0');
@@ -293,17 +318,15 @@ begin
     -- TODO DAQ main tasks:
     --   * Handle OOS
     --   * Implement buffer status in the AMC header
-    --   * TTS State aggregation
     --   * Check for VFAT and OH BX vs L1A bx mismatches
     --   * Resync handling
-    --   * Stop building events if input fifo is full -- let it drain to some level and only then restart building (otherwise you're pointing to inexisting data). I guess it's better to loose some data than to have something that doesn't make any sense..
 
     --================================--
     -- DAQLink interface
     --================================--
     
     daq_to_daqlink_o.reset <= '0'; -- will need to investigate this later
-    daq_to_daqlink_o.resync <= '0'; -- will need to investigate this later
+    daq_to_daqlink_o.resync <= resync_done_delayed;
     daq_to_daqlink_o.trig <= x"00";
     daq_to_daqlink_o.ttc_clk <= ttc_clks_i.clk_40;
     daq_to_daqlink_o.ttc_bc0 <= ttc_cmds_i.bc0;
@@ -320,6 +343,24 @@ begin
     daq_disper_err_cnt <= daqlink_to_daq_i.disperr_cnt;
     daq_notintable_err_cnt <= daqlink_to_daq_i.notintable_cnt;
     
+    i_resync_frontend : entity work.oneshot
+        port map(
+            reset_i   => reset_pwrup or reset_global or reset_local,
+            clk_i     => ttc_clks_i.clk_40,
+            input_i   => resync_done_delayed,
+            oneshot_o => resync_frontend_o
+        );
+    
+    i_resync_delay : entity work.synchronizer
+        generic map(
+            N_STAGES => 4
+        )
+        port map(
+            async_i => resync_done,
+            clk_i   => ttc_clks_i.clk_40,
+            sync_o  => resync_done_delayed
+        );
+    
     --================================--
     -- Resets
     --================================--
@@ -334,7 +375,7 @@ begin
             sync_o  => reset_global
         );
     
-    reset_daq_async <= reset_pwrup or reset_global or reset_local;
+    reset_daq_async <= reset_pwrup or reset_global or reset_local or resync_done_delayed;
     reset_daqlink <= reset_pwrup or reset_global or reset_daqlink_ipb;
     
     -- Reset after powerup
@@ -352,12 +393,17 @@ begin
         end if;
     end process;
 
-    process(ttc_clks_i.clk_40)
-    begin
-        if (rising_edge(ttc_clks_i.clk_40)) then
-            reset_daq <= reset_daq_async;
-        end if;
-    end process;
+    i_rst_extend : entity work.pulse_extend
+        generic map(
+            DELAY_CNT_LENGTH => 3
+        )
+        port map(
+            clk_i          => ttc_clks_i.clk_40,
+            rst_i          => '0',
+            pulse_length_i => "111",
+            pulse_i        => reset_daq_async,
+            pulse_o        => reset_daq
+        );
 
     --================================--
     -- DAQ output FIFO
@@ -534,6 +580,7 @@ begin
             control_i                   => input_control_arr(I)
         );
     
+        input_control_arr(I).eb_zero_supression_en <= zero_suppression_en;
         chmb_evtfifos_empty(I) <= chamber_evtfifos(I).empty;
         chamber_evtfifos(I).rd_en <= chmb_evtfifos_rd_en(I);
         chamber_infifos(I).rd_en <= chmb_infifos_rd_en(I);
@@ -596,12 +643,12 @@ begin
 
     tts_state <= tts_override when (tts_override /= x"0") else
                  x"8" when (daq_enable = '0') else
-                 x"4" when (tts_busy = '1') else
+                 x"4" when (tts_busy = '1' or resync_mode = '1') else
                  x"c" when (tts_critical_error = '1') else
                  x"2" when (tts_out_of_sync = '1') else
                  x"1" when (tts_warning = '1') else
                  x"8"; 
-     
+        
     -- warning counter
     i_tts_warning_counter : entity work.counter
     generic map(
@@ -614,6 +661,26 @@ begin
         en_i      => tts_warning,
         count_o   => tts_warning_cnt
     );
+
+    -- resync handling
+    process(ttc_clks_i.clk_40)
+    begin
+        if (rising_edge(ttc_clks_i.clk_40)) then
+            if (reset_daq = '1') then
+                resync_mode <= '0';
+                resync_done <= '0';
+            else
+                if (ttc_cmds_i.resync = '1') then
+                    resync_mode <= '1';
+                end if;
+                
+                -- wait for all L1As to be processed and output buffer drained and then reset everything (resync_done triggers the reset_daq)
+                if (resync_mode = '1' and l1afifo_empty = '1' and daq_state = x"0" and daqfifo_empty = '1') then
+                    resync_done <= '1';
+                end if;
+            end if;
+        end if;
+    end process;
      
     --================================--
     -- Event shipping to DAQLink
@@ -833,8 +900,6 @@ begin
                             e_chmb_mixed_oh_bc                  := chamber_evtfifos(e_input_idx).dout(2);
                             e_chmb_mixed_vfat_bc                := chamber_evtfifos(e_input_idx).dout(1);
                             e_chmb_mixed_vfat_ec                := chamber_evtfifos(e_input_idx).dout(0);
-
-                            daq_curr_vfat_block <= unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) - 3;
                             
                             -- send the data
                             daq_event_data <= x"000000" & -- Zero suppression flags
@@ -863,11 +928,20 @@ begin
                             
                             -- move to the next state
                             e_word_count <= e_word_count + 1;
-                            daq_state <= x"5";
+                            
+                            -- if we do have any VFAT data in this event then go on to send that, otherwise just jump to the chamber trailer
+                            if (unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) /= x"000") then
+                                daq_curr_vfat_block <= unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12)) - 3;
 
-                            -- read a block from the input fifo
-                            chmb_infifos_rd_en(e_input_idx) <= '1';
-                            daq_curr_block_word <= 2;
+                                -- read a block from the input fifo
+                                chmb_infifos_rd_en(e_input_idx) <= '1';
+                                daq_curr_block_word <= 2;
+                                
+                                daq_state <= x"5";                                
+                            else
+                                daq_state <= x"6";
+                            end if;
+                            
                         
                         else
                         
@@ -996,105 +1070,27 @@ begin
         end if;        
     end process;
 
-    --================================--
-    -- Monitoring & Control
-    --================================--
-    
---    --== DAQ control ==--
---    ipb_read_reg_data(0)(0) <= daq_enable;
---    ipb_read_reg_data(0)(2) <= reset_daqlink_ipb;
---    ipb_read_reg_data(0)(3) <= reset_local;
---    ipb_read_reg_data(0)(7 downto 4) <= tts_override;
---    ipb_read_reg_data(0)(31 downto 8) <= input_mask;
---    
---    daq_enable <= ipb_write_reg_data(0)(0);
---    reset_daqlink_ipb <= ipb_write_reg_data(0)(2);
---    reset_local <= ipb_write_reg_data(0)(3);
---    tts_override <= ipb_write_reg_data(0)(7 downto 4);
---    input_mask <= ipb_write_reg_data(0)(31 downto 8);
---
---    --== DAQ and TTS state ==--
---    ipb_read_reg_data(1) <= tts_state &
---                            l1afifo_empty &
---                            l1afifo_near_full &
---                            l1afifo_full &
---                            l1afifo_underflow &
---                            err_l1afifo_full &
---                            x"0000" & "00" &
---                            ttc_status_i.bc0_status.locked &
---                            daq_almost_full &
---                            ttc_status_i.mmcm_locked & 
---                            daq_clk_locked_i & 
---                            daq_ready;
---
---    --== DAQLink error counters ==--
---    ipb_read_reg_data(2)(15 downto 0) <= daq_notintable_err_cnt;
---    ipb_read_reg_data(3)(15 downto 0) <= daq_disper_err_cnt;
---    
---    --== Number of received triggers (L1A ID) ==--
---    ipb_read_reg_data(4) <= x"00" & ttc_daq_cntrs_i.l1id;
---
---    --== Number of sent events ==--
---    ipb_read_reg_data(5) <= std_logic_vector(cnt_sent_events);
---    
---    --== DAV Timeout ==--
---    ipb_read_reg_data(6)(23 downto 0) <= std_logic_vector(dav_timeout);
---    dav_timeout <= ipb_write_reg_data(6)(23 downto 0);
---
---    --== DAV Timing stats ==--    
---    ipb_read_reg_data(7)(23 downto 0) <= std_logic_vector(max_dav_timer);
---    ipb_read_reg_data(8)(23 downto 0) <= std_logic_vector(last_dav_timer);
---    
---    --== Software settable run type and run parameters ==--
---    ipb_read_reg_data(15)(27 downto 24) <= run_type;
---    ipb_read_reg_data(15)(23 downto 0) <= run_params;
---
---    run_type <= ipb_write_reg_data(15)(27 downto 24);
---    run_params <= ipb_write_reg_data(15)(23 downto 0);    
---
---    --================================--
---    -- IPbus
---    --================================--
---
---    process(ipb_clk_i)       
---    begin    
---        if (rising_edge(ipb_clk_i)) then      
---            if (ipb_reset_i = '1') then    
---                ipb_miso_o <= (ipb_ack => '0', ipb_err => '0', ipb_rdata => (others => '0'));    
---                ipb_state <= IDLE;
---                ipb_reg_sel <= 0;
---                
---                ipb_write_reg_data <= (others => (others => '0'));
---                ipb_write_reg_data(0)(31 downto 8) <= x"000001"; -- enable the first input by default
---                ipb_write_reg_data(6)(23 downto 0) <= x"03d090"; -- default DAV timeout of 10ms
---                
---                for I in 0 to (g_NUM_OF_OHs - 1) loop
---                    ipb_write_reg_data((I+1)*16 + 3)(23 downto 0) <= x"000c35"; -- default DAV timeout of 10ms
---                end loop;
---            else         
---                case ipb_state is
---                    when IDLE =>                    
---                        ipb_reg_sel <= to_integer(unsigned(ipb_mosi_i.ipb_addr(8 downto 0)));
---                        if (ipb_mosi_i.ipb_strobe = '1') then
---                            ipb_state <= RSPD;
---                        end if;
---                    when RSPD =>
---                        ipb_miso_o <= (ipb_ack => '1', ipb_err => '0', ipb_rdata => ipb_read_reg_data(ipb_reg_sel));
---                        if (ipb_mosi_i.ipb_write = '1') then
---                            ipb_write_reg_data(ipb_reg_sel) <= ipb_mosi_i.ipb_wdata;
---                        end if;
---                        ipb_state <= RST;
---                    when RST =>
---                        ipb_miso_o.ipb_ack <= '0';
---                        ipb_state <= IDLE;
---                    when others => 
---                        ipb_miso_o <= (ipb_ack => '0', ipb_err => '0', ipb_rdata => (others => '0'));    
---                        ipb_state <= IDLE;
---                        ipb_reg_sel <= 0;
---                    end case;
---            end if;        
---        end if;        
---    end process;
+    ------------------------- DEBUG -----------------------
+    gen_debug:
+    if g_DEBUG generate
+        
+        i_daq_ila : ila_daq
+            port map(
+                clk    => ttc_clks_i.clk_40,
+                probe0 => std_logic_vector(daq_state),
+                probe1 => tts_state,
+                probe2 => ttc_cmds_i.resync,
+                probe3 => resync_mode,
+                probe4 => resync_done_delayed,
+                probe5 => reset_daq_async,
+                probe6 => reset_daq,
+                probe7 => l1afifo_empty,
+                probe8 => daq_almost_full,
+                probe9 => daq_ready
+            );
+        
+    end generate;
+    -------------------------------------------------------
 
     --===============================================================================================
     -- this section is generated by <gem_amc_repo_root>/scripts/generate_registers.py (do not edit) 
@@ -1335,6 +1331,7 @@ begin
 
     -- Connect read signals
     regs_read_arr(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT) <= daq_enable;
+    regs_read_arr(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT) <= zero_suppression_en;
     regs_read_arr(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT) <= reset_daqlink_ipb;
     regs_read_arr(0)(REG_DAQ_CONTROL_RESET_BIT) <= reset_local;
     regs_read_arr(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB) <= tts_override;
@@ -1826,6 +1823,7 @@ begin
 
     -- Connect write signals
     daq_enable <= regs_write_arr(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT);
+    zero_suppression_en <= regs_write_arr(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT);
     reset_daqlink_ipb <= regs_write_arr(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT);
     reset_local <= regs_write_arr(0)(REG_DAQ_CONTROL_RESET_BIT);
     tts_override <= regs_write_arr(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB);
@@ -1856,6 +1854,7 @@ begin
 
     -- Defaults
     regs_defaults(0)(REG_DAQ_CONTROL_DAQ_ENABLE_BIT) <= REG_DAQ_CONTROL_DAQ_ENABLE_DEFAULT;
+    regs_defaults(0)(REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT) <= REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT) <= REG_DAQ_CONTROL_DAQ_LINK_RESET_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_RESET_BIT) <= REG_DAQ_CONTROL_RESET_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB) <= REG_DAQ_CONTROL_TTS_OVERRIDE_DEFAULT;

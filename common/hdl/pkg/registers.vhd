@@ -2931,6 +2931,10 @@ package registers is
     constant REG_DAQ_CONTROL_DAQ_ENABLE_BIT    : integer := 0;
     constant REG_DAQ_CONTROL_DAQ_ENABLE_DEFAULT : std_logic := '0';
 
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT    : integer := 1;
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_DEFAULT : std_logic := '0';
+
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT    : integer := 2;
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_DEFAULT : std_logic := '0';
@@ -3005,7 +3009,7 @@ package registers is
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"03d090";
+    constant REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000500";
 
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_ADDR    : std_logic_vector(8 downto 0) := '0' & x"07";
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_MSB    : integer := 23;
@@ -3125,7 +3129,7 @@ package registers is
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"13";
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH0_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"14";
     constant REG_DAQ_OH0_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3259,7 +3263,7 @@ package registers is
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"23";
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH1_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"24";
     constant REG_DAQ_OH1_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3393,7 +3397,7 @@ package registers is
     constant REG_DAQ_OH2_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"33";
     constant REG_DAQ_OH2_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH2_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH2_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH2_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH2_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"34";
     constant REG_DAQ_OH2_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3527,7 +3531,7 @@ package registers is
     constant REG_DAQ_OH3_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"43";
     constant REG_DAQ_OH3_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH3_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH3_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH3_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH3_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"44";
     constant REG_DAQ_OH3_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3661,7 +3665,7 @@ package registers is
     constant REG_DAQ_OH4_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"53";
     constant REG_DAQ_OH4_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH4_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH4_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH4_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH4_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"54";
     constant REG_DAQ_OH4_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3795,7 +3799,7 @@ package registers is
     constant REG_DAQ_OH5_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"63";
     constant REG_DAQ_OH5_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH5_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH5_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH5_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH5_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"64";
     constant REG_DAQ_OH5_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -3929,7 +3933,7 @@ package registers is
     constant REG_DAQ_OH6_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"73";
     constant REG_DAQ_OH6_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH6_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH6_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH6_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH6_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"74";
     constant REG_DAQ_OH6_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -4063,7 +4067,7 @@ package registers is
     constant REG_DAQ_OH7_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"83";
     constant REG_DAQ_OH7_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH7_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH7_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH7_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH7_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"84";
     constant REG_DAQ_OH7_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -4197,7 +4201,7 @@ package registers is
     constant REG_DAQ_OH8_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"93";
     constant REG_DAQ_OH8_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH8_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH8_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH8_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH8_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"94";
     constant REG_DAQ_OH8_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -4331,7 +4335,7 @@ package registers is
     constant REG_DAQ_OH9_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"a3";
     constant REG_DAQ_OH9_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH9_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH9_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH9_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH9_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"a4";
     constant REG_DAQ_OH9_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -4465,7 +4469,7 @@ package registers is
     constant REG_DAQ_OH10_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"b3";
     constant REG_DAQ_OH10_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH10_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH10_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH10_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH10_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"b4";
     constant REG_DAQ_OH10_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -4599,7 +4603,7 @@ package registers is
     constant REG_DAQ_OH11_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"c3";
     constant REG_DAQ_OH11_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH11_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH11_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH11_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH11_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"c4";
     constant REG_DAQ_OH11_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -5464,7 +5468,7 @@ package registers is
 
     constant REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0002";
     constant REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_BIT    : integer := 0;
-    constant REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_DEFAULT : std_logic := '1';
+    constant REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_DEFAULT : std_logic := '0';
 
     constant REG_SLOW_CONTROL_SCA_STATUS_READY_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0100";
     constant REG_SLOW_CONTROL_SCA_STATUS_READY_MSB    : integer := 31;
