@@ -5,28 +5,34 @@ use work.ipbus.all;
 
 package sca_pkg is
 
-    -- channels
+    --==== channels ====--
     constant SCA_CHANNEL_CONFIG   : std_logic_vector(7 downto 0) := x"00";
     constant SCA_CHANNEL_GPIO     : std_logic_vector(7 downto 0) := x"02";
     constant SCA_CHANNEL_JTAG     : std_logic_vector(7 downto 0) := x"13";
     constant SCA_CHANNEL_ADC      : std_logic_vector(7 downto 0) := x"14";
 
-    -- config reg commands
+    --==== config reg commands ====--
     constant SCA_CMD_CONFIG_WRITE_CRB   : std_logic_vector(7 downto 0) := x"02"; 
     constant SCA_CMD_CONFIG_WRITE_CRC   : std_logic_vector(7 downto 0) := x"04"; 
     constant SCA_CMD_CONFIG_WRITE_CRD   : std_logic_vector(7 downto 0) := x"06"; 
 
-    -- GPIO commands
+    --==== GPIO commands ====--
     constant SCA_CMD_GPIO_SET_DIR       : std_logic_vector(7 downto 0) := x"20"; 
     constant SCA_CMD_GPIO_READ_DIR      : std_logic_vector(7 downto 0) := x"21"; 
     constant SCA_CMD_GPIO_SET_OUT       : std_logic_vector(7 downto 0) := x"10"; 
 
-    -- ADC commands
+    --==== ADC commands and constants ====--
     constant SCA_CMD_ADC_SET_MUX        : std_logic_vector(7 downto 0) := x"30"; 
     constant SCA_CMD_ADC_READ_MUX       : std_logic_vector(7 downto 0) := x"31"; 
     constant SCA_CMD_ADC_READ           : std_logic_vector(7 downto 0) := x"b2"; 
+    constant SCA_CMD_ADC_SET_CURREN     : std_logic_vector(7 downto 0) := x"40";   
+    constant SCA_CMD_ADC_SET_GAIN       : std_logic_vector(7 downto 0) := x"70";   
+    -- since most of the OH v2b SCA ADCs are not calibrated, we choose a constant gain factor of 90% that will be written   
+    constant SCA_CFG_ADC_GAIN           : std_logic_vector(31 downto 0) := x"660e0000";
+    -- this constant is a bitmask of which ADC channels are connected to PT100 temperature sensors and thus need the current source enabled during the measurement
+    constant SCA_CFG_ADC_CURRENT_SOURCE : std_logic_vector(31 downto 0) := x"410401B5";
 
-    -- JTAG commands and constants
+    --==== JTAG commands and constants ====--
     constant SCA_CFG_JTAG_FREQ          : std_logic_vector(31 downto 0) := x"09000000"; -- Use 2MHz JTAG clk frequency by default (can go higher, no prob)  
     constant SCA_CFG_JTAG_CTRL_REG      : std_logic_vector(31 downto 0) := x"00000c00"; -- TX on falling edge, shift out LSB 
     constant SCA_CMD_JTAG_SET_FREQ      : std_logic_vector(7 downto 0) := x"90"; 
@@ -54,14 +60,15 @@ package sca_pkg is
     type t_sca_reply_array is array(integer range <>) of t_sca_reply;
 
     -- the messages in this array are executed in sequence after SCA CONTOLLER reset followed by SCA chip reset
-    constant SCA_CONFIG_SEQUENCE : t_sca_command_array(0 to 6) := (
+    constant SCA_CONFIG_SEQUENCE : t_sca_command_array(0 to 7) := (
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRB, length => x"01", data => x"00000004"),         -- enable GPIO
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRC, length => x"01", data => x"00000000"),         -- disable I2C
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRD, length => x"01", data => x"00000018"),         -- 0x18 enable JTAG and ADC
         (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_DIR, length => x"04", data => x"ffffffff"),               -- set all GPIO channels as outputs
         (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_OUT, length => x"04", data => x"ffffffff"),               -- set all GPIO ouputs to high
         (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_CTRL_REG, length => x"04", data => SCA_CFG_JTAG_CTRL_REG),-- set JTAG control reg defaults
-        (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_FREQ, length => x"04", data => SCA_CFG_JTAG_FREQ)         -- set default JTAG clk frequency
+        (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_FREQ, length => x"04", data => SCA_CFG_JTAG_FREQ),        -- set default JTAG clk frequency
+        (channel => SCA_CHANNEL_ADC, command => SCA_CMD_ADC_SET_GAIN, length => x"04", data => SCA_CFG_ADC_GAIN)            -- set default ADC gain to 90%
     );
     
     type t_sca_adc_channel_arr is array(integer range <>) of std_logic_vector(4 downto 0);
