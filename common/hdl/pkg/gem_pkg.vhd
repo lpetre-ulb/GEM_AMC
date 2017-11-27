@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171006";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171114";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 6;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -36,6 +36,9 @@ package gem_pkg is
     -- 1.11.1 Changed the default value of TTC_HARD_RESET_EN from 1 to 0 (TTC hard resets are not forwarded to OH by default)
     -- 1.11.2 Fixed a mismatched width bug when checking VFAT data for zero suppression. Extended reset_daq pulse for resync. Debug probes added for resync debugging.
     -- 1.11.3 Fixed a bug in resync procedure - has to also wait for DAQ output FIFO to drain before doing the reset
+    -- 1.11.4 Updated DAQ timeout defaults to sensible values that work well with 100kHz of L1A rate
+    -- 1.11.5 Updates in SCA ADC monitoring - setting fixed gain of 90% and enabling current source when measuring the PT100 ADC channels
+    -- 1.11.6 Changed the SCA ADC MONITORING_OFF register default to 0xffffffff so that monitoring is off at startup
 
     --======================--
     --==      General     ==--

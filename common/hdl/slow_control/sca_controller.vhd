@@ -119,11 +119,12 @@ architecture sca_controller_arch of sca_controller is
 
     -------------- types and constants -------------- 
 
-    type top_state_t is (SCA_RESET, SCA_CONFIGURE, IDLE, SET_HARD_RESET, UNSET_HARD_RESET, USER_COMMAND, MONITORING_SET_CHAN, MONITORING_READ, JTAG_SHIFT, JTAG_SET_LENGTH, JTAG_GO, ERROR);
+    type top_state_t is (SCA_RESET, SCA_CONFIGURE, IDLE, SET_HARD_RESET, UNSET_HARD_RESET, USER_COMMAND, MONITORING_SET_CHAN, MONITORING_SET_CURREN, MONITORING_READ, MONITORING_RESET_CURREN, JTAG_SHIFT, JTAG_SET_LENGTH, JTAG_GO, ERROR);
     type transaction_state_t is (INIT, IDLE, WAIT_FOR_TX, WAIT_FOR_REPLY, WAIT_FOR_SCA_RESET, CLOSE_TRANSACTION);
 
     constant TRANS_TIMEOUT        : unsigned(15 downto 0) := x"fa00"; -- transaction timeout (64000 clock cycles = 800us, this is required with some margin for ADC readout which takes 670us)
     constant TRANS_MAX_RETRIES    : unsigned(2 downto 0) := "101"; -- transaction retry count (max 5 retries)
+    constant ONE_32               : unsigned(31 downto 0) := x"00000001"; -- simply a one in 32 bits (used in ADC current enabling to shift the bit around to get the channel mask) 
 
     -------------- signals -------------- 
 
@@ -186,7 +187,7 @@ architecture sca_controller_arch of sca_controller is
     signal jtag_sca_cmd_done    : std_logic;                 -- SCA command done
     signal jtag_async_ack_done  : std_logic;                 -- used to send a done pulse to the user when in async mode
     signal jtag_async_tdo_en    : std_logic;                 -- used to latch in a TDO shift command in async mode so that the command can be executed after the previous command is completed
-    
+        
     -- debug
     signal hard_reset_i_sync    : std_logic;
     signal user_command_en_i_sync  : std_logic;
@@ -241,6 +242,7 @@ begin
     --========= Top level FSM =========--
 
     process(clk_80_i)
+        variable adc_curren_channel_mask    : std_logic_vector(31 downto 0);
     begin
         if (rising_edge(clk_80_i)) then
             if (reset_i = '1') then
@@ -366,6 +368,24 @@ begin
                         else
                             trans_en <= '0';
                             if (trans_en = '0') then
+                                top_state <= MONITORING_SET_CURREN;
+                            end if;
+                        end if;
+                        
+                    when MONITORING_SET_CURREN =>
+                        if (trans_done = '0') and (trans_error = '0') then
+                            trans_en <= '1';
+                            adc_curren_channel_mask := std_logic_vector(ONE_32 srl to_integer(unsigned(SCA_MONITOR_ADC_CHANNELS(sca_adc_idx)))) and SCA_CFG_ADC_CURRENT_SOURCE; 
+                            tx_sca_command.channel <= SCA_CHANNEL_ADC;
+                            tx_sca_command.command <= SCA_CMD_ADC_SET_CURREN;
+                            tx_sca_command.length <= x"04";
+                            tx_sca_command.data <= adc_curren_channel_mask(7 downto 0) & adc_curren_channel_mask(15 downto 8) & adc_curren_channel_mask(23 downto 16) & adc_curren_channel_mask(31 downto 24);
+                        elsif (trans_error = '1') then
+                            top_state <= ERROR;
+                            trans_en <= '0';
+                        else
+                            trans_en <= '0';
+                            if (trans_en = '0') then
                                 top_state <= MONITORING_READ;
                             end if;
                         end if;
@@ -382,7 +402,7 @@ begin
                             trans_en <= '0';
                         else
                             trans_en <= '0';
-                            top_state <= IDLE;
+                            top_state <= MONITORING_RESET_CURREN;
                             if (rx_sca_reply.data(20) = '0') then -- bit 20 indicates overflow
                                 adc_readings_o(sca_adc_idx) <= rx_sca_reply.data(19 downto 16) & rx_sca_reply.data(31 downto 24);
                             else
@@ -394,7 +414,24 @@ begin
                                 sca_adc_idx <= 0;
                             end if;
                         end if;
-
+                        
+                    when MONITORING_RESET_CURREN =>
+                        if (trans_done = '0') and (trans_error = '0') then
+                            trans_en <= '1';
+                            tx_sca_command.channel <= SCA_CHANNEL_ADC;
+                            tx_sca_command.command <= SCA_CMD_ADC_SET_CURREN;
+                            tx_sca_command.length <= x"04";
+                            tx_sca_command.data <= (others => '0');
+                        elsif (trans_error = '1') then
+                            top_state <= ERROR;
+                            trans_en <= '0';
+                        else
+                            trans_en <= '0';
+                            if (trans_en = '0') then
+                                top_state <= IDLE;
+                            end if;
+                        end if;
+                        
                     when JTAG_SHIFT =>
                         if (trans_done = '0') and (trans_error = '0') then
                             trans_en <= '1';

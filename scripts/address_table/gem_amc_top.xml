@@ -1055,7 +1055,7 @@
         <node id="ADC_MONITORING" address="0x2000">
           <node id="MONITORING_OFF" address="0x0" mask="0xffffffff" permission="rw"
                 description="Bits corresponding to each link if set to 1 will suspend ADC monitoring on that SCA"
-                fw_signal="sca_adc_monitor_off_arr" fw_default="0x00000000"/>
+                fw_signal="sca_adc_monitor_off_arr" fw_default="0xffffffff"/>
 
           <node id="OH${OH_IDX}" address="0x1"
                 description="ADC monitoring of Optohybrid ${OH_IDX}"
