@@ -177,6 +177,8 @@ def findRegisters(node, baseName, baseAddress, modules, currentModule, vars, isG
     if (isGenerated == None or isGenerated == False) and node.get('generate') is not None and node.get('generate') == 'true':
         if node.get('generate_idx_var') == 'OH_IDX':
             generateSize = num_of_oh
+        elif node.get('generate_idx_var') == 'GBT_IDX':
+            generateSize = num_of_oh * 3
         else:
             generateSize = parseInt(node.get('generate_size'))
 
@@ -596,9 +598,7 @@ def printNodeToUHALFile(node, file, level, baseAddress, baseName, addrOffset, nu
         "GEM_AMC.TRIGGER.STATUS",
         "GEM_AMC.GEM_SYSTEM",
         "GEM_AMC.GEM_TESTS",
-        # "GEM_AMC.DAQ.CTRL", # keep this
-        # "GEM_AMC.DAQ.OH<num>", # keep this
-        # "GEM_AMC.DAQ",
+        "GEM_AMC.DAQ",
         "GEM_AMC.OH_LINKS.CTRL",
         "GEM_AMC.SLOW_CONTROL",
         "GEM_AMC.GLIB_SYSTEM",
