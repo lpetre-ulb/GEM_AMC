@@ -60,6 +60,7 @@ entity system is
     refclk_B_1_n_i : in std_logic_vector (3 downto 1);
 
     clk_50_o       : out std_logic;
+    clk_62p5_o     : out std_logic;
     clk_200_o      : out std_logic;
     
     ----------------- for GEM ------------------------
@@ -139,8 +140,9 @@ architecture system_arch of system is
       clk_200_diff_in_clk_n : in std_logic;
       clk_200_diff_in_clk_p : in std_logic;
 
-      clk_out1_200mhz : out std_logic;
-      clk_out2_50mhz  : out std_logic;
+      clk_out1_200mhz   : out std_logic;
+      clk_out2_50mhz    : out std_logic;
+      clk_out3_62p5mhz  : out std_logic;
       
       axi_clk_o         : out STD_LOGIC;
       axi_reset_o       : out STD_LOGIC_VECTOR ( 0 to 0 );
@@ -172,8 +174,9 @@ architecture system_arch of system is
 --============================================================================
   signal s_pg_bx0_ext_en : std_logic;
 
-  signal s_clk_200 : std_logic;
-  signal s_clk_50  : std_logic;
+  signal s_clk_200  : std_logic;
+  signal s_clk_50   : std_logic;
+  signal s_clk_62p5 : std_logic;
 
   signal BRAM_CTRL_REG_FILE_en   : std_logic;
   signal BRAM_CTRL_REG_FILE_dout : std_logic_vector (31 downto 0) := x"00000000";
@@ -321,6 +324,7 @@ begin
   ipb_axi_bvalid(0)        <= ipb_axi_miso_i.bvalid;
   
   clk_50_o   <= s_clk_50;
+  clk_62p5_o <= s_clk_62p5;
   clk_200_o  <= s_clk_200;
   
   i_ttc_clocks : entity work.ttc_clocks
@@ -367,8 +371,9 @@ begin
       clk_200_diff_in_clk_n => clk_200_diff_in_clk_n,
       clk_200_diff_in_clk_p => clk_200_diff_in_clk_p,
 
-      clk_out1_200mhz => s_clk_200,
-      clk_out2_50mhz  => s_clk_50,
+      clk_out1_200mhz   => s_clk_200,
+      clk_out2_50mhz    => s_clk_50,
+      clk_out3_62p5mhz  => s_clk_62p5,
 
       axi_clk_o         => axi_clk,
       axi_reset_o       => axi_reset,

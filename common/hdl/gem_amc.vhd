@@ -166,7 +166,7 @@ architecture gem_amc_arch of gem_amc is
     
     --== VFAT3 ==--
     signal use_oh_vfat3_connectors      : std_logic;
-    signal vfat3_run_mode               : std_logic;
+    signal vfat3_sc_only_mode           : std_logic;
     signal vfat3_tx_stream              : std_logic_vector(7 downto 0);
     signal vfat3_tx_idle                : std_logic;
     signal vfat3_sync                   : std_logic;
@@ -184,6 +184,13 @@ architecture gem_amc_arch of gem_amc is
     signal vfat3_sc_status              : t_vfat_slow_control_status;    
     
     signal vfat3_daq_link_arr           : t_oh_vfat_daq_link_arr(g_NUM_OF_OHs - 1 downto 0);
+    
+    signal vfat_mask_arr                : t_std24_array(g_NUM_OF_OHs - 1 downto 0);
+    
+    signal use_v3b_elink_mapping        : std_logic;
+    signal v3b_slow_rx_bitshift         : std_logic_vector(2 downto 0);    
+    signal v3b_tx_0_bitslip             : std_logic_vector(3 downto 0);    
+    signal v3b_tx_1_bitslip             : std_logic_vector(3 downto 0);    
     
     -- test module links
     signal test_gbt_rx_data_arr         : t_gbt_frame_array((g_NUM_OF_OHs * 3) - 1 downto 0);
@@ -293,14 +300,14 @@ begin
 
     i_vfat3_tx_stream : entity work.vfat3_tx_stream
         port map(
-            reset_i       => reset or link_reset,
-            ttc_clk_i     => ttc_clocks_i,
-            ttc_cmds_i    => ttc_cmd,
-            run_mode_i    => vfat3_run_mode,
-            data_o        => vfat3_tx_stream,
-            idle_o        => vfat3_tx_idle,
-            sync_o        => vfat3_sync,
-            sync_verify_o => vfat3_sync_verify
+            reset_i        => reset or link_reset,
+            ttc_clk_i      => ttc_clocks_i,
+            ttc_cmds_i     => ttc_cmd,
+            sc_only_mode_i => vfat3_sc_only_mode,
+            data_o         => vfat3_tx_stream,
+            idle_o         => vfat3_tx_idle,
+            sync_o         => vfat3_sync,
+            sync_verify_o  => vfat3_sync_verify
         );
 
     --================================--
@@ -336,7 +343,7 @@ begin
         i_optohybrid_single : entity work.optohybrid
             generic map(
                 g_OH_IDX        => std_logic_vector(to_unsigned(i, 4)),
-                g_DEBUG         => i = 0
+                g_DEBUG         => i = 1
             )
             port map(
                 reset_i                 => reset or link_reset,
@@ -355,6 +362,7 @@ begin
                 vfat3_tx_data_o         => vfat3_tx_data_arr(i),
                 vfat3_rx_data_i         => vfat3_rx_data_arr(i),
                 vfat3_link_status_o     => vfat3_link_status_arr(i),
+                vfat_mask_arr_i         => vfat_mask_arr(i),
 
                 vfat3_sc_tx_data_i      => vfat3_sc_tx_data,
                 vfat3_sc_tx_empty_i     => vfat3_sc_tx_empty,
@@ -416,24 +424,27 @@ begin
     i_daq : entity work.daq
         generic map(
             g_NUM_OF_OHs => g_NUM_OF_OHs,
-            g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ
+            g_DAQ_CLK_FREQ => g_DAQ_CLK_FREQ,
+            g_INCLUDE_SPY_FIFO => false,
+            g_DEBUG => true
         )
         port map(
-            reset_i          => reset,
-            daq_clk_i        => daq_data_clk_i,
-            daq_clk_locked_i => daq_data_clk_locked_i,
-            daq_to_daqlink_o => daq_to_daqlink_o,
-            daqlink_to_daq_i => daqlink_to_daq_i,
-            ttc_clks_i       => ttc_clocks_i,
-            ttc_cmds_i       => ttc_cmd,
-            ttc_daq_cntrs_i  => ttc_counters,
-            ttc_status_i     => ttc_status,
-            tk_data_links_i  => tk_data_links,
-            ipb_reset_i      => ipb_reset_i,
-            ipb_clk_i        => ipb_clk_i,
-            ipb_mosi_i       => ipb_mosi_arr_i(C_IPB_SLV.daq),
-            ipb_miso_o       => ipb_miso_arr(C_IPB_SLV.daq),
-            board_sn_i       => board_id_i
+            reset_i                 => reset,
+            daq_clk_i               => daq_data_clk_i,
+            daq_clk_locked_i        => daq_data_clk_locked_i,
+            daq_to_daqlink_o        => daq_to_daqlink_o,
+            daqlink_to_daq_i        => daqlink_to_daq_i,
+            ttc_clks_i              => ttc_clocks_i,
+            ttc_cmds_i              => ttc_cmd,
+            ttc_daq_cntrs_i         => ttc_counters,
+            ttc_status_i            => ttc_status,
+            vfat3_daq_clk_i         => ttc_clocks_i.clk_40,
+            vfat3_daq_links_arr_i   => vfat3_daq_link_arr,
+            ipb_reset_i             => ipb_reset_i,
+            ipb_clk_i               => ipb_clk_i,
+            ipb_mosi_i              => ipb_mosi_arr_i(C_IPB_SLV.daq),
+            ipb_miso_o              => ipb_miso_arr(C_IPB_SLV.daq),
+            board_sn_i              => board_id_i
         );    
 
     ------------ DEBUG - fanout DAQ data from OH1 to all DAQ inputs --------------
@@ -458,13 +469,17 @@ begin
             board_id_o                  => open,
             loopback_gbt_test_en_o      => loopback_gbt_test_en,
             use_oh_vfat3_connectors_o   => use_oh_vfat3_connectors,
-            vfat3_run_mode_o            => vfat3_run_mode,
+            vfat3_sc_only_mode_o        => vfat3_sc_only_mode,
+            use_v3b_elink_mapping_o     => use_v3b_elink_mapping,
+            v3b_slow_rx_bitshift_o      => v3b_slow_rx_bitshift,
+            v3b_tx_0_bitslip_o          => v3b_tx_0_bitslip,
+            v3b_tx_1_bitslip_o          => v3b_tx_1_bitslip,
             manual_link_reset_o         => manual_link_reset
         );
 
-    --==================--
-    -- OH Link Counters --
-    --==================--
+    --===============================--
+    -- OH Link Counters and settings --
+    --===============================--
 
     i_oh_link_registers : entity work.oh_link_regs
         generic map(
@@ -476,6 +491,8 @@ begin
 
             gbt_link_status_arr_i   => gbt_link_status_arr,
             vfat3_link_status_arr_i => vfat3_link_status_arr,
+
+            vfat_mask_arr_o         => vfat_mask_arr,
 
             ipb_reset_i             => ipb_reset_i,
             ipb_clk_i               => ipb_clk_i,
@@ -577,12 +594,18 @@ begin
             g_NUM_OF_OHs  => g_NUM_OF_OHs
         )
         port map(
+            gbt_frame_clk_i             => ttc_clocks_i.clk_40,
+            
             gbt_rx_data_arr_i           => gbt_rx_data_arr,
             gbt_tx_data_arr_o           => gbt_tx_data_arr,
             gbt_link_status_arr_i       => gbt_link_status_arr,
 
             link_test_mode_i            => loopback_gbt_test_en,
             use_oh_vfat3_connectors_i   => use_oh_vfat3_connectors,
+            use_v3b_mapping_i           => use_v3b_elink_mapping,
+            v3b_slow_rx_bitshift_i      => v3b_slow_rx_bitshift,
+            v3b_slow_tx_bitslip_0_i     => v3b_tx_0_bitslip,
+            v3b_slow_tx_bitslip_1_i     => v3b_tx_1_bitslip,
 
             sca_tx_data_arr_i           => sca_tx_data_arr,
             sca_rx_data_arr_o           => sca_rx_data_arr,

@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171120";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180224";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 3;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 2;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 6;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 4;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 5;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -67,7 +67,30 @@ package gem_pkg is
     -- 3.2.4  Implemented sbit monitor which latches on first valid sbit after reset on a selected link
     -- 3.2.5  ILA core in trigger RX link for debugging
     -- 3.2.6  ILA core removed
-
+    -- 3.2.7  Added an sbit to L1A delay counter in sbit monitor
+    -- 3.2.8  Changed the VFAT3_RUN_MODE register to SC_ONLY_MODE, the default is 0. Also explicitly send the comm port mode command during link reset corresponding to this value.
+    -- 3.3.0  Preliminary quick-and-dirty DAQ module for VFAT3. It implements fake small fifos for all VFATs and a serializer which then feed to existing logic from v2.
+    --        This was done as a quick measure to test the data throughput, and it should work mostly fine, but small possibilities exist for data to be mixed from different events.
+    --        Should be redone such that each VFAT3 has it's own normal packet FIFO and then input processor would simply read all of them once they all have data (with a timeout also) -- this would eliminate the need for the current "input fifo" and make things much simpler and more robust against event mixing
+    -- 3.3.1  Added DAQ input fanout for rate testing. Added TTC generator calpulse prescale. Added possibility to use only the calpulse from the TTC generator while using all other commands from the backplane.
+    --        All of these features are meant for fake data rate testing.
+    --        Also added a VFAT mask in OH_LINKS, which when set will completely shut off the DAQ and slow control RX of the given VFAT.
+    -- 3.3.2  Added a control register to ignore daqlink signals (the daqlink_ready and daqlink_almost_full) -- useful for datarate tests without AMC13
+    --        Changed the DAQLink data clock from 50MHz to 62.5MHz in order to reach the full AMC13 input capability of 4Gb/s
+    -- 3.3.3  Fixed a bug in vfat_input_buffer, which caused it to miss all events.. Returned back to 50MHz clock for the DAQ due to timing errors with faster clocks
+    -- 3.3.4  Fixed a bug in clocking the daq ILA (not really important for normal operation). Switched to 12 chambers.
+    --        Fixed a bug in event size error checking in input processor (it was setting it right away whenever there was a zero suppressed event actually)
+    --        Discovered a bug, not yet fixed. Global TTS state actually only takes the state of the last input, has to be done with a variable instead of a signal in the for loop there..
+    -- 3.3.5  Using 62.5MHz clock again
+    -- 3.3.6  Found out that the global event builder max throughput is ~2.8Gb/s because there were several places where a clock cycle was wasted for waiting for data from the FIFOs.
+    --        So this version switched all FIFOs to First-Word-Fall-Through mode and removed most dead cycles
+    -- 3.4.0  Added compatibility with OH v3b (only affects the GBT-OH_FPGA communication)
+    -- 3.4.1  Changed the SCA GPIO direction and output defaults to only drive the PROG_B and those channels that go to the FPGA (also set that we do not drive INIT_B)
+    -- 3.4.2  Added a possibility to bitslip the OH FPGA elinks 0 and 1 independently when in v3b mapping mode
+    -- 3.4.3  Increased the PH FPGA TX elinks bitslip setting from 3 to 4 bits to allow 8 bit shift (whole clock cycle)
+    -- 3.4.4  Set the default parameters for OH v3b FPGA elink bitslips that are working. Also ILA debugging OH index was changed from 0 to 1
+    -- 3.4.5  Fix VFAT7 when using v3b (changed elink in v3b OH)
+        
     --======================--
     --==      General     ==--
     --======================-- 
@@ -107,6 +130,8 @@ package gem_pkg is
     type t_std3_array is array(integer range <>) of std_logic_vector(2 downto 0);
 
     type t_std2_array is array(integer range <>) of std_logic_vector(1 downto 0);
+
+    type t_std176_array is array(integer range <>) of std_logic_vector(175 downto 0);
 
     --============--
     --==   GBT  ==--
@@ -213,6 +238,8 @@ package gem_pkg is
     --=====================================--
     
     type t_daq_input_status is record
+        vfat_fifo_ovf           : std_logic;
+        vfat_fifo_unf           : std_logic;
         evtfifo_empty           : std_logic;
         evtfifo_near_full       : std_logic;
         evtfifo_full            : std_logic;
@@ -248,6 +275,7 @@ package gem_pkg is
 
     type t_daq_input_control is record
         eb_timeout_delay        : std_logic_vector(23 downto 0);
+        eb_zero_supression_en   : std_logic;
     end record;
     
     type t_daq_input_control_arr is array(integer range <>) of t_daq_input_control;

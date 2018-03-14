@@ -25,6 +25,7 @@ entity sbit_monitor is
         
         -- TTC
         ttc_clk_i           : in  t_ttc_clks;
+        ttc_cmds_i          : in  t_ttc_cmds;
 
         -- Sbit cluster inputs
         link_select_i       : in std_logic_vector(3 downto 0);
@@ -32,7 +33,8 @@ entity sbit_monitor is
         sbit_trigger_i      : in std_logic_vector(g_NUM_OF_OHs - 1 downto 0);
 
         -- output
-        frozen_sbits_o      : out t_oh_sbits
+        frozen_sbits_o      : out t_oh_sbits;
+        l1a_dealy_o         : out std_logic_vector(31 downto 0)
 
     );
 end sbit_monitor;
@@ -45,7 +47,12 @@ architecture sbit_monitor_arch of sbit_monitor is
     signal link_trigger     : std_logic;
     signal link_sbits       : t_oh_sbits;
     
+    signal l1a_delay_run    : std_logic := '0';
+    signal l1a_delay        : unsigned(31 downto 0);
+    
 begin
+
+    l1a_dealy_o <= std_logic_vector(l1a_delay);
 
     -- MUX to select the link
     link_trigger <= sbit_trigger_i(to_integer(unsigned(link_select_i)));
@@ -66,5 +73,31 @@ begin
             end if;
         end if;
     end process;
+    
+    -- count the gap between this sbit cluster and the following L1A
+    process(ttc_clk_i.clk_40)
+    begin
+        if (rising_edge(ttc_clk_i.clk_40)) then
+            if (reset_i = '1') then
+                l1a_delay <= (others => '0');
+                l1a_delay_run <= '0';
+            else
+                
+                if (link_trigger = '1' and armed = '1' and l1a_delay_run = '0') then
+                    l1a_delay_run <= '1';
+                end if;
+                
+                if (l1a_delay_run = '1' and ttc_cmds_i.l1a = '1') then
+                    l1a_delay_run <= '0';
+                end if;
+                
+                if (l1a_delay_run = '1') then
+                    l1a_delay <= l1a_delay + 1;
+                end if;
+                
+            end if;
+        end if;
+    end process;
+    
 
 end sbit_monitor_arch;

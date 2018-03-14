@@ -105,6 +105,7 @@ architecture ttc_arch of ttc is
 
     -- ttc generator
     signal gen_enable               : std_logic;
+    signal gen_enable_cal_only      : std_logic; -- for synthetic tests, this will use only the calpulse signal from the generator while all the other commands will come from AMC13
     signal gen_reset                : std_logic;
     signal gen_ttc_cmds             : t_ttc_cmds;
     signal gen_single_hard_reset    : std_logic;
@@ -113,8 +114,9 @@ architecture ttc_arch of ttc is
     signal gen_cyclic_l1a_gap       : std_logic_vector(15 downto 0);
     signal gen_cyclic_l1a_cnt       : std_logic_vector(23 downto 0);
     signal gen_cyclic_cal_l1a_gap   : std_logic_vector(11 downto 0);
+    signal gen_cyclic_cal_prescale  : std_logic_vector(11 downto 0);
     signal gen_cyclic_l1a_start     : std_logic;
-    signal gen_cyclic_l1a_running   : std_logic;    
+    signal gen_cyclic_l1a_running   : std_logic;
 
     -- daq counters
     signal l1id_cnt                 : std_logic_vector(23 downto 0);
@@ -298,7 +300,7 @@ begin
 
     i_ttc_generator : entity work.ttc_generator
         port map(
-            reset_i              => reset_i or not gen_enable or gen_reset,
+            reset_i              => reset_i or gen_reset,
             ttc_clks_i           => ttc_clks_i,
             ttc_cmds_o           => gen_ttc_cmds,
             single_hard_reset_i  => gen_single_hard_reset,
@@ -307,6 +309,7 @@ begin
             cyclic_l1a_gap_i     => gen_cyclic_l1a_gap,
             cyclic_l1a_cnt_i     => gen_cyclic_l1a_cnt,
             cyclic_cal_l1a_gap_i => gen_cyclic_cal_l1a_gap,
+            cyclic_cal_prescale_i=> gen_cyclic_cal_prescale,
             cyclic_l1a_start_i   => gen_cyclic_l1a_start,
             cyclic_l1a_running_o => gen_cyclic_l1a_running
         );
@@ -321,7 +324,7 @@ begin
     stop_cmd       <= stop_cmd_real when gen_enable = '0' else gen_ttc_cmds.stop;
     test_sync_cmd  <= test_sync_cmd_real when gen_enable = '0' else gen_ttc_cmds.test_sync;
     hard_reset_cmd <= hard_reset_cmd_real when gen_enable = '0' else gen_ttc_cmds.hard_reset;
-    calpulse_cmd   <= calpulse_cmd_real when gen_enable = '0' else gen_ttc_cmds.calpulse;
+    calpulse_cmd   <= calpulse_cmd_real when gen_enable = '0' and gen_enable_cal_only = '0' else gen_ttc_cmds.calpulse;
     l1a_cmd        <= l1a_cmd_real when gen_enable = '0' else gen_ttc_cmds.l1a;
 
     ------------- TTC counters -------------
@@ -538,6 +541,7 @@ begin
     regs_addresses(30)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= "10" & x"4";
     regs_addresses(31)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= "10" & x"5";
     regs_addresses(32)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= "10" & x"6";
+    regs_addresses(33)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= "10" & x"7";
 
     -- Connect read signals
     regs_read_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= ttc_ctrl.l1a_enable;
@@ -573,9 +577,11 @@ begin
     regs_read_arr(25)(REG_TTC_TTC_SPY_BUFFER_MSB downto REG_TTC_TTC_SPY_BUFFER_LSB) <= ttc_spy_buffer;
     regs_read_arr(27)(REG_TTC_GENERATOR_ENABLE_BIT) <= gen_enable;
     regs_read_arr(27)(REG_TTC_GENERATOR_CYCLIC_RUNNING_BIT) <= gen_cyclic_l1a_running;
+    regs_read_arr(27)(REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_BIT) <= gen_enable_cal_only;
     regs_read_arr(27)(REG_TTC_GENERATOR_CYCLIC_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_GAP_LSB) <= gen_cyclic_l1a_gap;
     regs_read_arr(27)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_LSB) <= gen_cyclic_cal_l1a_gap;
     regs_read_arr(31)(REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_LSB) <= gen_cyclic_l1a_cnt;
+    regs_read_arr(33)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_LSB) <= gen_cyclic_cal_prescale;
 
     -- Connect write signals
     ttc_ctrl.l1a_enable <= regs_write_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT);
@@ -589,9 +595,11 @@ begin
     ttc_conf.cmd_stop <= regs_write_arr(6)(REG_TTC_CONFIG_CMD_STOP_MSB downto REG_TTC_CONFIG_CMD_STOP_LSB);
     ttc_conf.cmd_test_sync <= regs_write_arr(7)(REG_TTC_CONFIG_CMD_TEST_SYNC_MSB downto REG_TTC_CONFIG_CMD_TEST_SYNC_LSB);
     gen_enable <= regs_write_arr(27)(REG_TTC_GENERATOR_ENABLE_BIT);
+    gen_enable_cal_only <= regs_write_arr(27)(REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_BIT);
     gen_cyclic_l1a_gap <= regs_write_arr(27)(REG_TTC_GENERATOR_CYCLIC_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_GAP_LSB);
     gen_cyclic_cal_l1a_gap <= regs_write_arr(27)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_LSB);
     gen_cyclic_l1a_cnt <= regs_write_arr(31)(REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_LSB);
+    gen_cyclic_cal_prescale <= regs_write_arr(33)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_LSB);
 
     -- Connect write pulse signals
     ttc_ctrl.reset_local <= regs_write_pulse_arr(0);
@@ -623,9 +631,11 @@ begin
     regs_defaults(6)(REG_TTC_CONFIG_CMD_STOP_MSB downto REG_TTC_CONFIG_CMD_STOP_LSB) <= REG_TTC_CONFIG_CMD_STOP_DEFAULT;
     regs_defaults(7)(REG_TTC_CONFIG_CMD_TEST_SYNC_MSB downto REG_TTC_CONFIG_CMD_TEST_SYNC_LSB) <= REG_TTC_CONFIG_CMD_TEST_SYNC_DEFAULT;
     regs_defaults(27)(REG_TTC_GENERATOR_ENABLE_BIT) <= REG_TTC_GENERATOR_ENABLE_DEFAULT;
+    regs_defaults(27)(REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_BIT) <= REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_DEFAULT;
     regs_defaults(27)(REG_TTC_GENERATOR_CYCLIC_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_GAP_LSB) <= REG_TTC_GENERATOR_CYCLIC_L1A_GAP_DEFAULT;
     regs_defaults(27)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_LSB) <= REG_TTC_GENERATOR_CYCLIC_CALPULSE_TO_L1A_GAP_DEFAULT;
     regs_defaults(31)(REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_MSB downto REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_LSB) <= REG_TTC_GENERATOR_CYCLIC_L1A_COUNT_DEFAULT;
+    regs_defaults(33)(REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_MSB downto REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_LSB) <= REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_DEFAULT;
 
     -- Define writable regs
     regs_writable_arr(4) <= '1';
@@ -634,6 +644,7 @@ begin
     regs_writable_arr(7) <= '1';
     regs_writable_arr(27) <= '1';
     regs_writable_arr(31) <= '1';
+    regs_writable_arr(33) <= '1';
 
     --==== Registers end ============================================================================
 

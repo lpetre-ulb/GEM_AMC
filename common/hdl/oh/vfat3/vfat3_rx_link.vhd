@@ -23,6 +23,9 @@ entity vfat3_rx_link is
         -- clocks
         ttc_clk_i           : in  t_ttc_clks;
         
+        -- control
+        mask_i              : in std_logic;
+        
         -- aligned data link
         data_i              : in  std_logic_vector(7 downto 0);
         sync_ok_i           : in  std_logic;
@@ -96,11 +99,11 @@ begin
 
     daq_data_en <= '1' when ((daq_word_cntdown /= "00000") or (data_i = VFAT3_DAQ_HEADER_I) or (data_i = VFAT3_DAQ_HEADER_IW)) else '0';
     daq_data_o <= data_i; -- when daq_data_en = '1' else (others => '0');
-    daq_data_en_o <= daq_data_en;
+    daq_data_en_o <= daq_data_en and not mask_i;
     daq_crc_error_o <= event_done and not crc_ok;
     daq_event_done_o <= event_done;
     slow_ctrl_data_o <= '1' when data_i = VFAT3_SC1_WORD else '0';
-    slow_ctrl_data_en_o <= '1' when (data_i = VFAT3_SC1_WORD or data_i = VFAT3_SC0_WORD) and daq_data_en = '0' else '0';
+    slow_ctrl_data_en_o <= '1' when (data_i = VFAT3_SC1_WORD or data_i = VFAT3_SC0_WORD) and (daq_data_en = '0') and (mask_i = '0') else '0';
 
     cnt_events_o <= std_logic_vector(cnt_events);
     cnt_crc_errors_o  <= std_logic_vector(cnt_crc_errors);

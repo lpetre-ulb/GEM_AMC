@@ -89,6 +89,7 @@ architecture gem_ctp7_arch of gem_ctp7 is
 
     -------------------------- System clocks ---------------------------------
     signal clk_50       : std_logic;
+    signal clk_62p5     : std_logic;
     signal clk_200      : std_logic;
 
     -------------------------- AXI-IPbus bridge ---------------------------------
@@ -173,6 +174,7 @@ begin
             refclk_B_1_n_i                 => refclk_B_1_n_i,
 
             clk_50_o                       => clk_50,
+            clk_62p5_o                     => clk_62p5,
             clk_200_o                      => clk_200,
             
             axi_clk_o                      => axi_clk,
@@ -252,7 +254,7 @@ begin
             g_USE_TRIG_LINKS     => CFG_USE_TRIG_LINKS,
             g_NUM_OF_OHs         => CFG_NUM_OF_OHs,
             g_NUM_IPB_SLAVES     => C_NUM_IPB_SLAVES,
-            g_DAQ_CLK_FREQ       => 50_000_000
+            g_DAQ_CLK_FREQ       => 62_500_000 --50_000_000
         )
         port map(
             reset_i                 => '0',
@@ -282,7 +284,7 @@ begin
             led_l1a_o               => LEDs(0),
             led_trigger_o           => LEDs(1),
             
-            daq_data_clk_i          => clk_50,
+            daq_data_clk_i          => clk_62p5, --clk_50,
             daq_data_clk_locked_i   => '1',
             daq_to_daqlink_o        => daq_to_daqlink,
             daqlink_to_daq_i        => daqlink_to_daq,

@@ -41,8 +41,10 @@ port(
     evtfifo_underflow_o         : out std_logic;
     evtfifo_data_cnt_o          : out std_logic_vector(11 downto 0);
 
-    -- Track data
-    tk_data_link_i              : in t_data_link;
+    -- VFAT data links
+    data_clk_i                  : in std_logic;
+    data_processor_clk_i        : in std_logic; -- recommended to have a higher frequency than the data_clk_i e.g. 2x higher (which would be 80MHz TTC clk)
+    oh_daq_links_i              : in t_vfat_daq_link_arr(23 downto 0);
     
     -- Status and control
     status_o                    : out t_daq_input_status;
@@ -97,7 +99,8 @@ architecture Behavioral of track_input_processor is
     --================== SIGNALS ==================--
 
     -- Constants (TODO: should be moved to package)
-    constant vfat_block_marker      : std_logic_vector(47 downto 0) := x"a000c000e000";
+    constant vfat3_header_i         : std_logic_vector(7 downto 0) := x"1E";
+    constant vfat3_header_iw        : std_logic_vector(7 downto 0) := x"5E";
 
     -- TTS
     signal tts_state                : std_logic_vector(3 downto 0) := "1000";
@@ -140,17 +143,23 @@ architecture Behavioral of track_input_processor is
     signal evtfifo_almost_full      : std_logic := '0';
     signal evtfifo_empty            : std_logic := '0';
     signal evtfifo_underflow        : std_logic := '0';
-
+    
+    -- VFAT input status
+    signal vfat_fifo_ovf            : std_logic := '0';
+    signal vfat_fifo_unf            : std_logic := '0';
+    
     -- Event processor
-    signal ep_vfat_block_data       : std_logic_vector(223 downto 0) := (others => '0');
+    signal ep_vfat_block_data       : std_logic_vector(191 downto 0) := (others => '0');
     signal ep_vfat_block_en         : std_logic := '0';
     signal ep_vfat_word             : integer range 0 to 14 := 14;
+    signal ep_zero_packet           : std_logic;
     signal ep_last_ec               : std_logic_vector(7 downto 0) := (others => '0');
     signal ep_last_bc               : std_logic_vector(11 downto 0) := (others => '0');
     signal ep_first_ever_block      : std_logic := '1'; -- it's the first ever event
     signal ep_end_of_event          : std_logic := '0';
-    signal ep_last_rx_data          : std_logic_vector(223 downto 0) := (others => '0');
+    signal ep_last_rx_data          : std_logic_vector(191 downto 0) := (others => '0');
     signal ep_last_rx_data_valid    : std_logic := '0';
+    signal ep_last_rx_data_suppress : std_logic := '0';
     signal ep_invalid_vfat_block    : std_logic := '0';
     
     -- Event builder
@@ -218,6 +227,8 @@ begin
                           err_evtfifo_underflow or 
                           err_infifo_full or
                           err_infifo_underflow;
+--                          vfat_fifo_ovf or
+--                          vfat_fifo_unf;
                           
     tts_warning <= err_infifo_near_full or err_evtfifo_near_full;
     
@@ -241,7 +252,7 @@ begin
         g_ALLOW_ROLLOVER => FALSE
     )
     port map(
-        ref_clk_i => tk_data_link_i.clk,
+        ref_clk_i => data_processor_clk_i,
         reset_i   => reset_i,
         en_i      => err_infifo_near_full,
         count_o   => status_o.infifo_near_full_cnt
@@ -253,7 +264,7 @@ begin
         g_ALLOW_ROLLOVER => FALSE
     )
     port map(
-        ref_clk_i => tk_data_link_i.clk,
+        ref_clk_i => data_processor_clk_i,
         reset_i   => reset_i,
         en_i      => err_evtfifo_near_full,
         count_o   => status_o.evtfifo_near_full_cnt
@@ -267,7 +278,7 @@ begin
     i_input_fifo : component daq_input_fifo
     port map(
         rst           => reset_i,
-        wr_clk        => tk_data_link_i.clk,
+        wr_clk        => data_processor_clk_i,
         rd_clk        => fifo_rd_clk_i,
         din           => infifo_din,
         wr_en         => infifo_wr_en,
@@ -290,7 +301,7 @@ begin
     i_event_fifo : component daq_event_fifo
     port map(
         rst           => reset_i,
-        wr_clk        => tk_data_link_i.clk,
+        wr_clk        => data_processor_clk_i,
         rd_clk        => fifo_rd_clk_i,
         din           => evtfifo_din,
         wr_en         => evtfifo_wr_en,
@@ -333,7 +344,7 @@ begin
         g_COUNTER_WIDTH => 15
     )
     port map(
-        clk_i   => tk_data_link_i.clk,
+        clk_i   => data_processor_clk_i,
         reset_i => reset_i,
         en_i    => infifo_wr_en,
         rate_o  => status_o.infifo_wr_rate
@@ -346,74 +357,41 @@ begin
         g_COUNTER_WIDTH => 17
     )
     port map(
-        clk_i   => tk_data_link_i.clk,
+        clk_i   => data_processor_clk_i,
         reset_i => reset_i,
         en_i    => evtfifo_wr_en,
         rate_o  => status_o.evtfifo_wr_rate
     );
 
     --================================--
-    -- Glue input data into VFAT blocks
+    -- Read the serialized VFAT data input 
     --================================--
-    -- TODO: this should be merged with Input Processor later
-    process(tk_data_link_i.clk)
-    begin
-        if (rising_edge(tk_data_link_i.clk)) then
-        
-            if (reset_i = '1') then
-                ep_vfat_block_data <= (others => '0');
-                ep_vfat_block_en <= '0';
-                ep_vfat_word <= 14;
-                err_vfat_block_too_big <= '0';
-                err_vfat_block_too_small <= '0';
-            else
-                if (tk_data_link_i.data_en = '1') then
-                
-                    -- receiving VFAT data
-                    if (ep_vfat_word > 2) then
-                        ep_vfat_block_data((((ep_vfat_word - 2) * 16) - 1) downto ((ep_vfat_word - 3) * 16)) <= tk_data_link_i.data;
-                        ep_vfat_word <= ep_vfat_word - 1;
-                    -- receiving OH BX data
-                    elsif (ep_vfat_word > 0) then
-                        ep_vfat_block_data((((ep_vfat_word + 12) * 16) - 1) downto ((ep_vfat_word + 11) * 16)) <= tk_data_link_i.data;
-                        ep_vfat_word <= ep_vfat_word - 1;
-                    -- still receiving data even though we expect that the block should have ended already
-                    else
-                        err_vfat_block_too_big <= '1';
-                    end if;
-                    
-                    -- the last word
-                    if (ep_vfat_word = 1) then
-                        ep_vfat_block_en <= '1';
-                    else
-                        ep_vfat_block_en <= '0';
-                    end if;
-                    
-                else
 
-                    -- get ready to read a new block
-                    ep_vfat_word <= 14;
-                    ep_vfat_block_en <= '0';
-                
-                    -- if the strobe is off and the vfat word pointer is not at 0 and not at 14 it means that it didn't finish transmitting all 14 VFAT words - not good
-                    if ((ep_vfat_word /= 0) and (ep_vfat_word /= 14)) then
-                        err_vfat_block_too_small <= '1';
-                    end if;
-                                    
-                end if;
-                
-            end if;
-        end if;
-    end process;
+    i_vfat_input_serializer: entity work.vfat_input_serializer
+        port map(
+            reset_i        => reset_i,
+            daq_data_clk_i => data_clk_i,
+            oh_daq_links_i => oh_daq_links_i,
+            rd_clk_i       => data_processor_clk_i,
+            data_valid_o   => ep_vfat_block_en,
+            data_o         => ep_vfat_block_data,
+            crc_err_o      => open,
+            zero_packet_o  => ep_zero_packet,
+            overflow_o     => vfat_fifo_ovf,
+            underflow_o    => vfat_fifo_unf
+        );
+
+    err_vfat_block_too_big <= '0';
+    err_vfat_block_too_small <= '0';
     
 
     --================================--
     -- Input processor
     --================================--
     
-    process(tk_data_link_i.clk)
+    process(data_processor_clk_i)
     begin
-        if (rising_edge(tk_data_link_i.clk)) then
+        if (rising_edge(data_processor_clk_i)) then
 
             if (reset_i = '1') then
                 ep_last_rx_data <= (others => '0');
@@ -428,11 +406,13 @@ begin
                 ep_last_ec <= (others => '0');
                 ep_last_bc <= (others => '0');
                 ep_first_ever_block <= '1';
+                ep_last_rx_data_suppress <= '0';
             else
 
                 -- fill in last data
                 ep_last_rx_data <= ep_vfat_block_data; -- TOTO Optimization: instead of duplicating all the data you could only retain the OH 32bits, others you can get form infifo_din
                 ep_last_rx_data_valid <= ep_vfat_block_en;
+                ep_last_rx_data_suppress <= ep_zero_packet and control_i.eb_zero_supression_en;
             
                 if (eb_timeout_flag = '1') then
                     ep_first_ever_block <= '1';
@@ -445,22 +425,22 @@ begin
                         err_infifo_full <= '1';
                     end if;
                     
-                    -- push to input FIFO
-                    if (infifo_full = '0') then
+                    -- push to input FIFO if it's not full and we don't zero suppress it
+                    if ((infifo_full = '0') and (ep_zero_packet = '0' or control_i.eb_zero_supression_en = '0')) then
                         infifo_din <= ep_vfat_block_data(191 downto 0);
                         infifo_wr_en <= '1';
                     end if;
                     
-                    -- invalid vfat block? if yes, then just attach it to current event
-                    if ((ep_vfat_block_data(191 downto 144) and x"f000f000f000") /= vfat_block_marker) then
+                    -- check the header and the crc error flag. invalid vfat block? if yes, then just attach it to the current event
+                    if (((ep_vfat_block_data(175 downto 168) /= vfat3_header_i) and (ep_vfat_block_data(175 downto 168) /= vfat3_header_iw)) or (ep_vfat_block_data(176) = '1')) then
                         ep_invalid_vfat_block <= '1';
                         ep_end_of_event <= '0'; -- a corrupt block will never be an end of event - just attach it to current event
                         err_corrupted_vfat_data <= '1';
                         cnt_corrupted_vfat <= cnt_corrupted_vfat + 1;
                     else -- valid block
                         ep_invalid_vfat_block <= '0';
-                        ep_last_ec <= ep_vfat_block_data(171 downto 164);
-                        ep_last_bc <= ep_vfat_block_data(187 downto 176);
+                        ep_last_ec <= ep_vfat_block_data(167 downto 160);
+                        ep_last_bc <= ep_vfat_block_data(155 downto 144);
                         
                         if (ep_first_ever_block = '1') then
                             ep_first_ever_block <= '0';
@@ -468,7 +448,7 @@ begin
                         
 --                        if ((ep_first_ever_block = '0') and (ep_last_ec /= ep_vfat_block_data(171 downto 164))) then
 -- for now checking for end of event using BC, but later should use an L1A counter or OH orbit counter + OH BC (on VFAT2 EC is reset with BC0, so we can't use that for now)
-                        if ((ep_first_ever_block = '0') and (eb_timeout_flag = '0') and (ep_last_bc /= ep_vfat_block_data(187 downto 176))) then
+                        if ((ep_first_ever_block = '0') and (eb_timeout_flag = '0') and (ep_last_bc /= ep_vfat_block_data(155 downto 144))) then
                             ep_end_of_event <= '1';
                         else
                             ep_end_of_event <= '0';
@@ -488,9 +468,9 @@ begin
     --================================--
     -- Event Builder
     --================================--
-    process(tk_data_link_i.clk)
+    process(data_processor_clk_i)
     begin
-        if (rising_edge(tk_data_link_i.clk)) then
+        if (rising_edge(data_processor_clk_i)) then
         
             if (reset_i = '1') then
                 evtfifo_din <= (others => '0');
@@ -546,10 +526,10 @@ begin
                         eb_invalid_vfat_block <= '1';
                     end if;
                     
-                    -- increment the word counter if the counter is not full yet
-                    if (eb_vfat_words_64 < x"fff") then
+                    -- increment the word counter if the counter is not full yet and we didn't zero suppress this data
+                    if (eb_vfat_words_64 < x"fff") and (ep_last_rx_data_suppress = '0') then
                         eb_vfat_words_64 <= eb_vfat_words_64 + 3;
-                    else
+                    elsif (eb_vfat_words_64 = x"fff") then
                         eb_event_too_big <= '1';
                         err_event_too_big <= '1';
                     end if;
@@ -562,26 +542,26 @@ begin
                           
                     -- if we don't have valid bc, fill them in now (this is the case of first ever vfat block or after a timeout)
                     if (eb_counters_valid = '0') then
-                        eb_vfat_bc <= ep_last_rx_data(187 downto 176);
-                        eb_oh_bc <= ep_last_rx_data(223 downto 192);
-                        eb_vfat_ec <= ep_last_rx_data(171 downto 164);
+                        eb_vfat_bc <= ep_last_rx_data(155 downto 144);
+--                        eb_oh_bc <= ep_last_rx_data(223 downto 192);
+                        eb_vfat_ec <= ep_last_rx_data(167 downto 160);
                         eb_counters_valid <= '1';
                     else -- we do have a valid bc
                         
                         -- is the current vfat bc different than the previous (in the same event)
-                        if (eb_vfat_bc /= ep_last_rx_data(187 downto 176)) then
+                        if (eb_vfat_bc /= ep_last_rx_data(155 downto 144)) then
                             eb_mixed_vfat_bc <= '1';
                             err_mixed_vfat_bc <= '1';
                         end if;
                         
                         -- is the current OH bc different than the previous (in the same event)
-                        if (eb_oh_bc /= ep_last_rx_data(223 downto 192)) then
-                            eb_mixed_oh_bc <= '1';
-                            err_mixed_oh_bc <= '1';
-                        end if;
+--                        if (eb_oh_bc /= ep_last_rx_data(223 downto 192)) then
+--                            eb_mixed_oh_bc <= '1';
+--                            err_mixed_oh_bc <= '1';
+--                        end if;
                         
                         -- is the current VFAT ec different than the previous (in the same event)
-                        if (eb_vfat_ec /= ep_last_rx_data(171 downto 164)) then
+                        if (eb_vfat_ec /= ep_last_rx_data(167 downto 160)) then
                             eb_mixed_vfat_ec <= '1';
                             err_mixed_vfat_ec <= '1';
                         end if;
@@ -614,11 +594,15 @@ begin
                     end if;
 
                     if (eb_timeout_flag = '0') then
-                        eb_vfat_bc <= ep_last_rx_data(187 downto 176);
-                        eb_oh_bc <= ep_last_rx_data(223 downto 192);
-                        eb_vfat_ec <= ep_last_rx_data(171 downto 164);
+                        eb_vfat_bc <= ep_last_rx_data(155 downto 144);
+--                        eb_oh_bc <= ep_last_rx_data(223 downto 192);
+                        eb_vfat_ec <= ep_last_rx_data(167 downto 160);
                         eb_counters_valid <= '1';
-                        eb_vfat_words_64 <= x"003"; -- minimum number of VFAT blocks = 1 block (3 64bit words)
+                        if (ep_last_rx_data_suppress = '0') then
+                            eb_vfat_words_64 <= x"003"; -- we already have one VFAT block in the next event (that's the one that marked the end of the previous event)
+                        else
+                            eb_vfat_words_64 <= x"000"; -- the current VFAT block which belongs to the next event is zero suppressed
+                        end if;
                     else
                         eb_counters_valid <= '0';
                         eb_vfat_words_64 <= x"000"; -- no data yet after timeout
@@ -654,7 +638,10 @@ begin
     --================================--
     -- Monitoring & Control
     --================================--
-
+    
+    status_o.vfat_fifo_ovf              <= vfat_fifo_ovf;
+    status_o.vfat_fifo_unf              <= vfat_fifo_unf;
+    
     status_o.evtfifo_empty              <= evtfifo_empty;
     status_o.evtfifo_near_full          <= err_evtfifo_near_full;
     status_o.evtfifo_full               <= evtfifo_full;
@@ -687,7 +674,7 @@ begin
     status_o.ep_vfat_block_data(3)      <= ep_vfat_block_data(127 downto 96);
     status_o.ep_vfat_block_data(4)      <= ep_vfat_block_data(159 downto 128);
     status_o.ep_vfat_block_data(5)      <= ep_vfat_block_data(191 downto 160);
-    status_o.ep_vfat_block_data(6)      <= ep_vfat_block_data(223 downto 192);
+    status_o.ep_vfat_block_data(6)      <= (others => '0');
 
     eb_timeout_delay <= unsigned(control_i.eb_timeout_delay);
 

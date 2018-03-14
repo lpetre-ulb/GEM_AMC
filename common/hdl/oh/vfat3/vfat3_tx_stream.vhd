@@ -25,7 +25,7 @@ entity vfat3_tx_stream is
         ttc_cmds_i              : in  t_ttc_cmds;
         
         -- control
-        run_mode_i              : in  std_logic;
+        sc_only_mode_i          : in  std_logic;
         
         -- output
         data_o                  : out std_logic_vector(7 downto 0);
@@ -46,13 +46,13 @@ architecture vfat3_tx_stream_arch of vfat3_tx_stream is
     constant EC0_WORD           : std_logic_vector(7 downto 0) := x"0f";
     constant BC0_WORD           : std_logic_vector(7 downto 0) := x"33";
     constant CALPULSE_WORD      : std_logic_vector(7 downto 0) := x"3c";
-    constant RUN_MODE_WORD      : std_logic_vector(7 downto 0) := x"66";
+    constant NORMAL_MODE_WORD   : std_logic_vector(7 downto 0) := x"66";
     constant SC_ONLY_WORD       : std_logic_vector(7 downto 0) := x"5a";
     
     constant SYNC_VERIFY_TIMEOUT: unsigned(11 downto 0) := unsigned(C_TTC_NUM_BXs);
     constant BEFORE_SYNC_TIMEOUT: unsigned(11 downto 0) := x"fff";
     
-    type t_state is (WAIT_BEFORE_SYNC, SYNC, RUNNING);
+    type t_state is (WAIT_BEFORE_SYNC, SYNC, SET_COMMPORT_MODE, RUNNING);
     
     signal state                : t_state := SYNC;
     signal sync_countdown       : unsigned(1 downto 0) := "10";
@@ -60,7 +60,7 @@ architecture vfat3_tx_stream_arch of vfat3_tx_stream is
     signal sync_verify_countdown: unsigned(11 downto 0) := SYNC_VERIFY_TIMEOUT;
     
     signal idle_word            : std_logic_vector(7 downto 0) := x"00";
-    signal current_run_mode     : std_logic := '0';
+    signal current_sc_only_mode : std_logic := '0';
     
     
 begin
@@ -75,7 +75,7 @@ begin
                 sync_o <= '0';
                 sync_verify_o <= '0';
                 sync_countdown <= "10";
-                current_run_mode <= '0';
+                current_sc_only_mode <= '0';
                 sync_verify_countdown <= SYNC_VERIFY_TIMEOUT;
                 before_sync_countdown <= BEFORE_SYNC_TIMEOUT;
             else
@@ -93,8 +93,17 @@ begin
                                     
                     sync_countdown <= sync_countdown - 1;
                     if (sync_countdown = "00") then
-                        state <= RUNNING;
+                        state <= SET_COMMPORT_MODE;
                     end if;
+                elsif (state = SET_COMMPORT_MODE) then
+                    if (sc_only_mode_i = '0') then
+                        data_o <= NORMAL_MODE_WORD;
+                        current_sc_only_mode <= '0';
+                    else
+                        data_o <= SC_ONLY_WORD;
+                        current_sc_only_mode <= '1';
+                    end if;
+                    state <= RUNNING;
                 elsif (state = RUNNING) then
                     idle_o <= '0';
                     sync_o <= '0';
@@ -119,12 +128,12 @@ begin
                         data_o <= BC0_WORD;
                     elsif (ttc_cmds_i.calpulse = '1') then
                         data_o <= CALPULSE_WORD;
-                    elsif (current_run_mode = '0' and run_mode_i = '1') then
-                        data_o <= RUN_MODE_WORD;
-                        current_run_mode <= '1';
-                    elsif (current_run_mode = '1' and run_mode_i = '0') then
+                    elsif (current_sc_only_mode = '1' and sc_only_mode_i = '0') then
+                        data_o <= NORMAL_MODE_WORD;
+                        current_sc_only_mode <= '0';
+                    elsif (current_sc_only_mode = '0' and sc_only_mode_i = '1') then
                         data_o <= SC_ONLY_WORD;
-                        current_run_mode <= '0';
+                        current_sc_only_mode <= '1';
                     elsif (sync_verify_countdown = x"000") then
                         data_o <= SYNC_VERIFY_WORD;
                         sync_verify_countdown <= SYNC_VERIFY_TIMEOUT;

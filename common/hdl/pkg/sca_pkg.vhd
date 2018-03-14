@@ -36,6 +36,10 @@ package sca_pkg is
     constant SCA_CMD_JTAG_READ_TDI0     : std_logic_vector(7 downto 0) := x"01";
     constant SCA_CMD_JTAG_GO            : std_logic_vector(7 downto 0) := x"a2";
 
+    -- default values
+    -- for GPIO, note that the bytes are in reverse order, meaning that e.g. 0x00000080 only sets bit 31
+    constant SCA_DEFAULT_GPIO_OUTPUT    : std_logic_vector(31 downto 0) := x"f0ffffff"; -- PROG_B = high, not driving INIT_B, GPIO that go to FPGA are all set low 
+
     type t_sca_reply is record
         channel           : std_logic_vector(7 downto 0);
         error             : std_logic_vector(7 downto 0);
@@ -58,8 +62,8 @@ package sca_pkg is
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRB, length => x"01", data => x"00000004"),         -- enable GPIO
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRC, length => x"01", data => x"00000000"),         -- disable I2C
         (channel => SCA_CHANNEL_CONFIG, command => SCA_CMD_CONFIG_WRITE_CRD, length => x"01", data => x"00000018"),         -- 0x18 enable JTAG and ADC
-        (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_DIR, length => x"04", data => x"ffffffff"),               -- set all GPIO channels as outputs
-        (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_OUT, length => x"04", data => x"ffffffff"),               -- set all GPIO ouputs to high
+        (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_DIR, length => x"04", data => x"0f000080"),               -- set PROG_B and those that go to FPGA as outputs, all others as input 
+        (channel => SCA_CHANNEL_GPIO, command => SCA_CMD_GPIO_SET_OUT, length => x"04", data => SCA_DEFAULT_GPIO_OUTPUT),   -- set GPIO ouputs to default
         (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_CTRL_REG, length => x"04", data => SCA_CFG_JTAG_CTRL_REG),-- set JTAG control reg defaults
         (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_FREQ, length => x"04", data => SCA_CFG_JTAG_FREQ)         -- set default JTAG clk frequency
     );

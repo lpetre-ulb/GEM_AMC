@@ -72,8 +72,8 @@ def main():
 
     heading("Hola, I'm SCA controller tester :)")
 
-    if not checkStatus(ohList):
-        if not 'r' in instructions:
+    if not 'r' in instructions:
+        if not checkStatus(ohList):
             exit()
 
     writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.LINK_ENABLE_MASK'), ohMask)
@@ -81,6 +81,7 @@ def main():
     if instructions == 'r':
         subheading('Reseting the SCA')
         writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.CTRL.MODULE_RESET'), 0x1)
+        checkStatus(ohList)
     elif instructions == 'hh':
         subheading('Disabling monitoring')
         writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.ADC_MONITORING.MONITORING_OFF'), 0xffffffff)
@@ -101,7 +102,7 @@ def main():
                 print(('OH #%d FPGA ID= ' % oh) + hex(value[oh]))
                 if value[oh] != VIRTEX6_FPGA_ID:
                     errors += 1
-        
+
         totalTime = clock() - timeStart
         printCyan('Num errors = ' + str(errors) + ', time took = ' + str(totalTime))
 
@@ -117,13 +118,15 @@ def main():
             adc3 = jtagCommand(False, None, 0, 0x04030000, 32, ohList)
             jtagCommand(True, Virtex6Instructions.BYPASS, 10, None, 0, False)
 
+            ohIdx = 0
             for oh in ohList:
-                coreTemp = ((adc1[oh] >> 6) & 0x3FF) * 503.975 / 1024.0-273.15
-                volt1 = ((adc2[oh] >> 6) & 0x3FF) * 3.0 / 1024.0
-                volt2 = ((adc3[oh] >> 6) & 0x3FF) * 3.0 / 1024.0
+                coreTemp = ((adc1[ohIdx] >> 6) & 0x3FF) * 503.975 / 1024.0-273.15
+                volt1 = ((adc2[ohIdx] >> 6) & 0x3FF) * 3.0 / 1024.0
+                volt2 = ((adc3[ohIdx] >> 6) & 0x3FF) * 3.0 / 1024.0
 
                 #printCyan('adc1 = ' + hex(adc1) + ', adc2 = ' + hex(adc2) + ', adc3 = ' + hex(adc3))
                 printCyan(('=== OH #%d ===' % oh) + 'Core temp = ' + str(coreTemp) + ', voltage #1 = ' + str(volt1) + ', voltage #2 = ' + str(volt2))
+                ohIdx += 1
 
             sleep(0.5)
 
@@ -197,8 +200,10 @@ def main():
 
         fpgaIds = jtagCommand(True, Virtex6Instructions.FPGA_ID, 10, 0x0, 32, ohList)
         sleep(0.0001)
+        fpgaIdIdx = 0
         for oh in ohList:
-            print('FPGA ID = ' + hex(fpgaIds[oh]))
+            print('FPGA ID = ' + hex(fpgaIds[fpgaIdIdx]))
+            fpgaIdIdx += 1
             #if fpgaIds[oh] != VIRTEX6_FPGA_ID:
             #    raise ValueError("Bad FPGA-ID (should be " + hex(VIRTEX6_FPGA_ID) + ")... Hands off...")
 
@@ -322,35 +327,35 @@ def main():
         nn = getNode('GEM_AMC.SLOW_CONTROL.SCA.JTAG.TDI')
         for i in range(0,1000000):
             #print(str(i))
-            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_CHANNEL'), 0x02)                                                                              
-            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_COMMAND'), 0x10)                                                                              
-            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_LENGTH'), 0x4)                                                                               
-            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_DATA'), 0x0)                                                                                           
-            
+            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_CHANNEL'), 0x02)
+            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_COMMAND'), 0x10)
+            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_LENGTH'), 0x4)
+            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_DATA'), 0x0)
+
             #readReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.JTAG.TDI'))
             wReg(ADDR_JTAG_TMS, 0x00000000)
 
             #sleep(0.01)
             #print('execute')
-            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_EXECUTE'), 0x1)          
+            #writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.SCA_CMD_EXECUTE'), 0x1)
         totalTime = clock() - timeStart
         printCyan('time took = ' + str(totalTime))
-        
+
     elif instructions == 'test2':
-        timeStart = clock()                                                              
-        nn = getNode('GEM_AMC.SLOW_CONTROL.SCA.JTAG.TDI')                                
+        timeStart = clock()
+        nn = getNode('GEM_AMC.SLOW_CONTROL.SCA.JTAG.TDI')
         for i in range(0,10000):
             print(str(i))
             sleep(0.001)
             writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.MANUAL_CONTROL.FPGA_HARD_RESET'), 0x1)
 
     elif instructions == 'compare-mcs-bit':
-        if len(sys.argv) < 4:
+        if len(sys.argv) < 5:
             print("Usage: sca.py compare-mcs-bit <mcs_filename> <bit_filename>")
             return
 
-        mcsFilename = sys.argv[2]
-        bitFilename = sys.argv[3]
+        mcsFilename = sys.argv[3]
+        bitFilename = sys.argv[4]
         mcsBytes = readMcs(mcsFilename)
 
         bitBytes = array.array('L')
@@ -403,6 +408,40 @@ def main():
                sleep(0.5)
 
         print("Num errors: " + str(errors))
+    elif instructions == 'gpio-set-direction':
+        if len(sys.argv) < 4:
+            print('Usage: sca.py gpio-set-direction <direction-mask>')
+            print('direction-mask is a 32 bit number where each bit represents a GPIO channel -- if a given bit is high it means that this GPIO channel will be set to OUTPUT mode, and otherwise it will be set to INPUT mode')
+            return
+        directionMask = parseInt(sys.argv[3])
+
+        subheading('Disabling monitoring')
+        writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.ADC_MONITORING.MONITORING_OFF'), 0xffffffff)
+        sleep(0.01)
+        subheading('Setting the GPIO direction mask to ' + hex(directionMask))
+        sendScaCommand(ohList, 0x2, 0x20, 0x4, directionMask, False)
+    elif instructions == 'gpio-set-output':
+        if len(sys.argv) < 4:
+            print('Usage: sca.py gpio-set-output <output-data>')
+            print('output-data is a 32 bit number representing the 32 GPIO channels state')
+            return
+        outputData = parseInt(sys.argv[3])
+
+        subheading('Disabling monitoring')
+        writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.ADC_MONITORING.MONITORING_OFF'), 0xffffffff)
+        sleep(0.01)
+        subheading('Setting the GPIO output to ' + hex(outputData))
+        sendScaCommand(ohList, 0x2, 0x10, 0x4, outputData, False)
+    elif instructions == 'gpio-read-input':
+        subheading('Disabling monitoring')
+        writeReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.ADC_MONITORING.MONITORING_OFF'), 0xffffffff)
+        sleep(0.01)
+        subheading('Reading the GPIO input')
+        readData = sendScaCommand(ohList, 0x2, 0x1, 0x1, 0x0, True)
+        idx = 0
+        for oh in ohList:
+            print('OH %d  GPIO Input = ' %(oh) + hex(readData[idx]))
+            idx += 1
 
 
 def initJtagRegAddrs():

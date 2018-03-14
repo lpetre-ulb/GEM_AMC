@@ -68,7 +68,22 @@ package system_package is
     (gth_4p8g, false),                  -- GTH FW Ch 21
     (gth_4p8g, false),                  -- GTH FW Ch 22
     (gth_4p8g, false),                  -- GTH FW Ch 23
-    
+
+-- for gbt use this:    
+--    (gth_4p8g, false),                  -- GTH FW Ch 24
+--    (gth_4p8g, false),                  -- GTH FW Ch 25
+--    (gth_4p8g, false),                  -- GTH FW Ch 26
+--    (gth_4p8g, false),                  -- GTH FW Ch 27
+--    (gth_4p8g, false),                  -- GTH FW Ch 28
+--    (gth_4p8g, false),                  -- GTH FW Ch 29
+--    (gth_4p8g, false),                  -- GTH FW Ch 30
+--    (gth_4p8g, false),                  -- GTH FW Ch 31
+--    (gth_4p8g, false),                  -- GTH FW Ch 32
+--    (gth_4p8g, false),                  -- GTH FW Ch 33
+--    (gth_4p8g, false),                  -- GTH FW Ch 34
+--    (gth_4p8g, false)                   -- GTH FW Ch 35
+
+-- for trigger use this:    
     (gth_3p2g, TRUE),                  -- GTH FW Ch 24
     (gth_3p2g, false),                  -- GTH FW Ch 25
     (gth_3p2g, false),                  -- GTH FW Ch 26
@@ -80,7 +95,7 @@ package system_package is
     (gth_3p2g, false),                  -- GTH FW Ch 32
     (gth_3p2g, false),                  -- GTH FW Ch 33
     (gth_3p2g, false),                  -- GTH FW Ch 34
-    (gth_3p2g, false)                   -- GTH FW Ch 35
+    (gth_3p2g, false)                   -- GTH FW Ch 35    
     );
 
 end package system_package;

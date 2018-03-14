@@ -173,6 +173,10 @@
               description="Enable TTC generator module. Note that all real TTC commands are suppressed when the generator module is enabled"
               fw_signal="gen_enable" fw_default="0b0"
               sw_ctrl_configure_set="0x0"/>
+        <node id="ENABLE_CALPULSE_ONLY" address="0x1" mask="0x00000004" permission="rw"
+              description="Enable TTC generator calpulse signal only. Having ENABLE = 0 and ENABLE_CALPULSE_ONLY = 1 will result in using all TTC commands from AMC13 except calpulse, which will be taken from the generator. This is a debugging feature used for synthetic tests which can emulate data coming from the VFATs. If the ENABLE is set to 1, then this register is ignored, and all TTC commands will be taken from the generator."
+              fw_signal="gen_enable_cal_only" fw_default="0b0"
+              sw_ctrl_configure_set="0x0"/>
         <node id="SINGLE_HARD_RESET" address="0x2" permission="w"
               description="Writing to this register will trigger a single hard-reset command to be sent"
               fw_write_pulse_signal="gen_single_hard_reset"/>
@@ -188,6 +192,9 @@
         <node id="CYCLIC_CALPULSE_TO_L1A_GAP" address="0x1" mask="0xfff00000" permission="rw"
               description="This register lets you set the number of BXs between the cyclic CalPulse and the following L1A. Setting this to 0 will disable the cyclic CalPulse"
               fw_signal="gen_cyclic_cal_l1a_gap" fw_default="0x000"/>
+        <node id="CYCLIC_CALPULSE_PRESCALE" address="0x7" mask="0x00000fff" permission="rw"
+              description="This register lets you prescale the calpulse in relation to L1A. A value of 0 means that there will be a calpulse before every L1A (if the CYCLIC_CALPULSE_TO_L1A_GAP is more than 0) while e.g. a value of 100 means that there will be a calpulse before every 100th L1A."
+              fw_signal="gen_cyclic_cal_prescale" fw_default="0x000"/>
         <node id="CYCLIC_L1A_COUNT" address="0x5" mask="0x00ffffff" permission="rw"
               description="This register lets you set the number of cyclic L1As (and calpulses) to be sent uppon cyclic-start command. If this is set to 0 then cyclic L1As will be sent forever uppon cyclic-start command and can only be stopped with a reset or disabling the generator module."
               fw_signal="gen_cyclic_l1a_cnt" fw_default="0x002710"/>
@@ -255,6 +262,9 @@
               description="Last cluster ${CLUSTER_IDX}"
               fw_signal="'0' &amp; sbitmon_sbits(${CLUSTER_IDX}).size &amp; '0' &amp; sbitmon_sbits(${CLUSTER_IDX}).address"
               generate="true" generate_size="8" generate_address_step="0x1" generate_idx_var="CLUSTER_IDX"/>
+        <node id="L1A_DELAY" address="0xa" mask="0xffffffff" permission="r"
+              description="Number of BX between this sbit and the subsequent L1A"
+              fw_signal="sbitmon_l1a_delay"/>
       </node>
 
       <node id="OH${OH_IDX}" address="0x100"
@@ -384,9 +394,21 @@
         <node id="USE_OH_VFAT3_SLOTS" address="0x1" mask="0x00000001" permission="rw"
               description="When this is set to 1 then VFAT3 connectors mounted on the Optohybrid v3a will be used instead of GEB VFAT3 slots 0 and 1"
               fw_signal="use_oh_vfat3_connectors" fw_default="0b0"/>
-        <node id="VFAT3_RUN_MODE" address="0x1" mask="0x00000002" permission="rw"
-              description="When this is set to 1 then VFAT3s will be set to run mode, otherwise they will be set to slow-control-only mode"
-              fw_signal="vfat3_run_mode" fw_default="0b0"/>
+        <node id="SC_ONLY_MODE" address="0x1" mask="0x00000002" permission="rw"
+              description="When this is set to 0 then comm port of VFAT3s will be set to normal mode, otherwise they will be set to slow-control-only mode. This setting is applied to all VFATs during link reset and whenever this value is changed."
+              fw_signal="vfat3_sc_only_mode" fw_default="0b0"/>
+        <node id="USE_OH_V3B_MAPPING" address="0x1" mask="0x00000004" permission="rw"
+              description="If set high, then will use the v3b elink assignments for the OH FPGA communication, otherwise v3a"
+              fw_signal="use_v3b_elink_mapping" fw_default="0b0"/>
+        <node id="V3B_FPGA_SLOW_RX_BITSHIFT" address="0x1" mask="0x00000070" permission="rw"
+              description="for debugging only - allows shifting the bits in the slow 80Mbit/s RX elink of v3b (shift of 0 means picking out bits 0 and 4, shift of 1 means picking out bits 1 and 5, shift of 4 means picking out bits 4 and 0, etc)"
+              fw_signal="v3b_slow_rx_bitshift" fw_default="0b010"/>
+        <node id="V3B_FPGA_TX_0_BITSLIP" address="0x1" mask="0x00000f00" permission="rw"
+              description="bit slips the OH FPGA TX elink 0 (the top 8 bits)"
+              fw_signal="v3b_tx_0_bitslip" fw_default="0x0"/>
+        <node id="V3B_FPGA_TX_1_BITSLIP" address="0x1" mask="0x0000f000" permission="rw"
+              description="bit slips the OH FPGA TX elink 1 (the bottom 8 bits)"
+              fw_signal="v3b_tx_1_bitslip" fw_default="0x4"/>
       </node>
 
       <node id="TESTS" address="0x200">
@@ -526,6 +548,9 @@
                            explicitly written (this can be changed in the future if
                            necessary)"
               fw_signal="reset_local" fw_default="0b0"/>
+        <node id="ZERO_SUPPRESSION_EN"              address="0x0" mask="0x00000002" permission="rw"
+              description="Enable/disable VFAT2 zero suppression"
+              fw_signal="zero_suppression_en" fw_default="0b0"/>
         <node id="TTS_OVERRIDE"       address="0x0" mask="0x000000f0" permission="rw"
               description="When not 0, it will override the AMC TTS state with the
                            provided value (e.g. writing 0x8 will force AMC to always be
@@ -542,7 +567,20 @@
                            inserted and timeout flag will be set there, though no VFAT
                            payload will be present). Units = clock cycles @ 25MHz
                            (current DAQLink clk frequency)"
-              fw_signal="dav_timeout" fw_default="0x3d090"/>
+              fw_signal="dav_timeout" fw_default="0x00500"/>
+        <node id="DBG_FANOUT_ENABLE"        address="0x6"  mask="0x01000000" permission="rw"
+              description="This register enables and disables the fanout feature.
+                           This feature is used for testing only. When enabled it will
+                           take the data input from one OH and fan it out to all DAQ module
+                           inputs. The input to be used is controlled by DBG_FANOUT_INPUT reg."
+              fw_signal="dbg_fanout_enable" fw_default="0b0"/>
+        <node id="DBG_FANOUT_INPUT"        address="0x6"  mask="0xf0000000" permission="rw"
+              description="Selects the input to be faned out when the fanout feature is enabled (see DBG_FANOUT_ENABLE)."
+              fw_signal="dbg_fanout_input" fw_default="0x0"/>
+        <node id="DBG_IGNORE_DAQLINK"        address="0x6"  mask="0x02000000" permission="rw"
+              description="This register when set to 1 will cause the DAQ module to ignore the DAQLink ready and DAQLink backpressure signals.
+                           It can be used for fake datarate testing without involving AMC13."
+              fw_signal="dbg_daqlink_ignore" fw_default="0b0"/>
       </node>
 
       <node id="STATUS"  address="0x1"
@@ -670,7 +708,7 @@
                              will close the current event and report it to DAQ. This is one
                              of the two ways to close an event, the other is to get new
                              data with different BX number"
-                fw_signal="input_control_arr(${OH_IDX}).eb_timeout_delay" fw_default="0x0030d4"/>
+                fw_signal="input_control_arr(${OH_IDX}).eb_timeout_delay" fw_default="0x000100"/>
         </node>
 
         <node id="STATUS"  address="0x0">
@@ -735,6 +773,12 @@
                              same event (EC/BC is the same)
                              TTS ERROR is asserted when this bit is 1"
                 fw_signal="input_status_arr(${OH_IDX}).err_event_too_big"/>
+          <node id="VFAT_INPUT_HAD_OVF"           mask="0x00010000" permission="r" address="0x0"
+                description="Individual VFAT input buffer had overflow. This indicates a logic problem in the firmware and therefore is a critical error"
+                fw_signal="input_status_arr(${OH_IDX}).vfat_fifo_ovf"/>
+          <node id="VFAT_INPUT_HAD_UNF"           mask="0x00020000" permission="r" address="0x0"
+                description="Individual VFAT input buffer had underflow. This indicates a logic problem in the firmware and therefore is a critical error"
+                fw_signal="input_status_arr(${OH_IDX}).vfat_fifo_unf"/>
           <node id="TTS_STATE"           mask="0x0000f000" permission="r" address="0x0"
                 description="Input TTS state (gets integrated into global TTS state later)"
                 fw_signal="input_status_arr(${OH_IDX}).tts_state"/>
@@ -895,6 +939,10 @@
               description="This flag is latched high if the GBT RX sync fifo has underflow, and is reset with link reset"
               fw_signal="gbt_link_status_arr_i(${OH_IDX} * 3 + 2).gbt_rx_sync_status.had_unf"
               sw_monitor_error_value="0"/>
+
+        <node id="VFAT_MASK" address="0x1" mask="0x00ffffff" permission="rw"
+              description="Mask the RX link of the selected VFATs (both slow control and DAQ path will be shut off for these VFATs)."
+              fw_signal="vfat_mask_arr(${OH_IDX})" fw_default="0x000000"/>
 
         <node id="VFAT${VFAT_IDX}" address="0x10"
               description="Link status of VFAT ${VFAT_IDX} on ${OH_IDX}"
@@ -1235,16 +1283,7 @@
 
         <!--TTC module -->
         <node id="CONTROL"  address="0x0000"
-            description="Implements various control and monitoring functions of the Optohybrid"
-            fw_is_module="true"
-            fw_module_file="../src/control/control.vhd"
-            fw_user_clock_signal="clock_i"
-            fw_bus_clock_signal="clock_i"
-            fw_bus_reset_signal="reset"
-            fw_master_bus_signal="ipb_mosi_i"
-            fw_slave_bus_signal="ipb_miso_o"
-            fw_reg_addr_msb="5"
-            fw_reg_addr_lsb="0">
+            description="Implements various control and monitoring functions of the Optohybrid">
 
             <node id="LOOPBACK" address="0x0"
                 description="Loopback Test Register" fw_signal="loopback">
@@ -1395,16 +1434,7 @@
 
     <!--ADC module -->
     <node id="ADC"  address="0x1000"
-        description="Connects to the Virtex-6 XADC"
-        fw_is_module="true"
-        fw_module_file="../src/control/adc.vhd"
-        fw_user_clock_signal="clock_i"
-        fw_bus_clock_signal="ipb_clk_i"
-        fw_bus_reset_signal="ipb_reset_i"
-        fw_master_bus_signal="ipb_mosi_i"
-        fw_slave_bus_signal="ipb_miso_o"
-        fw_reg_addr_msb="3"
-        fw_reg_addr_lsb="0">
+        description="Connects to the Virtex-6 XADC">
 
             <node id="CTRL" address="0x0" description = "XADC Control">
 
@@ -1483,16 +1513,7 @@
 
     <!--Trigger Module -->
     <node id="TRIG"  address="0x2000"
-        description="Connects to the trigger control module"
-        fw_is_module="true"
-        fw_module_file="../src/trigger/trigger.vhd"
-        fw_user_clock_signal="clk_40"
-        fw_bus_clock_signal="clk_40"
-        fw_bus_reset_signal="reset_i"
-        fw_master_bus_signal="ipb_mosi_i"
-        fw_slave_bus_signal="ipb_miso_o"
-        fw_reg_addr_msb="7"
-        fw_reg_addr_lsb="0">
+        description="Connects to the trigger control module">
 
             <node id="CTRL" address="0x0" description = "Trig Control">
 
@@ -2806,16 +2827,7 @@
 
     <!--Clocking module -->
     <node id="CLOCKING"  address="0x3000"
-          description="Connects to MMCMs"
-          fw_is_module="true"
-          fw_module_file="../src/utils/clocking.vhd"
-          fw_user_clock_signal="clock"
-          fw_bus_clock_signal="clock"
-          fw_bus_reset_signal="ipb_reset_i"
-          fw_master_bus_signal="ipb_mosi_i"
-          fw_slave_bus_signal="ipb_miso_o"
-          fw_reg_addr_msb="2"
-          fw_reg_addr_lsb="0">
+          description="Connects to MMCMs">
 
             <node id="CLOCKING" address="0x0" description = "Clocking">
                 <node id="GBT_MMCM_LOCKED" address="0x2" permission="r"
@@ -2845,16 +2857,7 @@
 
     <!--Clocking module -->
     <node id="GBT"  address="0x4000"
-          description="Connects to GBT"
-          fw_is_module="true"
-          fw_module_file="../src/gbt/gbt.vhd"
-          fw_user_clock_signal="clock_i"
-          fw_bus_clock_signal="clock_i"
-          fw_bus_reset_signal="ipb_reset_i"
-          fw_master_bus_signal="ipb_mosi_i"
-          fw_slave_bus_signal="ipb_miso_o"
-          fw_reg_addr_msb="2"
-          fw_reg_addr_lsb="0">
+          description="Connects to GBT">
 
             <node id="TX" address="0x0" description = "TX">
                 <node id="BITSLIP0" address="0x0" permission="rw"

@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 33;
+    constant REG_TTC_NUM_REGS : integer := 34;
     constant REG_TTC_ADDRESS_MSB : integer := 5;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(5 downto 0) := "00" & x"0";
@@ -176,6 +176,10 @@ package registers is
     constant REG_TTC_GENERATOR_CYCLIC_RUNNING_ADDR    : std_logic_vector(5 downto 0) := "10" & x"1";
     constant REG_TTC_GENERATOR_CYCLIC_RUNNING_BIT    : integer := 1;
 
+    constant REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_ADDR    : std_logic_vector(5 downto 0) := "10" & x"1";
+    constant REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_BIT    : integer := 2;
+    constant REG_TTC_GENERATOR_ENABLE_CALPULSE_ONLY_DEFAULT : std_logic := '0';
+
     constant REG_TTC_GENERATOR_CYCLIC_L1A_GAP_ADDR    : std_logic_vector(5 downto 0) := "10" & x"1";
     constant REG_TTC_GENERATOR_CYCLIC_L1A_GAP_MSB    : integer := 19;
     constant REG_TTC_GENERATOR_CYCLIC_L1A_GAP_LSB     : integer := 4;
@@ -207,6 +211,11 @@ package registers is
     constant REG_TTC_GENERATOR_CYCLIC_START_MSB    : integer := 31;
     constant REG_TTC_GENERATOR_CYCLIC_START_LSB     : integer := 0;
 
+    constant REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_ADDR    : std_logic_vector(5 downto 0) := "10" & x"7";
+    constant REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_MSB    : integer := 11;
+    constant REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_LSB     : integer := 0;
+    constant REG_TTC_GENERATOR_CYCLIC_CALPULSE_PRESCALE_DEFAULT : std_logic_vector(11 downto 0) := x"000";
+
 
     --============================================================================
     --       >>> TRIGGER Module <<<    base address: 0x00800000
@@ -216,7 +225,7 @@ package registers is
     -- reporting data to DAQ)
     --============================================================================
 
-    constant REG_TRIGGER_NUM_REGS : integer := 65;
+    constant REG_TRIGGER_NUM_REGS : integer := 66;
     constant REG_TRIGGER_ADDRESS_MSB : integer := 12;
     constant REG_TRIGGER_ADDRESS_LSB : integer := 0;
     constant REG_TRIGGER_CTRL_MODULE_RESET_ADDR    : std_logic_vector(12 downto 0) := '0' & x"000";
@@ -280,6 +289,10 @@ package registers is
     constant REG_TRIGGER_SBIT_MONITOR_CLUSTER7_ADDR    : std_logic_vector(12 downto 0) := '0' & x"089";
     constant REG_TRIGGER_SBIT_MONITOR_CLUSTER7_MSB    : integer := 15;
     constant REG_TRIGGER_SBIT_MONITOR_CLUSTER7_LSB     : integer := 0;
+
+    constant REG_TRIGGER_SBIT_MONITOR_L1A_DELAY_ADDR    : std_logic_vector(12 downto 0) := '0' & x"08a";
+    constant REG_TRIGGER_SBIT_MONITOR_L1A_DELAY_MSB    : integer := 31;
+    constant REG_TRIGGER_SBIT_MONITOR_L1A_DELAY_LSB     : integer := 0;
 
     constant REG_TRIGGER_OH0_TRIGGER_RATE_ADDR    : std_logic_vector(12 downto 0) := '0' & x"100";
     constant REG_TRIGGER_OH0_TRIGGER_RATE_MSB    : integer := 31;
@@ -577,9 +590,28 @@ package registers is
     constant REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT    : integer := 0;
     constant REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_DEFAULT : std_logic := '0';
 
-    constant REG_GEM_SYSTEM_VFAT3_VFAT3_RUN_MODE_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
-    constant REG_GEM_SYSTEM_VFAT3_VFAT3_RUN_MODE_BIT    : integer := 1;
-    constant REG_GEM_SYSTEM_VFAT3_VFAT3_RUN_MODE_DEFAULT : std_logic := '0';
+    constant REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
+    constant REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_BIT    : integer := 1;
+    constant REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_DEFAULT : std_logic := '0';
+
+    constant REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
+    constant REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_BIT    : integer := 2;
+    constant REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_DEFAULT : std_logic := '0';
+
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_SLOW_RX_BITSHIFT_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_SLOW_RX_BITSHIFT_MSB    : integer := 6;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_SLOW_RX_BITSHIFT_LSB     : integer := 4;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_SLOW_RX_BITSHIFT_DEFAULT : std_logic_vector(6 downto 4) := "010";
+
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_0_BITSLIP_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_0_BITSLIP_MSB    : integer := 11;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_0_BITSLIP_LSB     : integer := 8;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_0_BITSLIP_DEFAULT : std_logic_vector(11 downto 8) := x"0";
+
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_1_BITSLIP_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_1_BITSLIP_MSB    : integer := 15;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_1_BITSLIP_LSB     : integer := 12;
+    constant REG_GEM_SYSTEM_VFAT3_V3B_FPGA_TX_1_BITSLIP_DEFAULT : std_logic_vector(15 downto 12) := x"4";
 
     constant REG_GEM_SYSTEM_CTRL_CNT_RESET_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0100";
     constant REG_GEM_SYSTEM_CTRL_CNT_RESET_MSB    : integer := 31;
@@ -919,6 +951,10 @@ package registers is
     constant REG_DAQ_CONTROL_DAQ_ENABLE_BIT    : integer := 0;
     constant REG_DAQ_CONTROL_DAQ_ENABLE_DEFAULT : std_logic := '0';
 
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_BIT    : integer := 1;
+    constant REG_DAQ_CONTROL_ZERO_SUPPRESSION_EN_DEFAULT : std_logic := '0';
+
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_ADDR    : std_logic_vector(8 downto 0) := '0' & x"00";
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_BIT    : integer := 2;
     constant REG_DAQ_CONTROL_DAQ_LINK_RESET_DEFAULT : std_logic := '0';
@@ -993,7 +1029,20 @@ package registers is
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"03d090";
+    constant REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000500";
+
+    constant REG_DAQ_CONTROL_DBG_FANOUT_ENABLE_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
+    constant REG_DAQ_CONTROL_DBG_FANOUT_ENABLE_BIT    : integer := 24;
+    constant REG_DAQ_CONTROL_DBG_FANOUT_ENABLE_DEFAULT : std_logic := '0';
+
+    constant REG_DAQ_CONTROL_DBG_IGNORE_DAQLINK_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
+    constant REG_DAQ_CONTROL_DBG_IGNORE_DAQLINK_BIT    : integer := 25;
+    constant REG_DAQ_CONTROL_DBG_IGNORE_DAQLINK_DEFAULT : std_logic := '0';
+
+    constant REG_DAQ_CONTROL_DBG_FANOUT_INPUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
+    constant REG_DAQ_CONTROL_DBG_FANOUT_INPUT_MSB    : integer := 31;
+    constant REG_DAQ_CONTROL_DBG_FANOUT_INPUT_LSB     : integer := 28;
+    constant REG_DAQ_CONTROL_DBG_FANOUT_INPUT_DEFAULT : std_logic_vector(31 downto 28) := x"0";
 
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_ADDR    : std_logic_vector(8 downto 0) := '0' & x"07";
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_MSB    : integer := 23;
@@ -1078,6 +1127,12 @@ package registers is
     constant REG_DAQ_OH0_STATUS_TTS_STATE_MSB    : integer := 15;
     constant REG_DAQ_OH0_STATUS_TTS_STATE_LSB     : integer := 12;
 
+    constant REG_DAQ_OH0_STATUS_VFAT_INPUT_HAD_OVF_ADDR    : std_logic_vector(8 downto 0) := '0' & x"10";
+    constant REG_DAQ_OH0_STATUS_VFAT_INPUT_HAD_OVF_BIT    : integer := 16;
+
+    constant REG_DAQ_OH0_STATUS_VFAT_INPUT_HAD_UNF_ADDR    : std_logic_vector(8 downto 0) := '0' & x"10";
+    constant REG_DAQ_OH0_STATUS_VFAT_INPUT_HAD_UNF_BIT    : integer := 17;
+
     constant REG_DAQ_OH0_STATUS_INPUT_FIFO_IS_UFLOW_ADDR    : std_logic_vector(8 downto 0) := '0' & x"10";
     constant REG_DAQ_OH0_STATUS_INPUT_FIFO_IS_UFLOW_BIT    : integer := 24;
 
@@ -1113,7 +1168,7 @@ package registers is
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"13";
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH0_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"14";
     constant REG_DAQ_OH0_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -1212,6 +1267,12 @@ package registers is
     constant REG_DAQ_OH1_STATUS_TTS_STATE_MSB    : integer := 15;
     constant REG_DAQ_OH1_STATUS_TTS_STATE_LSB     : integer := 12;
 
+    constant REG_DAQ_OH1_STATUS_VFAT_INPUT_HAD_OVF_ADDR    : std_logic_vector(8 downto 0) := '0' & x"20";
+    constant REG_DAQ_OH1_STATUS_VFAT_INPUT_HAD_OVF_BIT    : integer := 16;
+
+    constant REG_DAQ_OH1_STATUS_VFAT_INPUT_HAD_UNF_ADDR    : std_logic_vector(8 downto 0) := '0' & x"20";
+    constant REG_DAQ_OH1_STATUS_VFAT_INPUT_HAD_UNF_BIT    : integer := 17;
+
     constant REG_DAQ_OH1_STATUS_INPUT_FIFO_IS_UFLOW_ADDR    : std_logic_vector(8 downto 0) := '0' & x"20";
     constant REG_DAQ_OH1_STATUS_INPUT_FIFO_IS_UFLOW_BIT    : integer := 24;
 
@@ -1247,7 +1308,7 @@ package registers is
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"23";
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_MSB    : integer := 23;
     constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_LSB     : integer := 0;
-    constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"0030d4";
+    constant REG_DAQ_OH1_CONTROL_EOE_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000100";
 
     constant REG_DAQ_OH1_COUNTERS_INPUT_FIFO_DATA_CNT_ADDR    : std_logic_vector(8 downto 0) := '0' & x"24";
     constant REG_DAQ_OH1_COUNTERS_INPUT_FIFO_DATA_CNT_MSB    : integer := 11;
@@ -1316,7 +1377,7 @@ package registers is
     -- OH Link monitoring registers
     --============================================================================
 
-    constant REG_OH_LINKS_NUM_REGS : integer := 50;
+    constant REG_OH_LINKS_NUM_REGS : integer := 52;
     constant REG_OH_LINKS_ADDRESS_MSB : integer := 12;
     constant REG_OH_LINKS_ADDRESS_LSB : integer := 0;
     constant REG_OH_LINKS_OH0_GBT0_READY_ADDR    : std_logic_vector(12 downto 0) := '0' & x"100";
@@ -1354,6 +1415,11 @@ package registers is
 
     constant REG_OH_LINKS_OH0_GBT2_RX_HAD_UNDERFLOW_ADDR    : std_logic_vector(12 downto 0) := '0' & x"100";
     constant REG_OH_LINKS_OH0_GBT2_RX_HAD_UNDERFLOW_BIT    : integer := 11;
+
+    constant REG_OH_LINKS_OH0_VFAT_MASK_ADDR    : std_logic_vector(12 downto 0) := '0' & x"101";
+    constant REG_OH_LINKS_OH0_VFAT_MASK_MSB    : integer := 23;
+    constant REG_OH_LINKS_OH0_VFAT_MASK_LSB     : integer := 0;
+    constant REG_OH_LINKS_OH0_VFAT_MASK_DEFAULT : std_logic_vector(23 downto 0) := x"000000";
 
     constant REG_OH_LINKS_OH0_VFAT0_LINK_GOOD_ADDR    : std_logic_vector(12 downto 0) := '0' & x"110";
     constant REG_OH_LINKS_OH0_VFAT0_LINK_GOOD_BIT    : integer := 0;
@@ -1750,6 +1816,11 @@ package registers is
 
     constant REG_OH_LINKS_OH1_GBT2_RX_HAD_UNDERFLOW_ADDR    : std_logic_vector(12 downto 0) := '0' & x"200";
     constant REG_OH_LINKS_OH1_GBT2_RX_HAD_UNDERFLOW_BIT    : integer := 11;
+
+    constant REG_OH_LINKS_OH1_VFAT_MASK_ADDR    : std_logic_vector(12 downto 0) := '0' & x"201";
+    constant REG_OH_LINKS_OH1_VFAT_MASK_MSB    : integer := 23;
+    constant REG_OH_LINKS_OH1_VFAT_MASK_LSB     : integer := 0;
+    constant REG_OH_LINKS_OH1_VFAT_MASK_DEFAULT : std_logic_vector(23 downto 0) := x"000000";
 
     constant REG_OH_LINKS_OH1_VFAT0_LINK_GOOD_ADDR    : std_logic_vector(12 downto 0) := '0' & x"210";
     constant REG_OH_LINKS_OH1_VFAT0_LINK_GOOD_BIT    : integer := 0;

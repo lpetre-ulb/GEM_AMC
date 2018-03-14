@@ -50,11 +50,13 @@
       <node id="GENERATOR" address="0x20" >
         <node id="RESET" address="0x0" permission="w" />
         <node id="ENABLE" address="0x1" permission="rw" mask="0x1"/>
+        <node id="ENABLE_CALPULSE_ONLY" address="0x1" permission="rw" mask="0x4"/>
         <node id="SINGLE_HARD_RESET" address="0x2" permission="w" />
         <node id="SINGLE_RESYNC" address="0x3" permission="w" />
         <node id="SINGLE_EC0" address="0x4" permission="w" />
         <node id="CYCLIC_L1A_GAP" address="0x1" permission="rw" mask="0xffff0"/>
         <node id="CYCLIC_CALPULSE_TO_L1A_GAP" address="0x1" permission="rw" mask="0xfff00000"/>
+        <node id="CYCLIC_CALPULSE_PRESCALE" address="0x7" permission="rw" mask="0xfff"/>
         <node id="CYCLIC_L1A_COUNT" address="0x5" permission="rw" mask="0xffffff"/>
         <node id="CYCLIC_RUNNING" address="0x1" permission="r" mask="0x2"/>
         <node id="CYCLIC_START" address="0x6" permission="w" />
@@ -81,6 +83,7 @@
         <node id="CLUSTER5" address="0x7" permission="r" mask="0xffff"/>
         <node id="CLUSTER6" address="0x8" permission="r" mask="0xffff"/>
         <node id="CLUSTER7" address="0x9" permission="r" mask="0xffff"/>
+        <node id="L1A_DELAY" address="0xa" permission="r" mask="0xffffffff"/>
       </node>
       <node id="OH0" address="0x100" >
         <node id="TRIGGER_RATE" address="0x0" permission="r" />
@@ -168,7 +171,11 @@
       </node>
       <node id="VFAT3" address="0x10" >
         <node id="USE_OH_VFAT3_SLOTS" address="0x1" permission="rw" mask="0x1"/>
-        <node id="VFAT3_RUN_MODE" address="0x1" permission="rw" mask="0x2"/>
+        <node id="SC_ONLY_MODE" address="0x1" permission="rw" mask="0x2"/>
+        <node id="USE_OH_V3B_MAPPING" address="0x1" permission="rw" mask="0x4"/>
+        <node id="V3B_FPGA_SLOW_RX_BITSHIFT" address="0x1" permission="rw" mask="0x70"/>
+        <node id="V3B_FPGA_TX_0_BITSLIP" address="0x1" permission="rw" mask="0xf00"/>
+        <node id="V3B_FPGA_TX_1_BITSLIP" address="0x1" permission="rw" mask="0xf000"/>
       </node>
       <node id="TESTS" address="0x200" >
         <node id="GBT_LOOPBACK_EN" address="0x0" permission="rw" mask="0x1"/>
@@ -329,9 +336,13 @@
         <node id="DAQ_ENABLE" address="0x0" permission="rw" mask="0x1"/>
         <node id="DAQ_LINK_RESET" address="0x0" permission="rw" mask="0x4"/>
         <node id="RESET" address="0x0" permission="rw" mask="0x8"/>
+        <node id="ZERO_SUPPRESSION_EN" address="0x0" permission="rw" mask="0x2"/>
         <node id="TTS_OVERRIDE" address="0x0" permission="rw" mask="0xf0"/>
         <node id="INPUT_ENABLE_MASK" address="0x0" permission="rw" mask="0xffffff00"/>
         <node id="DAV_TIMEOUT" address="0x6" permission="rw" mask="0xffffff"/>
+        <node id="DBG_FANOUT_ENABLE" address="0x6" permission="rw" mask="0x1000000"/>
+        <node id="DBG_FANOUT_INPUT" address="0x6" permission="rw" mask="0xf0000000"/>
+        <node id="DBG_IGNORE_DAQLINK" address="0x6" permission="rw" mask="0x2000000"/>
       </node>
       <node id="STATUS" address="0x1" >
         <node id="DAQ_LINK_RDY" address="0x0" permission="r" mask="0x1"/>
@@ -382,6 +393,8 @@
           <node id="INPUT_FIFO_HAD_UFLOW" address="0x0" permission="r" mask="0x200"/>
           <node id="EVENT_FIFO_HAD_OFLOW" address="0x0" permission="r" mask="0x400"/>
           <node id="EVT_SIZE_ERR" address="0x0" permission="r" mask="0x800"/>
+          <node id="VFAT_INPUT_HAD_OVF" address="0x0" permission="r" mask="0x10000"/>
+          <node id="VFAT_INPUT_HAD_UNF" address="0x0" permission="r" mask="0x20000"/>
           <node id="TTS_STATE" address="0x0" permission="r" mask="0xf000"/>
           <node id="INPUT_FIFO_IS_UFLOW" address="0x0" permission="r" mask="0x1000000"/>
           <node id="INPUT_FIFO_IS_FULL" address="0x0" permission="r" mask="0x2000000"/>
@@ -428,6 +441,8 @@
           <node id="INPUT_FIFO_HAD_UFLOW" address="0x0" permission="r" mask="0x200"/>
           <node id="EVENT_FIFO_HAD_OFLOW" address="0x0" permission="r" mask="0x400"/>
           <node id="EVT_SIZE_ERR" address="0x0" permission="r" mask="0x800"/>
+          <node id="VFAT_INPUT_HAD_OVF" address="0x0" permission="r" mask="0x10000"/>
+          <node id="VFAT_INPUT_HAD_UNF" address="0x0" permission="r" mask="0x20000"/>
           <node id="TTS_STATE" address="0x0" permission="r" mask="0xf000"/>
           <node id="INPUT_FIFO_IS_UFLOW" address="0x0" permission="r" mask="0x1000000"/>
           <node id="INPUT_FIFO_IS_FULL" address="0x0" permission="r" mask="0x2000000"/>
@@ -473,6 +488,7 @@
         <node id="GBT0_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x200"/>
         <node id="GBT1_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x400"/>
         <node id="GBT2_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x800"/>
+        <node id="VFAT_MASK" address="0x1" permission="rw" mask="0xffffff"/>
         <node id="VFAT0" address="0x10" >
           <node id="LINK_GOOD" address="0x0" permission="r" mask="0x1"/>
           <node id="SYNC_ERR_CNT" address="0x0" permission="r" mask="0xf0"/>
@@ -631,6 +647,7 @@
         <node id="GBT0_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x200"/>
         <node id="GBT1_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x400"/>
         <node id="GBT2_RX_HAD_UNDERFLOW" address="0x0" permission="r" mask="0x800"/>
+        <node id="VFAT_MASK" address="0x1" permission="rw" mask="0xffffff"/>
         <node id="VFAT0" address="0x10" >
           <node id="LINK_GOOD" address="0x0" permission="r" mask="0x1"/>
           <node id="SYNC_ERR_CNT" address="0x0" permission="r" mask="0xf0"/>
