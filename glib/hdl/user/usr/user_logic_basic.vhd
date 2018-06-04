@@ -18,6 +18,7 @@ use work.user_package.all;
 use work.user_version_package.all;
 
 --! GEM packages
+use work.ttc_pkg.all;
 use work.gem_pkg.all;
 use work.gem_board_config_package.all;
 
@@ -206,6 +207,9 @@ end user_logic;
 architecture user_logic_arch of user_logic is        
 
     signal reset_pwrup          : std_logic;
+    
+    signal ttc_clocks           : t_ttc_clks;
+    signal ttc_clocks_locked    : std_logic;
 
     -------------------------- GTH ---------------------------------
     signal clk_gtx_tx_arr       : std_logic_vector(g_NUM_OF_GTX - 1 downto 0);
@@ -337,6 +341,26 @@ begin
         );
 
     --===================--
+    --==  TTC clocks   ==--
+    --===================--
+
+    i_ttc_clocks : entity work.ttc_clocks
+        port map(
+            clk_40_ttc_p_i       => xpoint1_clk3_p,
+            clk_40_ttc_n_i       => xpoint1_clk3_n,
+            mmcm_rst_i           => '0',
+            mmcm_locked_o        => ttc_clocks_locked,
+            ttc_mmcm_ps_clk_i    => ttc_clocks.clk_40,
+            ttc_mmcm_ps_clk_en_i => '0',
+            clk_40_bufg_o        => ttc_clocks.clk_40,
+            clk_80_bufg_o        => ttc_clocks.clk_80,
+            clk_160_bufg_o       => ttc_clocks.clk_160,
+            clk_120_bufg_o       => ttc_clocks.clk_120,
+            clk_320_bufg_o       => open
+        );
+
+
+    --===================--
     --== GEM AMC Logic ==--
     --===================--
           
@@ -355,11 +379,10 @@ begin
             reset_pwrup_o          => reset_pwrup,
             
             -- TTC
-            clk_40_ttc_p_i         => xpoint1_clk3_p,
-            clk_40_ttc_n_i         => xpoint1_clk3_n,
+            ttc_clocks_i           => ttc_clocks,
+            ttc_clocks_locked_i    => ttc_clocks_locked,
             ttc_data_p_i           => amc_port_rx_p(3),
             ttc_data_n_i           => amc_port_rx_n(3),
-            ttc_clocks_o           => open,
             
             -- 8b10b links
             gt_8b10b_rx_clk_arr_i  => gem_gt_8b10b_rx_clk_arr,

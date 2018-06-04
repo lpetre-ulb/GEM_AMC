@@ -177,6 +177,8 @@ def findRegisters(node, baseName, baseAddress, modules, currentModule, vars, isG
     if (isGenerated == None or isGenerated == False) and node.get('generate') is not None and node.get('generate') == 'true':
         if node.get('generate_idx_var') == 'OH_IDX':
             generateSize = num_of_oh
+        elif node.get('generate_idx_var') == 'GBT_IDX':
+            generateSize = num_of_oh * 3
         else:
             generateSize = parseInt(node.get('generate_size'))
 
@@ -596,9 +598,7 @@ def printNodeToUHALFile(node, file, level, baseAddress, baseName, addrOffset, nu
         "GEM_AMC.TRIGGER.STATUS",
         "GEM_AMC.GEM_SYSTEM",
         "GEM_AMC.GEM_TESTS",
-        # "GEM_AMC.DAQ.CTRL", # keep this
-        # "GEM_AMC.DAQ.OH<num>", # keep this
-        # "GEM_AMC.DAQ",
+        "GEM_AMC.DAQ",
         "GEM_AMC.OH_LINKS.CTRL",
         "GEM_AMC.SLOW_CONTROL",
         "GEM_AMC.GLIB_SYSTEM",
@@ -647,6 +647,27 @@ def printNodeToUHALFile(node, file, level, baseAddress, baseName, addrOffset, nu
         file.write('</node>\n')
     else:
         file.write('/>\n')
+
+    # add in duplicated RUN_PARAM sub fields
+    if name.find('RUN_PARAMS') > -1:
+        for parm in range(3):
+            for i in range(level):
+                file.write('  ')
+                pass
+            file.write('<node id="%s%d" ' % (name[:-1],parm+1))
+            if node.address is not None:
+                if baseName is None and level == 1:
+                    file.write('address="%s" ' % hex((node.address - baseAddress) + addrOffset))
+                else:
+                    file.write('address="%s" ' % hex(node.address - baseAddress))
+            if node.permission is not None:
+                file.write('permission="%s" ' % node.permission)
+            if node.mask is not None:
+                file.write('mask="0x%06x"' % (0xff<<(parm*8)))
+            if node.mode is not None:
+                file.write('mode="%s"' % node.mode)
+            file.write('/>\n')
+        
 
 # prints out bash script to read registers matching an expression
 def writeRegReadBashScript(modules, filename):

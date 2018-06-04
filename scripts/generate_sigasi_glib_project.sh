@@ -17,7 +17,7 @@ mkdir $SIGASI_PRJ_DIR
 SCRIPTS_DIR=`pwd`
 cd $SIGASI_PRJ_DIR
 
-python $SIGASI_PRJ_CREATOR_DIR/convertXilinxISEToSigasiProject.py gem_glib $SCRIPTS_DIR/../glib/work_dir/gem_glib.xise
+python2 $SIGASI_PRJ_CREATOR_DIR/convertXilinxISEToSigasiProject.py gem_glib $SCRIPTS_DIR/../glib/work_dir/gem_glib.xise
 
 #replace the incorrect sigasi/hdl path with glib/hdl (sigasi/hdl is infered from ../hdl in the xise)
 sed -i 's/sigasi\/hdl/glib/g' .project
