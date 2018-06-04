@@ -1049,7 +1049,7 @@ begin
                                           x"000000" &   -- Chamber error flag (hmm)
                                           -- GLIB status
                                           daq_almost_full &
-                                          ttc_status_i.mmcm_locked & 
+                                          ttc_status_i.clk_status.mmcm_locked & 
                                           daq_clk_locked_i & 
                                           daq_ready &
                                           ttc_status_i.bc0_status.locked &
@@ -1359,7 +1359,7 @@ begin
     regs_read_arr(0)(REG_DAQ_CONTROL_INPUT_ENABLE_MASK_MSB downto REG_DAQ_CONTROL_INPUT_ENABLE_MASK_LSB) <= input_mask;
     regs_read_arr(1)(REG_DAQ_STATUS_DAQ_LINK_RDY_BIT) <= daq_ready;
     regs_read_arr(1)(REG_DAQ_STATUS_DAQ_CLK_LOCKED_BIT) <= daq_clk_locked_i;
-    regs_read_arr(1)(REG_DAQ_STATUS_TTC_RDY_BIT) <= ttc_status_i.mmcm_locked;
+    regs_read_arr(1)(REG_DAQ_STATUS_TTC_RDY_BIT) <= ttc_status_i.clk_status.mmcm_locked;
     regs_read_arr(1)(REG_DAQ_STATUS_DAQ_LINK_AFULL_BIT) <= daq_almost_full;
     regs_read_arr(1)(REG_DAQ_STATUS_DAQ_OUTPUT_FIFO_HAD_OVERFLOW_BIT) <= err_daqfifo_full;
     regs_read_arr(1)(REG_DAQ_STATUS_TTC_BC0_LOCKED_BIT) <= ttc_status_i.bc0_status.locked;
