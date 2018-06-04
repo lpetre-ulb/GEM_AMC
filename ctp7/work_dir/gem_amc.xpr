@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="20" Path="/home/evka/code/gem_amc/ctp7/work_dir/gem_amc.xpr">
+<Project Version="7" Minor="20" Path="/home/evka/code/gem_amc_v2/ctp7/work_dir/gem_amc.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="e1dcef5053524aa7b3f3a5b0dc2878d1"/>

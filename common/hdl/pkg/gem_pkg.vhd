@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171114";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20171128";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 11;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 6;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 9;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -39,6 +39,9 @@ package gem_pkg is
     -- 1.11.4 Updated DAQ timeout defaults to sensible values that work well with 100kHz of L1A rate
     -- 1.11.5 Updates in SCA ADC monitoring - setting fixed gain of 90% and enabling current source when measuring the PT100 ADC channels
     -- 1.11.6 Changed the SCA ADC MONITORING_OFF register default to 0xffffffff so that monitoring is off at startup
+    -- 1.11.7 Debug version of DAQLink
+    -- 1.11.8 Delay DAQ reset after resync by 4 clocks
+    -- 1.11.9 Fix a possible deadlock in case of infifo underflow, in this case just put in some fake data and set a flag in the chamber trailer.
 
     --======================--
     --==      General     ==--
