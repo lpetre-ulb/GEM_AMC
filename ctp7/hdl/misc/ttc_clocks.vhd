@@ -20,6 +20,7 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 use work.ttc_pkg.all;
+use work.gth_pkg.all;
 
 --============================================================================
 --                                                          Entity declaration
@@ -34,7 +35,9 @@ entity ttc_clocks is
         clk_160_ttc_clean_i     : in  std_logic; -- TTC jitter cleaned 160MHz TTC clock (should come from MGT ref)
         ctrl_i                  : in  t_ttc_clk_ctrl; -- control signals
         clocks_o                : out t_ttc_clks; -- clock outputs
-        status_o                : out t_ttc_clk_status -- status outputs
+        status_o                : out t_ttc_clk_status; -- status outputs
+        gth_tx_pippm_ctrl_o     : out t_gth_tx_pippm_ctrl; -- control of the GTH PI phase
+        gth_master_pcs_clk_i    : in std_logic -- the master GTH PCS clock (master is the one that provides the TXOUTCLK as the clk_160_ttc_clean_i to this module)
     );
 
 end ttc_clocks;
@@ -75,66 +78,72 @@ END COMPONENT  ;
     --============================================================================
     --                                                         Signal declarations
     --============================================================================
-    signal clk_40_ttc_ibufgds   : std_logic;
-    signal clk_40_ttc_bufg      : std_logic;
+    signal clk_40_ttc_ibufgds       : std_logic;
+    signal clk_40_ttc_bufg          : std_logic;
 
-    signal clkfb                : std_logic;
+    signal clkfb                    : std_logic;
 
-    signal clk_40               : std_logic;
-    signal clk_80               : std_logic;
-    signal clk_160              : std_logic;
-    signal clk_120              : std_logic;
+    signal clk_40                   : std_logic;
+    signal clk_80                   : std_logic;
+    signal clk_160                  : std_logic;
+    signal clk_120                  : std_logic;
 
-    signal ttc_clocks_bufg      : t_ttc_clks;
+    signal ttc_clocks_bufg          : t_ttc_clks;
     
     ----------------- phase alignment ------------------
     constant MMCM_PS_DONE_TIMEOUT : unsigned(7 downto 0) := x"9f"; -- datasheet says MMCM should complete a phase shift in 12 clocks, but we check it with some margin, just in case
     type pa_state_t is (IDLE, CHECK_FOR_LOCK, SHIFT_PHASE, WAIT_SHIFT_DONE, CHECK_FOR_UNLOCK, SHIFT_BACK, SYNC_DONE, DEAD);
 
-    signal mmcm_ps_clk      : std_logic;
-    signal mmcm_ps_en       : std_logic;
-    signal mmcm_ps_incdec   : std_logic;
-    signal mmcm_ps_done     : std_logic;
-    signal mmcm_locked_raw  : std_logic;
-    signal mmcm_locked      : std_logic;
-    signal mmcm_reset       : std_logic;
+    signal mmcm_ps_clk              : std_logic;
+    signal mmcm_ps_en               : std_logic;
+    signal mmcm_ps_incdec           : std_logic;
+    signal mmcm_ps_done             : std_logic;
+    signal mmcm_locked_raw          : std_logic;
+    signal mmcm_locked              : std_logic;
+    signal mmcm_reset               : std_logic;
 
-    signal pll_locked_raw   : std_logic;
-    signal pll_locked       : std_logic;
-    signal pll_reset        : std_logic;
+    signal pll_locked_raw           : std_logic;
+    signal pll_locked               : std_logic;
+    signal pll_reset                : std_logic;
 
-    signal fsm_reset            : std_logic := '1';
-    signal pa_state             : pa_state_t            := IDLE;
-    signal searching_for_unlock : std_logic;
-    signal shifting_back        : std_logic;
-    signal shift_cnt            : unsigned(15 downto 0) := (others => '0');
-    signal shift_back_cnt       : unsigned(15 downto 0) := (others => '0');
-    signal pll_lock_wait_timer  : unsigned(23 downto 0) := (others => '0');
-    signal pll_lock_window      : unsigned(15 downto 0) := (others => '0');
-    signal mmcm_ps_done_timer   : unsigned(7 downto 0)  := (others => '0');
-    signal unlock_cnt           : unsigned(15 downto 0) := (others => '0');
-    signal mmcm_unlock_cnt      : unsigned(15 downto 0) := (others => '0');
-    signal pll_unlock_cnt       : unsigned(15 downto 0) := (others => '0');
+    signal fsm_reset                : std_logic := '1';
+    signal pa_state                 : pa_state_t            := IDLE;
+    signal searching_for_unlock     : std_logic := '0';
+    signal initial_unlock_search    : std_logic := '1';
+    signal shifting_back            : std_logic := '0';
+    signal shift_cnt                : unsigned(15 downto 0) := (others => '0');
+    signal shift_back_cnt           : unsigned(15 downto 0) := (others => '0');
+    signal pll_lock_wait_timer      : unsigned(23 downto 0) := (others => '0');
+    signal pll_lock_window          : unsigned(15 downto 0) := (others => '0');
+    signal mmcm_ps_done_timer       : unsigned(7 downto 0)  := (others => '0');
+    signal unlock_cnt               : unsigned(15 downto 0) := (others => '0');
+    signal mmcm_unlock_cnt          : unsigned(15 downto 0) := (others => '0');
+    signal pll_unlock_cnt           : unsigned(15 downto 0) := (others => '0');
     
-    signal mmcm_lock_stable_cnt : integer range 0 to 127 := 0;
-    signal pll_lock_stable_cnt  : integer range 0 to 127 := 0;
-    constant LOCK_STABLE_TIMEOUT: integer := 12;
+    signal mmcm_lock_stable_cnt     : integer range 0 to 127 := 0;
+    signal pll_lock_stable_cnt      : integer range 0 to 127 := 0;
+    signal pll_unlock_stable_cnt    : integer range 0 to 127 := 0;
     
-    signal sync_good            : std_logic;
+    constant LOCK_STABLE_TIMEOUT    : integer := 12;
+    constant UNLOCK_STABLE_TIMEOUT  : integer := 12;
+    
+    signal sync_good                : std_logic;
     
     -- time counters
-    signal sync_done_time       : std_logic_vector(15 downto 0);
-    signal phase_unlock_time    : std_logic_vector(15 downto 0);
+    signal sync_done_time           : std_logic_vector(15 downto 0);
+    signal phase_unlock_time        : std_logic_vector(15 downto 0);
     
     -- phase monitoring
-    signal phase                : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
-    signal phase_jump           : std_logic;
-    signal phase_jump_cnt       : std_logic_vector(15 downto 0);
-    signal phase_jump_size      : std_logic_vector(11 downto 0);
-    signal phase_jump_time      : std_logic_vector(15 downto 0); -- number of seconds since last phase jump
+    signal phase                    : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
+    signal phase_min                : std_logic_vector(11 downto 0);
+    signal phase_max                : std_logic_vector(11 downto 0);
+    signal phase_jump               : std_logic := '0';
+    signal phase_jump_cnt           : std_logic_vector(15 downto 0);
+    signal phase_jump_size          : std_logic_vector(11 downto 0);
+    signal phase_jump_time          : std_logic_vector(15 downto 0); -- number of seconds since last phase jump
         
     -- debug counters
-    signal shift_back_fail_cnt  : unsigned(7 downto 0) := (others => '0');
+    signal shift_back_fail_cnt      : unsigned(7 downto 0) := (others => '0');
       
 --============================================================================
 --                                                          Architecture begin
@@ -143,6 +152,10 @@ begin
 
     mmcm_reset <= ctrl_i.reset_mmcm;
     fsm_reset <= ctrl_i.reset_sync_fsm;
+
+    gth_tx_pippm_ctrl_o.enable <= '0';
+    gth_tx_pippm_ctrl_o.direction <= '0';
+    gth_tx_pippm_ctrl_o.step_size <= (others => '0');
 
     -- Input buffering
     --------------------------------------
@@ -346,7 +359,7 @@ begin
             
             if (ctrl_i.reset_cnt = '1') then
                 pll_unlock_cnt <= (others => '0');
-            elsif ((pa_state = SYNC_DONE) and (pll_locked = '1') and (pll_locked_raw = '0') and (pll_unlock_cnt /= x"ffff")) then
+            elsif ((pa_state = SYNC_DONE) and (pll_unlock_stable_cnt = UNLOCK_STABLE_TIMEOUT) and (pll_unlock_cnt /= x"ffff")) then
                 pll_unlock_cnt <= pll_unlock_cnt + 1;
             end if;
             
@@ -360,6 +373,12 @@ begin
                 pll_lock_stable_cnt <= 0;
             elsif (pll_lock_stable_cnt < LOCK_STABLE_TIMEOUT) then
                 pll_lock_stable_cnt <= pll_lock_stable_cnt + 1;
+            end if;
+
+            if ((pll_locked_raw = '1') or (pll_reset = '1')) then
+                pll_unlock_stable_cnt <= 0;
+            elsif (pll_unlock_stable_cnt < UNLOCK_STABLE_TIMEOUT + 1) then
+                pll_unlock_stable_cnt <= pll_unlock_stable_cnt + 1;
             end if;
             
         end if;
@@ -403,6 +422,7 @@ begin
                 pll_reset <= '1';
                 mmcm_ps_en <= '0';
                 pll_lock_wait_timer <= (others => '0'); 
+                mmcm_ps_done_timer <= (others => '0');
                 searching_for_unlock <= '0';
                 shifting_back <= '0';
                 shift_back_cnt <= (others => '0');
@@ -411,6 +431,7 @@ begin
                 shift_cnt <= (others => '0');
                 unlock_cnt <= (others => '0');
                 pll_lock_window <= (others => '0');
+                initial_unlock_search <= not ctrl_i.no_init_shift_out; -- initially after a reset shift the phase out of lock and the restart the FSM as usual
             else
                 case pa_state is
                     when IDLE =>
@@ -426,6 +447,8 @@ begin
                         shifting_back <= '0';
                         shift_back_cnt <= (others => '0');
                         mmcm_ps_incdec <= '1';
+                        shift_cnt <= (others => '0');
+                        pll_lock_window <= (others => '0');
                         
                     when CHECK_FOR_LOCK =>
                         if (pll_locked = '1') then
@@ -483,7 +506,13 @@ begin
                                 pll_reset <= '1';
                                 pll_lock_wait_timer <= pll_lock_wait_timer + 1;
                             elsif (pll_lock_wait_timer = PLL_LOCK_WAIT_TIMEOUT) then
-                                pa_state <= SHIFT_BACK;
+                                -- initially after a reset shift the phase out of lock and the restart the FSM as usual
+                                if (initial_unlock_search = '1') then
+                                    initial_unlock_search <= '0';
+                                    pa_state <= IDLE;
+                                else
+                                    pa_state <= SHIFT_BACK;
+                                end if;
                                 pll_lock_window <= shift_back_cnt;
                                 shift_back_cnt <= '0' & shift_back_cnt(15 downto 1); -- divide the shift back count by 2
                                 shifting_back <= '1';
@@ -505,12 +534,13 @@ begin
                             pll_reset <= '0';
                             
                             -- pll should lock, but if not, then just go back to IDLE and start all over again...                            
-                            if ((pll_locked = '1') and (shift_cnt = x"0000")) then
+                            if ((pll_locked = '1') and (shift_cnt = x"0000") and (ctrl_i.no_init_shift_out = '0')) then
                                 -- if we find that in fact the pll did lock, but there were 0 shifts done to get there, then go back to IDLE,
                                 -- because we found experimentaly that this results in wrong phase.. going through the FSM multiple times will 
-                                -- eventually shift it out of lock and then find a good locking point as per usual operation. 
-                                --pa_state <= IDLE;
-                                pa_state <= DEAD; -- just keep it in a dead state for now if this happens, this will prevent the GTH startup from completing and will be clearly visible during the FPGA programming  
+                                -- eventually shift it out of lock and then find a good locking point as per usual operation.
+                                initial_unlock_search <= '1'; 
+                                pa_state <= IDLE;
+                                --pa_state <= DEAD; -- just keep it in a dead state for now if this happens, this will prevent the GTH startup from completing and will be clearly visible during the FPGA programming  
                             elsif (pll_locked = '1') then
                                 pa_state <= SYNC_DONE;
                             elsif (pll_lock_wait_timer = PLL_LOCK_WAIT_TIMEOUT) then
@@ -571,6 +601,8 @@ begin
     -------------- DEBUG -------------- 
     
     status_o.phase <= phase;
+    status_o.phase_min <= phase_min;
+    status_o.phase_max <= phase_max;
     status_o.phase_jump <= phase_jump;
     status_o.phase_jump_cnt <= phase_jump_cnt;
     status_o.phase_jump_size <= phase_jump_size;
@@ -587,6 +619,8 @@ begin
             clk1_i              => clk_40_ttc_bufg,
             clk2_i              => ttc_clocks_bufg.clk_40,
             phase_o             => phase,
+            phase_min_o         => phase_min,
+            phase_max_o         => phase_max,
             phase_jump_o        => phase_jump,
             phase_jump_cnt_o    => phase_jump_cnt,
             phase_jump_size_o   => phase_jump_size,

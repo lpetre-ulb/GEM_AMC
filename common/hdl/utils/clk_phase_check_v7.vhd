@@ -30,6 +30,8 @@ entity clk_phase_check_v7 is
         clk1_i              : in  std_logic;
         clk2_i              : in  std_logic;
         phase_o             : out std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
+        phase_min_o         : out std_logic_vector(11 downto 0); -- the minimum measured phase value since last reset
+        phase_max_o         : out std_logic_vector(11 downto 0); -- the maximum measured phase value since last reset
         phase_jump_o        : out std_logic;                     -- this signal goes high if a significant phase difference is observed compared to the previous measurement (see PHASE_JUMP_THRESH)
         phase_jump_cnt_o    : out std_logic_vector(15 downto 0); -- number of times a phase jump has been detected
         phase_jump_size_o   : out std_logic_vector(11 downto 0); -- the magnitude of the phase jump (difference between the subsequent measurements that triggered the last phase jump detection)
@@ -80,6 +82,8 @@ architecture Behavioral of clk_phase_check_v7 is
     signal clk2_state           : t_clk_state := LOW;
     signal phase_cnt            : unsigned(11 downto 0) := (others => '0');
     signal phase                : unsigned(11 downto 0) := (others => '0');
+    signal phase_min            : unsigned(11 downto 0) := (others => '1');
+    signal phase_max            : unsigned(11 downto 0) := (others => '0');
     signal phase_jump           : std_logic;
     signal phase_jump_cnt       : unsigned(15 downto 0) := (others => '0');
     signal phase_jump_size      : unsigned(11 downto 0) := (others => '0');
@@ -89,6 +93,8 @@ begin
 
     mmcm_ps_clk <= clk1_i;
     phase_o <= std_logic_vector(phase);
+    phase_min_o <= std_logic_vector(phase_min);
+    phase_max_o <= std_logic_vector(phase_max);
     phase_jump_o <= phase_jump;
     phase_jump_cnt_o <= std_logic_vector(phase_jump_cnt);
     phase_jump_size_o <= std_logic_vector(phase_jump_size);
@@ -251,6 +257,8 @@ begin
                 clk2_state <= LOW;
                 phase_cnt <= (others => '0');
                 phase <= (others => '0');
+                phase_min <= (others => '1');
+                phase_max <= (others => '0');
                 phase_jump <= '0';
                 phase_jump_cnt <= (others => '0');
                 phase_jump_size <= (others => '0');
@@ -284,8 +292,14 @@ begin
                     -- fix the phase measurement when both clocks sample high
                     elsif (clk1_state = HIGH and clk2_state = HIGH) then
                         phase <= phase_cnt;
+                        if (phase_cnt < phase_min) then
+                            phase_min <= phase_cnt;
+                        end if;
+                        if (phase_cnt > phase_max) then
+                            phase_max <= phase_cnt;
+                        end if;
+                                                
                         first_ever_sample <= '0';
-                        
                         if (first_ever_sample = '0') then
                             if ((phase_cnt > phase) and ((phase_cnt - phase) > PHASE_JUMP_THRESH)) then
                                 phase_jump <= '1';
