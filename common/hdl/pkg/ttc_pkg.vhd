@@ -46,6 +46,7 @@ package ttc_pkg is
         pa_fsm_state        : std_logic_vector(2 downto 0);  -- phase alignment FSM state
         -- phase monitor
         phase               : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the jitter cleaned 40MHz and backplane TTC 40MHz clocks (each count is about 18.6012ps)
+        phase_mean          : std_logic_vector(11 downto 0); -- the mean of the phase in the last 2048 measurements
         phase_min           : std_logic_vector(11 downto 0); -- the minimum measured phase value since last reset
         phase_max           : std_logic_vector(11 downto 0); -- the maximum measured phase value since last reset
         phase_jump          : std_logic;                     -- this signal goes high if a significant phase difference is observed compared to the previous measurement

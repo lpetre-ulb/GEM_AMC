@@ -145,21 +145,24 @@
                              Note that absolute value is not very important, because these clocks will always have some offset due to routing on the FPGA,
                              the important thing is that this value doesn't change much."
                 fw_signal="ttc_clks_status_i.phase"/>
-          <node id="PM_PHASE_MIN" address="0x5" mask="0x00fff000" permission="r"
+          <node id="PM_PHASE_MEAN" address="0x5" mask="0x00fff000" permission="r"
+                description="Phase monitoring: the mean of the phase in the last 2048 measurements"
+                fw_signal="ttc_clks_status_i.phase_mean"/>
+          <node id="PM_PHASE_MIN" address="0x6" mask="0x00000fff" permission="r"
                 description="Phase monitoring: the minimum measured phase value since last counter reset"
                 fw_signal="ttc_clks_status_i.phase_min"/>
-          <node id="PM_PHASE_MAX" address="0x6" mask="0x00000fff" permission="r"
+          <node id="PM_PHASE_MAX" address="0x6" mask="0x00fff000" permission="r"
                 description="Phase monitoring: the maximum measured phase value since last counter reset"
                 fw_signal="ttc_clks_status_i.phase_max"/>
-          <node id="PM_PHASE_JUMP_CNT" address="0x6" mask="0xffff0000" permission="r"
+          <node id="PM_PHASE_JUMP_CNT" address="0x7" mask="0x0000ffff" permission="r"
                 description="Phase monitoring: number of times a phase jump has been detected.
                              A phase jump detection is triggered by a large difference between two subsequent phase measurements
                              (currently the threshold is set at 2ns)"
                 fw_signal="ttc_clks_status_i.phase_jump_cnt"/>
-          <node id="PM_PHASE_JUMP_SIZE" address="0x7" mask="0x00000fff" permission="r"
+          <node id="PM_PHASE_JUMP_SIZE" address="0x7" mask="0x0fff0000" permission="r"
                 description="Phase monitoring: the magnitude of the phase jump (difference between the subsequent phase measurements that triggered the last phase jump detection)"
                 fw_signal="ttc_clks_status_i.phase_jump_size"/>
-          <node id="PM_PHASE_JUMP_TIME" address="0x7" mask="0xffff0000" permission="r"
+          <node id="PM_PHASE_JUMP_TIME" address="0x8" mask="0x0000ffff" permission="r"
                 description="Phase monitoring: number of seconds since last phase jump"
                 fw_signal="ttc_clks_status_i.phase_jump_time"/>
         </node>

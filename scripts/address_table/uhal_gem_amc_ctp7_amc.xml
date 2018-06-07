@@ -37,11 +37,12 @@
           <node id="PA_PLL_LOCK_CLOCKS" address="0x4" permission="r" mask="0xffffff"/>
           <node id="PA_FSM_STATE" address="0x4" permission="r" mask="0x70000000"/>
           <node id="PM_PHASE" address="0x5" permission="r" mask="0xfff"/>
-          <node id="PM_PHASE_MIN" address="0x5" permission="r" mask="0xfff000"/>
-          <node id="PM_PHASE_MAX" address="0x6" permission="r" mask="0xfff"/>
-          <node id="PM_PHASE_JUMP_CNT" address="0x6" permission="r" mask="0xffff0000"/>
-          <node id="PM_PHASE_JUMP_SIZE" address="0x7" permission="r" mask="0xfff"/>
-          <node id="PM_PHASE_JUMP_TIME" address="0x7" permission="r" mask="0xffff0000"/>
+          <node id="PM_PHASE_MEAN" address="0x5" permission="r" mask="0xfff000"/>
+          <node id="PM_PHASE_MIN" address="0x6" permission="r" mask="0xfff"/>
+          <node id="PM_PHASE_MAX" address="0x6" permission="r" mask="0xfff000"/>
+          <node id="PM_PHASE_JUMP_CNT" address="0x7" permission="r" mask="0xffff"/>
+          <node id="PM_PHASE_JUMP_SIZE" address="0x7" permission="r" mask="0xfff0000"/>
+          <node id="PM_PHASE_JUMP_TIME" address="0x8" permission="r" mask="0xffff"/>
         </node>
         <node id="TTC_SINGLE_ERROR_CNT" address="0x10" permission="r" mask="0xffff"/>
         <node id="TTC_DOUBLE_ERROR_CNT" address="0x10" permission="r" mask="0xffff0000"/>
