@@ -107,7 +107,8 @@ entity gth_wrapper is
     
     gth_gbt_common_rxusrclk_o    : out std_logic;
     gth_gbt_common_txoutclk_o    : out std_logic;
-    gth_gbt_common_txoutclkpcs_o : out std_logic
+    gth_gbt_common_txoutclkpcs_o : out std_logic;
+    gth_gbt_phalign_o            : out std_logic
     
     );
 end gth_wrapper;
@@ -233,6 +234,7 @@ begin
       gen_gth_4p8g_txuserclk_master : if c_gth_config_arr(n).gth_txclk_out_master = true generate
 
         s_GTH_4p8g_TX_MMCM_reset <= s_tx_startup_fsm_mmcm_reset(n);
+        gth_gbt_phalign_o <= s_gth_tx_init_arr(n).TXPHALIGN;
         
 --        i_pcs_clk_phase_check : entity work.clk_phase_check_v7
 --            generic map(

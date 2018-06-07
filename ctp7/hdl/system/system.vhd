@@ -237,6 +237,7 @@ architecture system_arch of system is
   
   signal s_gth_gbt_tx_pippm_ctrl : t_gth_tx_pippm_ctrl;
   signal s_gth_gbt_common_txoutclkpcs : std_logic; 
+  signal s_gth_gbt_phalign       : std_logic;
   
   signal s_clk_gth_tx_usrclk_arr : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
   signal s_clk_gth_rx_usrclk_arr : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
@@ -335,7 +336,8 @@ begin
           clocks_o              => ttc_clks,
           status_o              => ttc_clks_status,
           gth_tx_pippm_ctrl_o   => s_gth_gbt_tx_pippm_ctrl,
-          gth_master_pcs_clk_i  => s_gth_gbt_common_txoutclkpcs
+          gth_master_pcs_clk_i  => s_gth_gbt_common_txoutclkpcs,
+          gth_txphalign_done_i  => s_gth_gbt_phalign
       ); 
   
   ttc_clks_o <= ttc_clks;
@@ -522,7 +524,8 @@ begin
 
       gth_gbt_common_rxusrclk_o => gth_gbt_common_rxusrclk_o,
       gth_gbt_common_txoutclk_o => ttc_clk_160_clean,
-      gth_gbt_common_txoutclkpcs_o => s_gth_gbt_common_txoutclkpcs
+      gth_gbt_common_txoutclkpcs_o => s_gth_gbt_common_txoutclkpcs,
+      gth_gbt_phalign_o       => s_gth_gbt_phalign
       );
     
   gen_gth_serial : for i in 0 to g_NUM_OF_GTH_GTs-1 generate

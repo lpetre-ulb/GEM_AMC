@@ -37,7 +37,8 @@ entity ttc_clocks is
         clocks_o                : out t_ttc_clks; -- clock outputs
         status_o                : out t_ttc_clk_status; -- status outputs
         gth_tx_pippm_ctrl_o     : out t_gth_tx_pippm_ctrl; -- control of the GTH PI phase
-        gth_master_pcs_clk_i    : in std_logic -- the master GTH PCS clock (master is the one that provides the TXOUTCLK as the clk_160_ttc_clean_i to this module)
+        gth_master_pcs_clk_i    : in std_logic; -- the master GTH PCS clock (master is the one that provides the TXOUTCLK as the clk_160_ttc_clean_i to this module)
+        gth_txphalign_done_i    : in std_logic  -- rising edge of this input tells this module that the GTH startup phase alignment was done and thus resets the PIPPM control logic
     );
 
 end ttc_clocks;
@@ -112,6 +113,7 @@ END COMPONENT  ;
     signal initial_unlock_search    : std_logic := '1';
     signal shifting_back            : std_logic := '0';
     signal shift_cnt                : unsigned(15 downto 0) := (others => '0');
+    signal shift_cnt_to_lock        : unsigned(15 downto 0) := (others => '0');
     signal shift_back_cnt           : unsigned(15 downto 0) := (others => '0');
     signal pll_lock_wait_timer      : unsigned(23 downto 0) := (others => '0');
     signal pll_lock_window          : unsigned(15 downto 0) := (others => '0');
@@ -133,14 +135,39 @@ END COMPONENT  ;
     signal sync_done_time           : std_logic_vector(15 downto 0);
     signal phase_unlock_time        : std_logic_vector(15 downto 0);
     
-    -- phase monitoring
-    signal phase                    : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
-    signal phase_min                : std_logic_vector(11 downto 0);
-    signal phase_max                : std_logic_vector(11 downto 0);
-    signal phase_jump               : std_logic := '0';
-    signal phase_jump_cnt           : std_logic_vector(15 downto 0);
-    signal phase_jump_size          : std_logic_vector(11 downto 0);
-    signal phase_jump_time          : std_logic_vector(15 downto 0); -- number of seconds since last phase jump
+    -- ttc phase monitoring
+    signal ttc_phase                : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
+    signal ttc_phase_mean           : std_logic_vector(11 downto 0);
+    signal ttc_phase_min            : std_logic_vector(11 downto 0);
+    signal ttc_phase_max            : std_logic_vector(11 downto 0);
+    signal ttc_phase_jump           : std_logic := '0';
+    signal ttc_phase_jump_cnt       : std_logic_vector(15 downto 0);
+    signal ttc_phase_jump_size      : std_logic_vector(11 downto 0);
+    signal ttc_phase_jump_time      : std_logic_vector(15 downto 0); -- number of seconds since last phase jump
+
+    -- GTH PCS-TXUSRCLK phase monitoring
+    signal gth_phase                : std_logic_vector(11 downto 0); -- phase difference between the rising edges of the two clocks (each count is about 18.6012ps)
+    signal gth_phase_mean           : std_logic_vector(11 downto 0);
+    signal gth_phase_min            : std_logic_vector(11 downto 0);
+    signal gth_phase_max            : std_logic_vector(11 downto 0);
+    signal gth_phase_jump           : std_logic := '0';
+    signal gth_phase_jump_cnt       : std_logic_vector(15 downto 0);
+    signal gth_phase_jump_size      : std_logic_vector(11 downto 0);
+    signal gth_phase_jump_time      : std_logic_vector(15 downto 0); -- number of seconds since last phase jump
+        
+    -- GTH PIPPM control
+    signal gth_shift_req            : std_logic := '0';
+    signal gth_shift_req_dly        : std_logic := '0';
+    signal gth_shift_ack            : std_logic := '0';
+    signal gth_shift_dir            : std_logic := '0';
+    signal gth_shift_error          : std_logic := '0';
+    signal gth_shift_cnt            : unsigned(2 downto 0) := (others => '0');
+    signal gth_reset_done           : std_logic := '0';
+    signal gth_txphalign_sync       : std_logic := '0';
+    signal gth_txphalign_sync_prev  : std_logic := '0';
+    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'));
+    signal gth_shift_en_timer       : unsigned(1 downto 0) := (others => '0');
+    signal gth_shift_cnt_global     : unsigned(15 downto 0) := (others => '0');
         
     -- debug counters
     signal shift_back_fail_cnt      : unsigned(7 downto 0) := (others => '0');
@@ -153,9 +180,7 @@ begin
     mmcm_reset <= ctrl_i.reset_mmcm;
     fsm_reset <= ctrl_i.reset_sync_fsm;
 
-    gth_tx_pippm_ctrl_o.enable <= '0';
-    gth_tx_pippm_ctrl_o.direction <= '0';
-    gth_tx_pippm_ctrl_o.step_size <= (others => '0');
+    gth_tx_pippm_ctrl_o <= gth_tx_pippm_ctrl;
 
     -- Input buffering
     --------------------------------------
@@ -418,7 +443,6 @@ begin
     begin
         if (rising_edge(mmcm_ps_clk)) then
             if ((mmcm_reset = '1') or (fsm_reset = '1') or (ctrl_i.force_sync_done = '1')) then
-                pa_state <= IDLE;
                 pll_reset <= '1';
                 mmcm_ps_en <= '0';
                 pll_lock_wait_timer <= (others => '0'); 
@@ -429,9 +453,15 @@ begin
                 mmcm_ps_incdec <= '1';
                 shift_back_fail_cnt <= (others => '0');
                 shift_cnt <= (others => '0');
+                shift_cnt_to_lock <= (others => '0');
                 unlock_cnt <= (others => '0');
                 pll_lock_window <= (others => '0');
                 initial_unlock_search <= not ctrl_i.no_init_shift_out; -- initially after a reset shift the phase out of lock and the restart the FSM as usual
+                if (ctrl_i.no_init_shift_out = '1') then
+                    pa_state <= IDLE;                
+                else
+                    pa_state <= CHECK_FOR_UNLOCK;                
+                end if;
             else
                 case pa_state is
                     when IDLE =>
@@ -447,7 +477,7 @@ begin
                         shifting_back <= '0';
                         shift_back_cnt <= (others => '0');
                         mmcm_ps_incdec <= '1';
-                        shift_cnt <= (others => '0');
+                        shift_cnt_to_lock <= (others => '0');
                         pll_lock_window <= (others => '0');
                         
                     when CHECK_FOR_LOCK =>
@@ -461,6 +491,7 @@ begin
                                 pa_state <= SHIFT_PHASE;
                                 pll_reset <= '1';
                                 pll_lock_wait_timer <= (others => '0');
+                                shift_cnt_to_lock <= shift_cnt_to_lock + 1;
                                 shift_cnt <= shift_cnt + 1;
                             else
                                 pll_lock_wait_timer <= pll_lock_wait_timer + 1;
@@ -501,6 +532,7 @@ begin
                         if (pll_locked = '1') then
                             pa_state <= SHIFT_PHASE;
                             shift_back_cnt <= shift_back_cnt + 1;
+                            shift_cnt <= shift_cnt + 1;
                         else
                             if (pll_lock_wait_timer = 0) then
                                 pll_reset <= '1';
@@ -534,7 +566,7 @@ begin
                             pll_reset <= '0';
                             
                             -- pll should lock, but if not, then just go back to IDLE and start all over again...                            
-                            if ((pll_locked = '1') and (shift_cnt = x"0000") and (ctrl_i.no_init_shift_out = '0')) then
+                            if ((pll_locked = '1') and (shift_cnt_to_lock = x"0000") and (ctrl_i.no_init_shift_out = '0')) then
                                 -- if we find that in fact the pll did lock, but there were 0 shifts done to get there, then go back to IDLE,
                                 -- because we found experimentaly that this results in wrong phase.. going through the FSM multiple times will 
                                 -- eventually shift it out of lock and then find a good locking point as per usual operation.
@@ -555,6 +587,7 @@ begin
                             mmcm_ps_en <= '1';
                             pll_reset <= '1';
                             mmcm_ps_done_timer <= (others => '0');
+                            shift_cnt <= shift_cnt - 1;
                         end if;
                         
                         mmcm_ps_incdec <= '0';
@@ -597,35 +630,215 @@ begin
             reset_i   => not sync_good or ctrl_i.reset_cnt,
             seconds_o => sync_done_time
         );    
+
+    -------------- GTH PI PPM shifting --------------
     
-    -------------- DEBUG -------------- 
+    -- transfer the mmcm_ps_en and mmcm_ps_incdec from mmcm_ps_clk to TXUSRCLK (ttc_clocks_bufg.clk_120) domain
+    process(mmcm_ps_clk)
+    begin
+        if (rising_edge(mmcm_ps_clk)) then
+            if ((fsm_reset = '1') or (ctrl_i.force_sync_done = '1')) then
+                gth_shift_req <= '0';
+                gth_shift_dir <= '0';
+                gth_shift_error <= '0';
+                gth_shift_req_dly <= '0';
+            else
+                gth_shift_req_dly <= gth_shift_req;
+                
+                if (gth_shift_req = '0') then
+                    if (mmcm_ps_en = '1') then
+                        gth_shift_req <= '1';
+                        gth_shift_dir <= mmcm_ps_incdec;
+                    else
+                        gth_shift_req <= '0';
+                    end if; 
+                    if (gth_shift_ack = '1') then
+                        gth_shift_error <= '1';
+                    end if;
+                else
+                    if (mmcm_ps_en = '1') then
+                        gth_shift_error <= '1';
+                    end if;
+                    if (gth_shift_ack = '1') then
+                        gth_shift_req <= '0';
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
     
-    status_o.phase <= phase;
-    status_o.phase_min <= phase_min;
-    status_o.phase_max <= phase_max;
-    status_o.phase_jump <= phase_jump;
-    status_o.phase_jump_cnt <= phase_jump_cnt;
-    status_o.phase_jump_size <= phase_jump_size;
-    status_o.phase_jump_time <= phase_jump_time;
+    i_gth_txphalign_done_sync : entity work.synchronizer
+        generic map(
+            N_STAGES => 3
+        )
+        port map(
+            async_i => gth_txphalign_done_i,
+            clk_i   => ttc_clocks_bufg.clk_120,
+            sync_o  => gth_txphalign_sync
+        );
     
-    i_clk_phase_check : entity work.clk_phase_check_v7
+    process(ttc_clocks_bufg.clk_120)
+    begin
+        if (rising_edge(ttc_clocks_bufg.clk_120)) then
+            gth_txphalign_sync_prev <= gth_txphalign_sync;
+            if (gth_txphalign_sync_prev = '0' and gth_txphalign_sync = '1') then
+                gth_reset_done <= '1';
+            else 
+                gth_reset_done <= '0';
+            end if;
+        end if;
+    end process;
+    
+    -- control of the GTH TX PIPPM controller
+    -- whenever it sees that the MMCM was shifted, it will shift the TX PI in the same direction (by asserting the PIPPM_EN for 2 clock cycles)
+    -- the PIPPM shift resolution is different from the MMCM shift resolution. The 4.8Gbs GBT GTH PI shift step in it's current configuration =  6.510416667ps, while this MMCM step is 18.601190476ps
+    -- given these step sizes, it's not possible to always shift them by exactly the same amount, but we can keep it within 3.255ps. Here's how:
+    -- every 7 shifts of MMCM matches exactly 20 shifts in the GTH PI
+    -- since 20 is not divisible by 7, we will shift the PI by 3 steps for every MMCM shift, but every 7th MMCM shift (starting from the 4th shift) we will only shift the PI by 2 steps
+    -- this will give us a total of 20 PI shifts for every 7 MMCM shifts
+    -- note that when the MMCM is shifting backwards, we have to shift the PI back by the same number of steps that we did when shifting forwards
+    process(ttc_clocks_bufg.clk_120)
+    begin
+        if (rising_edge(ttc_clocks_bufg.clk_120)) then
+            if (gth_reset_done = '1') then
+                gth_shift_ack <= '0';
+                gth_shift_cnt <= (others => '0');
+                gth_tx_pippm_ctrl.enable <= '0';
+                gth_tx_pippm_ctrl.direction <= '0';
+                gth_tx_pippm_ctrl.step_size <= (others => '0');
+                gth_shift_en_timer <= (others => '0');
+                gth_shift_cnt_global <= (others => '0');
+            elsif ((fsm_reset = '1') or (ctrl_i.force_sync_done = '1') or (ctrl_i.gth_phalign_disable = '1')) then
+                gth_shift_ack <= '0';
+                gth_tx_pippm_ctrl.enable <= '0';
+                gth_tx_pippm_ctrl.direction <= '0';
+                gth_tx_pippm_ctrl.step_size <= (others => '0');
+                gth_shift_en_timer <= (others => '0');
+                gth_shift_cnt_global <= (others => '0');
+            else
+
+                if (gth_shift_req_dly = '1' and gth_shift_ack = '0') then
+                    gth_shift_ack <= '1';
+                                        
+                    gth_tx_pippm_ctrl.direction <= gth_shift_dir;
+                    gth_tx_pippm_ctrl.enable <= '1';
+                    gth_shift_en_timer <= "01";
+                    
+                    -- set the GTH PI shift amount (we normally do 3 steps, except in the middle of every 7 shifts we do 2 steps)
+                    if (gth_shift_dir = '1') then
+                        if (gth_shift_cnt = 2) then
+                            gth_shift_cnt <= gth_shift_cnt + 1;
+                            gth_tx_pippm_ctrl.step_size <= x"2";
+                            gth_shift_cnt_global <= gth_shift_cnt_global + x"0002";
+                        elsif (gth_shift_cnt = 6) then
+                            gth_shift_cnt <= (others => '0');
+                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_shift_cnt_global <= gth_shift_cnt_global + x"0003";
+                        else
+                            gth_shift_cnt <= gth_shift_cnt + 1;
+                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_shift_cnt_global <= gth_shift_cnt_global + x"0003";
+                        end if;
+                    else
+                        if (gth_shift_cnt = 3) then
+                            gth_shift_cnt <= gth_shift_cnt - 1;
+                            gth_tx_pippm_ctrl.step_size <= x"2";
+                            gth_shift_cnt_global <= gth_shift_cnt_global - x"0002";
+                        elsif (gth_shift_cnt = 0) then
+                            gth_shift_cnt <= "110";
+                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_shift_cnt_global <= gth_shift_cnt_global - x"0003";
+                        else
+                            gth_shift_cnt <= gth_shift_cnt - 1;
+                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_shift_cnt_global <= gth_shift_cnt_global - x"0003";
+                        end if;
+                    end if;
+                    
+                elsif (gth_shift_req_dly = '0') then
+                    gth_shift_ack <= '0';
+                else
+                    gth_shift_ack <= gth_shift_ack;
+                end if;
+                
+                -- hold the enable signal high for 2 clock cycles
+                if (gth_tx_pippm_ctrl.enable = '1' and gth_shift_en_timer /= "10") then
+                    gth_shift_en_timer <= gth_shift_en_timer + 1;
+                elsif (gth_shift_en_timer = "10") then
+                    gth_tx_pippm_ctrl.enable <= '0';
+                end if;
+                
+            end if;
+        end if;
+    end process;
+    
+    status_o.gth_pi_shift_error <= gth_shift_error;
+    status_o.gth_pi_shift_cnt <= std_logic_vector(gth_shift_cnt_global);
+        
+    -------------- Phase monitoring of the TX 40MHz derived from TXOUTCLK vs TTC backplane -------------- 
+    
+    status_o.pm_gth.phase <= gth_phase;
+    status_o.pm_gth.phase_mean <= gth_phase_mean;
+    status_o.pm_gth.phase_min <= gth_phase_min;
+    status_o.pm_gth.phase_max <= gth_phase_max;
+    status_o.pm_gth.phase_jump <= gth_phase_jump;
+    status_o.pm_gth.phase_jump_cnt <= gth_phase_jump_cnt;
+    status_o.pm_gth.phase_jump_size <= gth_phase_jump_size;
+    status_o.pm_gth.phase_jump_time <= gth_phase_jump_time;
+    
+    i_gth_clk_phase_check : entity work.clk_phase_check_v7
+        generic map(
+            ROUND_FREQ_MHZ => 120.000,
+            EXACT_FREQ_HZ => x"072aabc8",
+            PHASE_JUMP_THRESH => x"035" -- 1ns
+        )
+        port map(
+            reset_i             => (not sync_good) or ctrl_i.reset_cnt,
+            clk1_i              => gth_master_pcs_clk_i,
+            clk2_i              => ttc_clocks_bufg.clk_120,
+            phase_o             => gth_phase,
+            phase_mean_o        => gth_phase_mean,
+            phase_min_o         => gth_phase_min,
+            phase_max_o         => gth_phase_max,
+            phase_jump_o        => gth_phase_jump,
+            phase_jump_cnt_o    => gth_phase_jump_cnt,
+            phase_jump_size_o   => gth_phase_jump_size,
+            phase_jump_time_o   => gth_phase_jump_time
+        );
+
+        
+    -------------- Phase monitoring of the 40MHz derived from TXOUTCLK vs TTC backplane -------------- 
+    
+    status_o.pm_ttc.phase <= ttc_phase;
+    status_o.pm_ttc.phase_mean <= ttc_phase_mean;
+    status_o.pm_ttc.phase_min <= ttc_phase_min;
+    status_o.pm_ttc.phase_max <= ttc_phase_max;
+    status_o.pm_ttc.phase_jump <= ttc_phase_jump;
+    status_o.pm_ttc.phase_jump_cnt <= ttc_phase_jump_cnt;
+    status_o.pm_ttc.phase_jump_size <= ttc_phase_jump_size;
+    status_o.pm_ttc.phase_jump_time <= ttc_phase_jump_time;
+    
+    i_ttc_clk_phase_check : entity work.clk_phase_check_v7
         generic map(
             ROUND_FREQ_MHZ => 40.000,
             EXACT_FREQ_HZ => C_TTC_CLK_FREQUENCY_SLV,
-            PHASE_JUMP_THRESH => x"06c"
+            PHASE_JUMP_THRESH => x"06c" -- 2ns
         )
         port map(
             reset_i             => (not sync_good) or ctrl_i.reset_cnt,
             clk1_i              => clk_40_ttc_bufg,
             clk2_i              => ttc_clocks_bufg.clk_40,
-            phase_o             => phase,
-            phase_min_o         => phase_min,
-            phase_max_o         => phase_max,
-            phase_jump_o        => phase_jump,
-            phase_jump_cnt_o    => phase_jump_cnt,
-            phase_jump_size_o   => phase_jump_size,
-            phase_jump_time_o   => phase_jump_time
+            phase_o             => ttc_phase,
+            phase_mean_o        => ttc_phase_mean,
+            phase_min_o         => ttc_phase_min,
+            phase_max_o         => ttc_phase_max,
+            phase_jump_o        => ttc_phase_jump,
+            phase_jump_cnt_o    => ttc_phase_jump_cnt,
+            phase_jump_size_o   => ttc_phase_jump_size,
+            phase_jump_time_o   => ttc_phase_jump_time
         );
+
+    -------------- DEBUG -------------- 
         
 --    i_vio_ttc_clocks : component vio_ttc_clocks
 --        port map(

@@ -13,7 +13,7 @@ package gem_pkg is
     constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180607";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 2;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -45,6 +45,7 @@ package gem_pkg is
     -- 1.12.0 Added a lot of TTC clock monitoring features, including unlock counters and phase monitoring. It's also possible to reset or disable the phase alignment procedure through registers
     -- 1.12.1 Changed phase_unlock detection to only trigger if the PLL lock goes low  for several clock cycles (currently set at 12). Also added recording of minimum and maximum phase in phase monitor.
     -- 1.12.2 Shift out of phase initially after phase alignment reset (can be disabled with a register). Also a running mean of the phase measurement was added.
+    -- 1.12.3 GTH PI clock phase adjustment implemented when shifting the MMCM outputs (which affects the TXUSRCLK phase). This should keep the GTH PI and TXUSRCLK reasonably in phase 
 
     --======================--
     --==      General     ==--
