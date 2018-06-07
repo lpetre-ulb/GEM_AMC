@@ -44,7 +44,7 @@ package gem_pkg is
     -- 1.11.9 Fix a possible deadlock in case of infifo underflow, in this case just put in some fake data and set a flag in the chamber trailer.
     -- 1.12.0 Added a lot of TTC clock monitoring features, including unlock counters and phase monitoring. It's also possible to reset or disable the phase alignment procedure through registers
     -- 1.12.1 Changed phase_unlock detection to only trigger if the PLL lock goes low  for several clock cycles (currently set at 12). Also added recording of minimum and maximum phase in phase monitor.
-    -- 1.12.2 Shift out of phase initially after phase alignment reset (can be disabled with a register)
+    -- 1.12.2 Shift out of phase initially after phase alignment reset (can be disabled with a register). Also a running mean of the phase measurement was added.
 
     --======================--
     --==      General     ==--
