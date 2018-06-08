@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 37;
+    constant REG_TTC_NUM_REGS : integer := 38;
     constant REG_TTC_ADDRESS_MSB : integer := 7;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(7 downto 0) := x"00";
@@ -37,6 +37,14 @@ package registers is
     constant REG_TTC_CTRL_L1A_ENABLE_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_L1A_ENABLE_BIT    : integer := 0;
     constant REG_TTC_CTRL_L1A_ENABLE_DEFAULT : std_logic := '1';
+
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_ADDR    : std_logic_vector(7 downto 0) := x"04";
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT    : integer := 27;
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_DEFAULT : std_logic := '1';
+
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_ADDR    : std_logic_vector(7 downto 0) := x"04";
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_BIT    : integer := 28;
+    constant REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_DEFAULT : std_logic := '0';
 
     constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_BIT    : integer := 29;
@@ -193,7 +201,8 @@ package registers is
     constant REG_TTC_STATUS_CLK_GTH_PM_PHASE_JUMP_SIZE_LSB     : integer := 16;
 
     constant REG_TTC_STATUS_CLK_GTH_SHIFT_ERROR_ADDR    : std_logic_vector(7 downto 0) := x"2b";
-    constant REG_TTC_STATUS_CLK_GTH_SHIFT_ERROR_BIT    : integer := 31;
+    constant REG_TTC_STATUS_CLK_GTH_SHIFT_ERROR_MSB    : integer := 31;
+    constant REG_TTC_STATUS_CLK_GTH_SHIFT_ERROR_LSB     : integer := 28;
 
     constant REG_TTC_STATUS_CLK_GTH_PM_PHASE_JUMP_TIME_ADDR    : std_logic_vector(7 downto 0) := x"2c";
     constant REG_TTC_STATUS_CLK_GTH_PM_PHASE_JUMP_TIME_MSB    : integer := 15;
@@ -202,6 +211,10 @@ package registers is
     constant REG_TTC_STATUS_CLK_GTH_SHIFT_CNT_ADDR    : std_logic_vector(7 downto 0) := x"2c";
     constant REG_TTC_STATUS_CLK_GTH_SHIFT_CNT_MSB    : integer := 31;
     constant REG_TTC_STATUS_CLK_GTH_SHIFT_CNT_LSB     : integer := 16;
+
+    constant REG_TTC_STATUS_CLK_GTH_RESET_CNT_ADDR    : std_logic_vector(7 downto 0) := x"2d";
+    constant REG_TTC_STATUS_CLK_GTH_RESET_CNT_MSB    : integer := 15;
+    constant REG_TTC_STATUS_CLK_GTH_RESET_CNT_LSB     : integer := 0;
 
     constant REG_TTC_STATUS_TTC_SINGLE_ERROR_CNT_ADDR    : std_logic_vector(7 downto 0) := x"30";
     constant REG_TTC_STATUS_TTC_SINGLE_ERROR_CNT_MSB    : integer := 15;

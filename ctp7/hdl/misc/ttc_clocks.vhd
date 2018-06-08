@@ -160,12 +160,13 @@ END COMPONENT  ;
     signal gth_shift_req_dly        : std_logic := '0';
     signal gth_shift_ack            : std_logic := '0';
     signal gth_shift_dir            : std_logic := '0';
-    signal gth_shift_error          : std_logic := '0';
+    signal gth_shift_error          : std_logic_vector(3 downto 0) := (others => '0');
     signal gth_shift_cnt            : unsigned(2 downto 0) := (others => '0');
     signal gth_reset_done           : std_logic := '0';
+    signal gth_reset_cnt            : std_logic_vector(15 downto 0);
     signal gth_txphalign_sync       : std_logic := '0';
     signal gth_txphalign_sync_prev  : std_logic := '0';
-    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'));
+    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'), sel => '0');
     signal gth_shift_en_timer       : unsigned(1 downto 0) := (others => '0');
     signal gth_shift_cnt_global     : unsigned(15 downto 0) := (others => '0');
         
@@ -640,7 +641,7 @@ begin
             if ((fsm_reset = '1') or (ctrl_i.force_sync_done = '1')) then
                 gth_shift_req <= '0';
                 gth_shift_dir <= '0';
-                gth_shift_error <= '0';
+                gth_shift_error <= (others => '0');
                 gth_shift_req_dly <= '0';
             else
                 gth_shift_req_dly <= gth_shift_req;
@@ -653,11 +654,11 @@ begin
                         gth_shift_req <= '0';
                     end if; 
                     if (gth_shift_ack = '1') then
-                        gth_shift_error <= '1';
+                        gth_shift_error <= x"1";
                     end if;
                 else
                     if (mmcm_ps_en = '1') then
-                        gth_shift_error <= '1';
+                        gth_shift_error <= x"2";
                     end if;
                     if (gth_shift_ack = '1') then
                         gth_shift_req <= '0';
@@ -689,6 +690,18 @@ begin
         end if;
     end process;
     
+    i_gth_reset_cnt : entity work.counter
+        generic map(
+            g_COUNTER_WIDTH  => 16,
+            g_ALLOW_ROLLOVER => false
+        )
+        port map(
+            ref_clk_i => ttc_clocks_bufg.clk_120,
+            reset_i   => '0',
+            en_i      => gth_reset_done,
+            count_o   => gth_reset_cnt
+        );
+    
     -- control of the GTH TX PIPPM controller
     -- whenever it sees that the MMCM was shifted, it will shift the TX PI in the same direction (by asserting the PIPPM_EN for 2 clock cycles)
     -- the PIPPM shift resolution is different from the MMCM shift resolution. The 4.8Gbs GBT GTH PI shift step in it's current configuration =  6.510416667ps, while this MMCM step is 18.601190476ps
@@ -700,27 +713,35 @@ begin
     process(ttc_clocks_bufg.clk_120)
     begin
         if (rising_edge(ttc_clocks_bufg.clk_120)) then
-            if (gth_reset_done = '1') then
+            if (gth_reset_done = '1' or gth_reset_cnt = x"0000") then
                 gth_shift_ack <= '0';
                 gth_shift_cnt <= (others => '0');
                 gth_tx_pippm_ctrl.enable <= '0';
                 gth_tx_pippm_ctrl.direction <= '0';
                 gth_tx_pippm_ctrl.step_size <= (others => '0');
+                gth_tx_pippm_ctrl.sel <= '0';
                 gth_shift_en_timer <= (others => '0');
                 gth_shift_cnt_global <= (others => '0');
             elsif ((fsm_reset = '1') or (ctrl_i.force_sync_done = '1') or (ctrl_i.gth_phalign_disable = '1')) then
                 gth_shift_ack <= '0';
                 gth_tx_pippm_ctrl.enable <= '0';
                 gth_tx_pippm_ctrl.direction <= '0';
+                gth_tx_pippm_ctrl.sel <= '0';
                 gth_tx_pippm_ctrl.step_size <= (others => '0');
                 gth_shift_en_timer <= (others => '0');
                 gth_shift_cnt_global <= (others => '0');
             else
 
+                gth_tx_pippm_ctrl.sel <= ctrl_i.gth_shift_use_sel;
+
                 if (gth_shift_req_dly = '1' and gth_shift_ack = '0') then
                     gth_shift_ack <= '1';
-                                        
-                    gth_tx_pippm_ctrl.direction <= not gth_shift_dir; -- shifting the MMCM feedback clock forward, actually shifts the outputs backwards.. so in this case we have to shift the PMA clock also backwards..
+                    
+                    if (ctrl_i.gth_shift_rev_dir = '0') then
+                        gth_tx_pippm_ctrl.direction <= not gth_shift_dir; -- shifting the MMCM feedback clock forward, actually shifts the outputs backwards.. so in this case we have to shift the PMA clock also backwards..
+                    else 
+                        gth_tx_pippm_ctrl.direction <= gth_shift_dir;
+                    end if;
                     gth_tx_pippm_ctrl.enable <= '1';
                     gth_shift_en_timer <= "01";
                     
@@ -774,6 +795,7 @@ begin
     
     status_o.gth_pi_shift_error <= gth_shift_error;
     status_o.gth_pi_shift_cnt <= std_logic_vector(gth_shift_cnt_global);
+    status_o.gth_reset_cnt <= gth_reset_cnt;
         
     -------------- Phase monitoring of the TX 40MHz derived from TXOUTCLK vs TTC backplane -------------- 
     
