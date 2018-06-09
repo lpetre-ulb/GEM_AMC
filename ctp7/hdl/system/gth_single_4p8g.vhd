@@ -745,7 +745,7 @@ begin
       TXPIPPMEN                  => tx_pippm_ctrl_i.enable, --'0',
       TXPIPPMOVRDEN              => '0',
       TXPIPPMPD                  => '0',
-      TXPIPPMSEL                 => '1',
+      TXPIPPMSEL                 => tx_pippm_ctrl_i.sel, --'0',
       TXPIPPMSTEPSIZE            => tx_pippm_ctrl_i.direction & tx_pippm_ctrl_i.step_size, -- "00000",
       ---------------------- Transceiver Reset Mode Operation --------------------
       GTRESETSEL                 => '0',
@@ -771,7 +771,7 @@ begin
       ------------------ Transmit Ports - Pattern Generator Ports ----------------
       TXPRBSFORCEERR            => gth_tx_ctrl_i.txprbsforceerr,
       ------------------ Transmit Ports - TX Buffer Bypass Ports -----------------
-      TXDLYBYPASS               => '1',
+      TXDLYBYPASS               => tx_pippm_ctrl_i.dlybypass,
       TXDLYEN                   => gth_tx_init_i.TXDLYEN,
       TXDLYHOLD                 => '0',
       TXDLYOVRDEN               => '0',
@@ -811,7 +811,7 @@ begin
       TXOUTCLK                  => gth_gt_clk_o.txoutclk,
       TXOUTCLKFABRIC            => open,
       TXOUTCLKPCS               => gth_gt_clk_o.txoutpcs,
-      TXOUTCLKSEL               => gth_tx_ctrl_i.TXOUTCLKSEL,
+      TXOUTCLKSEL               => "010", --gth_tx_ctrl_i.TXOUTCLKSEL,
       TXRATEDONE                => open,
       --------------------- Transmit Ports - TX Gearbox Ports --------------------
       TXGEARBOXREADY            => open,

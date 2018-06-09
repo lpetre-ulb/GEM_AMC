@@ -237,6 +237,8 @@ package gth_pkg is
     enable      : std_logic; -- should be asserted for 2 TXUSRCLK cycles to initiate the phase shift
     direction   : std_logic; -- 1 means increment, 0 means decrement
     step_size   : std_logic_vector(3 downto 0); -- the amount to be shifted (1 unit = PISO_serial_clk_period * TXOUT_DIV / 64)
+    sel         : std_logic; -- PIPPMSEL (should be 0 during the reset, otherwise reset FSM fails), but seems like should be set to 1 when using PIPPM
+    dlybypass   : std_logic; -- TXDLYBYPASS (this isn't really a pippm control, but just including here for easy debugging)
   end record;
 
   type t_gth_common_clk_out_arr is array(integer range <>) of t_gth_common_clk_out;

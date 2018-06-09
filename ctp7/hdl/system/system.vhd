@@ -237,7 +237,7 @@ architecture system_arch of system is
   
   signal s_gth_gbt_tx_pippm_ctrl : t_gth_tx_pippm_ctrl;
   signal s_gth_gbt_common_txoutclkpcs : std_logic; 
-  signal s_gth_gbt_phalign       : std_logic;
+  signal s_gth_gbt_reset_done    : std_logic;
   
   signal s_clk_gth_tx_usrclk_arr : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
   signal s_clk_gth_rx_usrclk_arr : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
@@ -276,9 +276,10 @@ architecture system_arch of system is
   signal ipb_axi_bvalid    : STD_LOGIC_VECTOR ( 0 downto 0 );  
   
   ----------------- TTC ------------------------
-  signal ttc_clk_160_clean : std_logic; -- this will be used as the source of all TTC clocks and should come from the jitter-cleaned MGT ref
+  signal ttc_clk_120_clean : std_logic; -- this will be used as the source of all TTC clocks and should come from the jitter-cleaned MGT ref
   signal ttc_clks          : t_ttc_clks;
   signal ttc_clks_status   : t_ttc_clk_status;
+  signal ttc_mmcm_reset    : std_logic;
       
   -------------------------- DEBUG ----------------------------------
 --  attribute mark_debug : string;
@@ -331,13 +332,14 @@ begin
       port map(
           clk_40_ttc_p_i        => clk_40_ttc_p_i,
           clk_40_ttc_n_i        => clk_40_ttc_n_i,
-          clk_160_ttc_clean_i   => ttc_clk_160_clean,
+          clk_120_ttc_clean_i   => ttc_clk_120_clean,
           ctrl_i                => ttc_clks_ctrl_i,
           clocks_o              => ttc_clks,
           status_o              => ttc_clks_status,
           gth_tx_pippm_ctrl_o   => s_gth_gbt_tx_pippm_ctrl,
           gth_master_pcs_clk_i  => s_gth_gbt_common_txoutclkpcs,
-          gth_txphalign_done_i  => s_gth_gbt_phalign
+          gth_tx_ready_i        => s_gth_gbt_reset_done,
+          gth_mmcm_reset_i      => ttc_mmcm_reset
       ); 
   
   ttc_clks_o <= ttc_clks;
@@ -483,8 +485,8 @@ begin
       gth_cpll_status_arr_o   => s_gth_cpll_status_arr,
 
       ttc_clks_i              => ttc_clks,
-      ttc_clks_locked_i       => ttc_clks_status.sync_done,
-      ttc_clks_reset_o        => open,
+      ttc_clks_locked_i       => ttc_clks_status.mmcm_locked,
+      ttc_clks_reset_o        => ttc_mmcm_reset,
 
       refclk_F_0_p_i          => refclk_F_0_p_i,
       refclk_F_0_n_i          => refclk_F_0_n_i,
@@ -523,9 +525,9 @@ begin
       gth_rx_serial_arr_i     => s_gth_rx_serial_arr,
 
       gth_gbt_common_rxusrclk_o => gth_gbt_common_rxusrclk_o,
-      gth_gbt_common_txoutclk_o => ttc_clk_160_clean,
+      gth_gbt_common_txoutclk_o => ttc_clk_120_clean,
       gth_gbt_common_txoutclkpcs_o => s_gth_gbt_common_txoutclkpcs,
-      gth_gbt_phalign_o       => s_gth_gbt_phalign
+      gth_gbt_reset_done_o      => s_gth_gbt_reset_done
       );
     
   gen_gth_serial : for i in 0 to g_NUM_OF_GTH_GTs-1 generate

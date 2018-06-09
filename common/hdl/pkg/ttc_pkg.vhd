@@ -57,10 +57,8 @@ package ttc_pkg is
         pa_fsm_state        : std_logic_vector(2 downto 0);  -- phase alignment FSM state
         -- phase monitor
         pm_ttc              : t_phase_monitor_status;
-        pm_gth              : t_phase_monitor_status;
-        -- gth pi ppm
-        gth_pi_shift_error  : std_logic; -- error while shifting the phase of the GTH PI
-        gth_pi_shift_cnt    : std_logic_vector(15 downto 0);
+        gbt_gth_ready       : std_logic;
+        gbt_gth_reset_cnt   : std_logic_vector(15 downto 0);
     end record;
 
     type t_ttc_clk_ctrl is record
@@ -69,7 +67,9 @@ package ttc_pkg is
         reset_mmcm          : std_logic; -- reset the MMCM, this will reset the MMCM and also restart the phase alignment procedure
         force_sync_done     : std_logic; -- force the sync_done signal high -- this may be useful in setups where backplane clock does not exist (no AMC13), and only the jitter cleaned clock is available
         no_init_shift_out   : std_logic; -- if this is set to 0 (default), then when the phase alignment FSM is reset, it will first shift the phase out of lock if it is currently locked, and then start searching for lock as usual
-        gth_phalign_disable : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM
+        gth_txdlybypass     : std_logic; -- this isn't really a TTC control, but rather a GBT MGT TXDLYBYPASS param (just including here for easy debugging, should be removed later)
+        pa_shift_wait_time  : std_logic_vector(15 downto 0); -- number of TXUSRCLK cycles to wait after each shift
+        pa_use_pippmsel     : std_logic; -- if 1 then TXPIPPMSEL will be set to 1 when using PIPPM, otherwise it will always be set to 0 (having it high during GTH reset, makes the reset FSM get stuck)
     end record;
 
     type t_ttc_cmds is record

@@ -108,7 +108,7 @@ entity gth_wrapper is
     gth_gbt_common_rxusrclk_o    : out std_logic;
     gth_gbt_common_txoutclk_o    : out std_logic;
     gth_gbt_common_txoutclkpcs_o : out std_logic;
-    gth_gbt_phalign_o            : out std_logic
+    gth_gbt_reset_done_o         : out std_logic
     
     );
 end gth_wrapper;
@@ -213,7 +213,8 @@ architecture gth_wrapper_arch of gth_wrapper is
   signal s_tx_startup_fsm_mmcm_reset : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
   signal s_tx_startup_fsm_mmcm_lock  : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0) := (others => '1');
 
-
+  signal s_gth_gt_txreset_done   : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
+  
   signal s_GTH_4p8g_TX_MMCM_reset  : std_logic;
   signal s_GTH_4p8g_TX_MMCM_locked : std_logic;
 
@@ -223,6 +224,8 @@ architecture gth_wrapper_arch of gth_wrapper is
 --============================================================================
 
 begin
+
+  gth_gt_txreset_done_o <= s_gth_gt_txreset_done; 
 
   gen_tx_mmcm_sigs : for n in 0 to g_NUM_OF_GTH_GTs-1 generate
 
@@ -234,7 +237,7 @@ begin
       gen_gth_4p8g_txuserclk_master : if c_gth_config_arr(n).gth_txclk_out_master = true generate
 
         s_GTH_4p8g_TX_MMCM_reset <= s_tx_startup_fsm_mmcm_reset(n);
-        gth_gbt_phalign_o <= s_gth_tx_init_arr(n).TXPHALIGN;
+        gth_gbt_reset_done_o <= s_gth_gt_txreset_done(n);
         
 --        i_pcs_clk_phase_check : entity work.clk_phase_check_v7
 --            generic map(
@@ -587,7 +590,7 @@ begin
           MMCM_RESET        => s_tx_startup_fsm_mmcm_reset(i*4+j),
           QPLL_RESET        => open,
           CPLL_RESET        => open,
-          TX_FSM_RESET_DONE => gth_gt_txreset_done_o(i*4+j),
+          TX_FSM_RESET_DONE => s_gth_gt_txreset_done(i*4+j),
           TXUSERRDY         => s_gth_tx_init_arr(i*4+j).txuserrdy,
           RUN_PHALIGNMENT   => s_gth_tx_run_phalignment(i*4+j),
           RESET_PHALIGNMENT => s_gth_tx_rst_phalignment(i*4+j),

@@ -158,11 +158,11 @@ begin
                 O => s_gth_4p8g_txoutclk_bufg
             );
             
-        i_bufg_4p8g_tx_outclkpcs : BUFG
-            port map(
-                I => s_gth_4p8g_txoutclkpcs,
-                O => s_gth_4p8g_txoutclkpcs_bufg
-            );
+--        i_bufg_4p8g_tx_outclkpcs : BUFG
+--            port map(
+--                I => s_gth_4p8g_txoutclkpcs,
+--                O => s_gth_4p8g_txoutclkpcs_bufg
+--            );
             
         -- Instantiate a MMCM module to divide the reference clock. Uses internal feedback
         -- for improved jitter performance, and to avoid consuming an additional BUFG
@@ -198,6 +198,7 @@ begin
       end generate;
 
       clk_gth_tx_usrclk_arr_o(n) <= ttc_clks_i.clk_120; --s_gth_4p8g_txusrclk;
+--      clk_gth_tx_usrclk_arr_o(n) <= s_gth_4p8g_txoutclk_bufg; 
 
     end generate;
 
