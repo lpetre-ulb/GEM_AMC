@@ -38,6 +38,11 @@ package registers is
     constant REG_TTC_CTRL_L1A_ENABLE_BIT    : integer := 0;
     constant REG_TTC_CTRL_L1A_ENABLE_DEFAULT : std_logic := '1';
 
+    constant REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_ADDR    : std_logic_vector(7 downto 0) := x"04";
+    constant REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_MSB    : integer := 23;
+    constant REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_LSB     : integer := 8;
+    constant REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_DEFAULT : std_logic_vector(23 downto 8) := x"a2c2";
+
     constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT    : integer := 27;
     constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_DEFAULT : std_logic := '1';

@@ -471,6 +471,7 @@ begin
 
     -- Connect read signals
     regs_read_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= ttc_ctrl.l1a_enable;
+    regs_read_arr(4)(REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_MSB downto REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_LSB) <= ttc_ctrl.clk_ctrl.pa_shift_wait_time;
     regs_read_arr(4)(REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT) <= ttc_ctrl.clk_ctrl.gth_shift_use_sel;
     regs_read_arr(4)(REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_BIT) <= ttc_ctrl.clk_ctrl.gth_shift_rev_dir;
     regs_read_arr(4)(REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_BIT) <= ttc_ctrl.clk_ctrl.gth_phalign_disable;
@@ -535,6 +536,7 @@ begin
 
     -- Connect write signals
     ttc_ctrl.l1a_enable <= regs_write_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT);
+    ttc_ctrl.clk_ctrl.pa_shift_wait_time <= regs_write_arr(4)(REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_MSB downto REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_LSB);
     ttc_ctrl.clk_ctrl.gth_shift_use_sel <= regs_write_arr(4)(REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT);
     ttc_ctrl.clk_ctrl.gth_shift_rev_dir <= regs_write_arr(4)(REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_BIT);
     ttc_ctrl.clk_ctrl.gth_phalign_disable <= regs_write_arr(4)(REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_BIT);
@@ -564,6 +566,7 @@ begin
 
     -- Defaults
     regs_defaults(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= REG_TTC_CTRL_L1A_ENABLE_DEFAULT;
+    regs_defaults(4)(REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_MSB downto REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_LSB) <= REG_TTC_CTRL_PA_SHIFT_WAIT_TIME_DEFAULT;
     regs_defaults(4)(REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT) <= REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_DEFAULT;
     regs_defaults(4)(REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_BIT) <= REG_TTC_CTRL_PA_GTH_SHIFT_REV_DIR_DEFAULT;
     regs_defaults(4)(REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_BIT) <= REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_DEFAULT;

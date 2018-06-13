@@ -92,13 +92,14 @@ END COMPONENT  ;
     signal ttc_clocks_bufg          : t_ttc_clks;
     
     ----------------- phase alignment ------------------
-    constant MMCM_PS_DONE_TIMEOUT : unsigned(7 downto 0) := x"9f"; -- datasheet says MMCM should complete a phase shift in 12 clocks, but we check it with some margin, just in case
+    constant MMCM_PS_DONE_TIMEOUT : unsigned(15 downto 0) := x"ffff"; -- datasheet says MMCM should complete a phase shift in 12 clocks, but we check it with some margin, just in case
     type pa_state_t is (IDLE, CHECK_FOR_LOCK, SHIFT_PHASE, WAIT_SHIFT_DONE, CHECK_FOR_UNLOCK, SHIFT_BACK, SYNC_DONE, DEAD);
 
     signal mmcm_ps_clk              : std_logic;
     signal mmcm_ps_en               : std_logic;
     signal mmcm_ps_incdec           : std_logic;
     signal mmcm_ps_done             : std_logic;
+    signal mmcm_ps_done_seen        : std_logic;
     signal mmcm_locked_raw          : std_logic;
     signal mmcm_locked              : std_logic;
     signal mmcm_reset               : std_logic;
@@ -117,7 +118,7 @@ END COMPONENT  ;
     signal shift_back_cnt           : unsigned(15 downto 0) := (others => '0');
     signal pll_lock_wait_timer      : unsigned(23 downto 0) := (others => '0');
     signal pll_lock_window          : unsigned(15 downto 0) := (others => '0');
-    signal mmcm_ps_done_timer       : unsigned(7 downto 0)  := (others => '0');
+    signal mmcm_ps_done_timer       : unsigned(15 downto 0)  := (others => '0');
     signal unlock_cnt               : unsigned(15 downto 0) := (others => '0');
     signal mmcm_unlock_cnt          : unsigned(15 downto 0) := (others => '0');
     signal pll_unlock_cnt           : unsigned(15 downto 0) := (others => '0');
@@ -446,6 +447,7 @@ begin
             if ((mmcm_reset = '1') or (fsm_reset = '1') or (ctrl_i.force_sync_done = '1')) then
                 pll_reset <= '1';
                 mmcm_ps_en <= '0';
+                mmcm_ps_done_seen <= '0';
                 pll_lock_wait_timer <= (others => '0'); 
                 mmcm_ps_done_timer <= (others => '0');
                 searching_for_unlock <= '0';
@@ -505,6 +507,7 @@ begin
                         
                     when SHIFT_PHASE =>
                         mmcm_ps_en <= '1';
+                        mmcm_ps_done_seen <= '0';
                         pa_state <= WAIT_SHIFT_DONE;
                         pll_reset <= '1';
                         mmcm_ps_done_timer <= (others => '0');
@@ -513,11 +516,15 @@ begin
                         mmcm_ps_en <= '0';
                         pll_reset <= '1';
 
-                        if ((mmcm_ps_done = '1') and (shifting_back = '1')) then
+                        if (mmcm_ps_done = '1') then
+                            mmcm_ps_done_seen <= '1';
+                        end if;
+
+                        if ((mmcm_ps_done_seen = '1') and (shifting_back = '1') and (mmcm_ps_done_timer = unsigned(ctrl_i.pa_shift_wait_time))) then
                             pa_state <= SHIFT_BACK;
-                        elsif ((mmcm_ps_done = '1') and (searching_for_unlock = '1')) then
+                        elsif ((mmcm_ps_done_seen = '1') and (searching_for_unlock = '1') and (mmcm_ps_done_timer = unsigned(ctrl_i.pa_shift_wait_time))) then
                             pa_state <= CHECK_FOR_UNLOCK;
-                        elsif ((mmcm_ps_done = '1') and (mmcm_locked = '1')) then
+                        elsif ((mmcm_ps_done_seen = '1') and (mmcm_locked = '1') and (mmcm_ps_done_timer = unsigned(ctrl_i.pa_shift_wait_time))) then
                             pa_state <= CHECK_FOR_LOCK;
                         else
                             -- datasheet says MMCM should lock in 12 clock cycles and assert mmcm_ps_done for one clock period, but we have a timeout just in case
@@ -586,6 +593,7 @@ begin
                             shift_back_cnt <= shift_back_cnt - 1;
                             pa_state <= WAIT_SHIFT_DONE;
                             mmcm_ps_en <= '1';
+                            mmcm_ps_done_seen <= '0';
                             pll_reset <= '1';
                             mmcm_ps_done_timer <= (others => '0');
                             shift_cnt <= shift_cnt - 1;

@@ -60,6 +60,9 @@
         <node id="PA_GTH_SHIFT_USE_SEL" address="0x4" mask="0x08000000" permission="rw"
               description="if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging)"
               fw_signal="ttc_ctrl.clk_ctrl.gth_shift_use_sel" fw_default="0b1"/>
+        <node id="PA_SHIFT_WAIT_TIME" address="0x4" mask="0x00ffff00" permission="rw"
+              description="Number of 160MHz cycles to wait after each shift"
+              fw_signal="ttc_ctrl.clk_ctrl.pa_shift_wait_time" fw_default="0xa2c2"/>
       </node>
 
       <node id="CONFIG" address="0x10"

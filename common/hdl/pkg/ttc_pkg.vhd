@@ -72,7 +72,8 @@ package ttc_pkg is
         no_init_shift_out   : std_logic; -- if this is set to 0 (default), then when the phase alignment FSM is reset, it will first shift the phase out of lock if it is currently locked, and then start searching for lock as usual
         gth_phalign_disable : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM
         gth_shift_rev_dir   : std_logic; -- shift the GTH in reverse direction (not sure which one is the correct one, so introducing this debug control)
-        gth_shift_use_sel   : std_logic; -- if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging) 
+        gth_shift_use_sel   : std_logic; -- if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging)
+        pa_shift_wait_time  : std_logic_vector(15 downto 0); -- number of clock cycles to wait between each phase shift 
     end record;
 
     type t_ttc_cmds is record

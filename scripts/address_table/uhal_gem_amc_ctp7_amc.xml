@@ -13,6 +13,7 @@
         <node id="PA_DISABLE_GTH_PHASE_TRACKING" address="0x4" permission="rw" mask="0x20000000"/>
         <node id="PA_GTH_SHIFT_REV_DIR" address="0x4" permission="rw" mask="0x10000000"/>
         <node id="PA_GTH_SHIFT_USE_SEL" address="0x4" permission="rw" mask="0x8000000"/>
+        <node id="PA_SHIFT_WAIT_TIME" address="0x4" permission="rw" mask="0xffff00"/>
       </node>
       <node id="CONFIG" address="0x10" >
         <node id="CMD_BC0" address="0x0" permission="rw" mask="0xff"/>
