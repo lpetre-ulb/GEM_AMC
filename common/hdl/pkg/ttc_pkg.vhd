@@ -55,6 +55,7 @@ package ttc_pkg is
         pll_lock_window     : std_logic_vector(15 downto 0); -- the width of the phase lock window
         phase_shift_cnt     : std_logic_vector(15 downto 0); -- number of phase shifts done by the phase alignment FSM
         pa_fsm_state        : std_logic_vector(2 downto 0);  -- phase alignment FSM state
+        pa_manual_shift_cnt : std_logic_vector(15 downto 0); -- number of manual shifts
         -- phase monitor
         pm_ttc              : t_phase_monitor_status;
         pm_gth              : t_phase_monitor_status;
@@ -73,7 +74,11 @@ package ttc_pkg is
         gth_phalign_disable : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM
         gth_shift_rev_dir   : std_logic; -- shift the GTH in reverse direction (not sure which one is the correct one, so introducing this debug control)
         gth_shift_use_sel   : std_logic; -- if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging)
-        pa_shift_wait_time  : std_logic_vector(15 downto 0); -- number of clock cycles to wait between each phase shift 
+        pa_shift_wait_time  : std_logic_vector(15 downto 0); -- number of clock cycles to wait between each phase shift
+        gth_txdlybypass     : std_logic; -- connected to GBT GTH TXDLYBYPASS
+        pa_manual_shift_en  : std_logic; -- positive edge of this signal will do one shift in the selected direction
+        pa_manual_shift_dir : std_logic; -- direction of the manual shifting
+        pa_manual_shift_ovrd: std_logic; -- if this is set to 1, then shift direction is overriden
     end record;
 
     type t_ttc_cmds is record

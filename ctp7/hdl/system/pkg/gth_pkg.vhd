@@ -238,6 +238,7 @@ package gth_pkg is
     direction   : std_logic; -- 1 means increment, 0 means decrement
     step_size   : std_logic_vector(3 downto 0); -- the amount to be shifted (1 unit = PISO_serial_clk_period * TXOUT_DIV / 64)
     sel         : std_logic;
+    txdlybypass : std_logic; -- this is not really a PIPPM control, but I put it here for now for convenience of accessing this through the regs
   end record;
 
   type t_gth_common_clk_out_arr is array(integer range <>) of t_gth_common_clk_out;

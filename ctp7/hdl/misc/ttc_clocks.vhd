@@ -103,6 +103,7 @@ END COMPONENT  ;
     signal mmcm_locked_raw          : std_logic;
     signal mmcm_locked              : std_logic;
     signal mmcm_reset               : std_logic;
+    signal mmcm_ps_en_manual        : std_logic;
 
     signal pll_locked_raw           : std_logic;
     signal pll_locked               : std_logic;
@@ -122,6 +123,7 @@ END COMPONENT  ;
     signal unlock_cnt               : unsigned(15 downto 0) := (others => '0');
     signal mmcm_unlock_cnt          : unsigned(15 downto 0) := (others => '0');
     signal pll_unlock_cnt           : unsigned(15 downto 0) := (others => '0');
+    signal manual_shift_cnt         : unsigned(15 downto 0) := (others => '0');
     
     signal mmcm_lock_stable_cnt     : integer range 0 to 127 := 0;
     signal pll_lock_stable_cnt      : integer range 0 to 127 := 0;
@@ -167,7 +169,7 @@ END COMPONENT  ;
     signal gth_reset_cnt            : std_logic_vector(15 downto 0);
     signal gth_txphalign_sync       : std_logic := '0';
     signal gth_txphalign_sync_prev  : std_logic := '0';
-    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'), sel => '0');
+    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'), sel => '0', txdlybypass => '0');
     signal gth_shift_en_timer       : unsigned(1 downto 0) := (others => '0');
     signal gth_shift_cnt_global     : unsigned(15 downto 0) := (others => '0');
         
@@ -183,6 +185,7 @@ begin
     fsm_reset <= ctrl_i.reset_sync_fsm;
 
     gth_tx_pippm_ctrl_o <= gth_tx_pippm_ctrl;
+    gth_tx_pippm_ctrl.txdlybypass <= ctrl_i.gth_txdlybypass;
 
     -- Input buffering
     --------------------------------------
@@ -264,8 +267,8 @@ begin
             DWE          => '0',
             -- Ports for dynamic phase shift
             PSCLK        => mmcm_ps_clk,
-            PSEN         => mmcm_ps_en,
-            PSINCDEC     => mmcm_ps_incdec,
+            PSEN         => (mmcm_ps_en and not ctrl_i.pa_manual_shift_ovrd) or (mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd),
+            PSINCDEC     => (mmcm_ps_incdec and not ctrl_i.pa_manual_shift_ovrd) or (ctrl_i.pa_manual_shift_dir and ctrl_i.pa_manual_shift_ovrd),
             PSDONE       => mmcm_ps_done,
             -- Other control and status signals
             LOCKED       => mmcm_locked_raw,
@@ -323,6 +326,7 @@ begin
     status_o.pa_fsm_state <= std_logic_vector(to_unsigned(pa_state_t'pos(pa_state), 3));
     status_o.sync_done_time <= sync_done_time;
     status_o.phase_unlock_time <= phase_unlock_time;
+    status_o.pa_manual_shift_cnt <= std_logic_vector(manual_shift_cnt);
       
     -- using this PLL to check phase alignment between the MMCM 120 output and TTC 120
     i_phase_monitor_pll : PLLE2_BASE
@@ -640,6 +644,34 @@ begin
             seconds_o => sync_done_time
         );    
 
+    -------------- Manual MMCM shifting -------------
+    
+    i_mmcm_ps_en_manual_oneshot : entity work.oneshot_cross_domain
+        port map(
+            reset_i       => mmcm_reset,
+            input_clk_i   => ttc_clocks_bufg.clk_40,
+            oneshot_clk_i => mmcm_ps_clk,
+            input_i       => ctrl_i.pa_manual_shift_en,
+            oneshot_o     => mmcm_ps_en_manual
+        );
+
+    process (mmcm_ps_clk)
+    begin
+        if (rising_edge(mmcm_ps_clk)) then
+            if (ctrl_i.reset_cnt = '1') then
+                manual_shift_cnt <= (others => '0');
+            else
+                if ((mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd) = '1') then
+                    if (ctrl_i.pa_manual_shift_dir = '1') then
+                        manual_shift_cnt <= manual_shift_cnt + 1;
+                    else
+                        manual_shift_cnt <= manual_shift_cnt - 1;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
     -------------- GTH PI PPM shifting --------------
     
     -- transfer the mmcm_ps_en and mmcm_ps_incdec from mmcm_ps_clk to TXUSRCLK (ttc_clocks_bufg.clk_120) domain
@@ -661,9 +693,9 @@ begin
                     else
                         gth_shift_req <= '0';
                     end if; 
-                    if (gth_shift_ack = '1') then
-                        gth_shift_error <= x"1";
-                    end if;
+--                    if (gth_shift_ack = '1') then
+--                        gth_shift_error <= x"1";
+--                    end if;
                 else
                     if (mmcm_ps_en = '1') then
                         gth_shift_error <= x"2";
