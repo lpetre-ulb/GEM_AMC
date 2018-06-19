@@ -194,9 +194,9 @@ begin
 
     gth_tx_pippm_ctrl_o.txdlybypass <= ctrl_i.gth_txdlybypass;
     gth_tx_pippm_ctrl_o.sel <= gth_pippm_auto_sel or ctrl_i.gth_sel_ovrd;
-    gth_tx_pippm_ctrl_o.direction <= gth_pippm_auto_dir when ctrl_i.pa_manual_gth_shift_ovrd = '1' else ctrl_i.pa_manual_gth_shift_dir;
-    gth_tx_pippm_ctrl_o.step_size <= gth_pippm_auto_step when ctrl_i.pa_manual_gth_shift_ovrd = '1' else ctrl_i.pa_manual_gth_shift_step;
-    gth_tx_pippm_ctrl_o.enable <= gth_pippm_auto_en when ctrl_i.pa_manual_gth_shift_ovrd = '1' else gth_pippm_manual_en;
+    gth_tx_pippm_ctrl_o.direction <= gth_pippm_auto_dir when ctrl_i.pa_manual_gth_shift_ovrd = '0' else ctrl_i.pa_manual_gth_shift_dir;
+    gth_tx_pippm_ctrl_o.step_size <= gth_pippm_auto_step when ctrl_i.pa_manual_gth_shift_ovrd = '0' else ctrl_i.pa_manual_gth_shift_step;
+    gth_tx_pippm_ctrl_o.enable <= gth_pippm_auto_en when ctrl_i.pa_manual_gth_shift_ovrd = '0' else gth_pippm_manual_en;
     
 
     -- Input buffering
