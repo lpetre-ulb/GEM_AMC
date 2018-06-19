@@ -62,23 +62,29 @@ package ttc_pkg is
         -- gth pi ppm
         gth_pi_shift_error  : std_logic_vector(3 downto 0); -- error while shifting the phase of the GTH PI
         gth_pi_shift_cnt    : std_logic_vector(15 downto 0);
+        gth_pi_man_shift_cnt: std_logic_vector(15 downto 0); -- number of manual shifts
         gth_reset_cnt       : std_logic_vector(15 downto 0);
     end record;
 
     type t_ttc_clk_ctrl is record
-        reset_cnt           : std_logic; -- reset the counters
-        reset_sync_fsm      : std_logic; -- reset the sync FSM, this will restart the phase alignment procedure
-        reset_mmcm          : std_logic; -- reset the MMCM, this will reset the MMCM and also restart the phase alignment procedure
-        force_sync_done     : std_logic; -- force the sync_done signal high -- this may be useful in setups where backplane clock does not exist (no AMC13), and only the jitter cleaned clock is available
-        no_init_shift_out   : std_logic; -- if this is set to 0 (default), then when the phase alignment FSM is reset, it will first shift the phase out of lock if it is currently locked, and then start searching for lock as usual
-        gth_phalign_disable : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM
-        gth_shift_rev_dir   : std_logic; -- shift the GTH in reverse direction (not sure which one is the correct one, so introducing this debug control)
-        gth_shift_use_sel   : std_logic; -- if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging)
-        pa_shift_wait_time  : std_logic_vector(15 downto 0); -- number of clock cycles to wait between each phase shift
-        gth_txdlybypass     : std_logic; -- connected to GBT GTH TXDLYBYPASS
-        pa_manual_shift_en  : std_logic; -- positive edge of this signal will do one shift in the selected direction
-        pa_manual_shift_dir : std_logic; -- direction of the manual shifting
-        pa_manual_shift_ovrd: std_logic; -- if this is set to 1, then shift direction is overriden
+        reset_cnt               : std_logic; -- reset the counters
+        reset_sync_fsm          : std_logic; -- reset the sync FSM, this will restart the phase alignment procedure
+        reset_mmcm              : std_logic; -- reset the MMCM, this will reset the MMCM and also restart the phase alignment procedure
+        force_sync_done         : std_logic; -- force the sync_done signal high -- this may be useful in setups where backplane clock does not exist (no AMC13), and only the jitter cleaned clock is available
+        no_init_shift_out       : std_logic; -- if this is set to 0 (default), then when the phase alignment FSM is reset, it will first shift the phase out of lock if it is currently locked, and then start searching for lock as usual
+        gth_phalign_disable     : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM
+        gth_shift_rev_dir       : std_logic; -- shift the GTH in reverse direction (not sure which one is the correct one, so introducing this debug control)
+        gth_shift_use_sel       : std_logic; -- if 1 then PIPPMSEL will be set to 1 when shifting the PI phase, otherwise it will always stay at 0 (debugging)
+        gth_sel_ovrd            : std_logic; -- if this is set to 1 then GTH PIPPMSEL will be forced to always be 1
+        pa_shift_wait_time      : std_logic_vector(15 downto 0); -- number of clock cycles to wait between each phase shift
+        gth_txdlybypass         : std_logic; -- connected to GBT GTH TXDLYBYPASS
+        pa_manual_shift_en      : std_logic; -- positive edge of this signal will do one shift in the selected direction
+        pa_manual_shift_dir     : std_logic; -- direction of the manual shifting
+        pa_manual_shift_ovrd    : std_logic; -- if this is set to 1, then shift direction is overriden
+        pa_manual_gth_shift_ovrd: std_logic; -- if this is set to 1, then GTH PI shifts will only be controlled manually instead of being automatically shifted after MMCM shifts
+        pa_manual_gth_shift_dir : std_logic; -- controls the GTH PIPPM shift direction in when manual override is set
+        pa_manual_gth_shift_step: std_logic_vector(3 downto 0); -- controls the GTH PIPPM shift step size
+        pa_manual_gth_shift_en  : std_logic; -- when pulsed, it will shift the GTH PIPPM by one step
     end record;
 
     type t_ttc_cmds is record

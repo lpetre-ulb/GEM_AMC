@@ -18,6 +18,11 @@
         <node id="PA_MANUAL_OVERRIDE" address="0x5" permission="rw" mask="0x1"/>
         <node id="PA_MANUAL_SHIFT_DIR" address="0x5" permission="rw" mask="0x2"/>
         <node id="PA_MANUAL_SHIFT_EN" address="0x6" permission="w" />
+        <node id="PA_GTH_MANUAL_SEL_OVERRIDE" address="0x7" permission="rw" mask="0x1"/>
+        <node id="PA_GTH_MANUAL_OVERRIDE" address="0x7" permission="rw" mask="0x2"/>
+        <node id="PA_GTH_MANUAL_SHIFT_DIR" address="0x7" permission="rw" mask="0x4"/>
+        <node id="PA_GTH_MANUAL_SHIFT_STEP" address="0x7" permission="rw" mask="0xf0"/>
+        <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w" />
       </node>
       <node id="CONFIG" address="0x10" >
         <node id="CMD_BC0" address="0x0" permission="rw" mask="0xff"/>
@@ -61,7 +66,8 @@
           <node id="GTH_SHIFT_ERROR" address="0xb" permission="r" mask="0xf0000000"/>
           <node id="GTH_SHIFT_CNT" address="0xc" permission="r" mask="0xffff0000"/>
           <node id="GTH_RESET_CNT" address="0xd" permission="r" mask="0xffff"/>
-          <node id="PA_MANUAL_SHIFT_CNT" address="0xd" permission="r" mask="0xffff0000"/>
+          <node id="PA_MANUAL_SHIFT_CNT" address="0xe" permission="r" mask="0xffff"/>
+          <node id="PA_MANUAL_GTH_SHIFT_CNT" address="0xe" permission="r" mask="0xffff0000"/>
         </node>
         <node id="TTC_SINGLE_ERROR_CNT" address="0x10" permission="r" mask="0xffff"/>
         <node id="TTC_DOUBLE_ERROR_CNT" address="0x10" permission="r" mask="0xffff0000"/>

@@ -44,7 +44,7 @@
         <node id="DISABLE_PHASE_ALIGNMENT" address="0x4" mask="0x80000000" permission="rw"
               description="Setting this to 1 will disable the phase alignment to backplane ref clock.
                            This is intended to be used only in setups that don't have an AMC13 and thus no backplane TTC clock, but generate the TTC clock internally in CTP7."
-              fw_signal="ttc_ctrl.clk_ctrl.force_sync_done" fw_default="0b0"/>
+              fw_signal="ttc_ctrl.clk_ctrl.force_sync_done" fw_default="0b1"/>
         <node id="PA_DISABLE_INIT_SHIFT_OUT" address="0x4" mask="0x40000000" permission="rw"
               description="If this is set to 0 (default), then when the phase alignment FSM is reset,
                            it will first shift the phase out of lock if it is currently locked,
@@ -53,7 +53,7 @@
         <node id="PA_DISABLE_GTH_PHASE_TRACKING" address="0x4" mask="0x20000000" permission="rw"
               description="If this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK
                            every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM"
-              fw_signal="ttc_ctrl.clk_ctrl.gth_phalign_disable" fw_default="0b0"/>
+              fw_signal="ttc_ctrl.clk_ctrl.gth_phalign_disable" fw_default="0b1"/>
         <node id="PA_GTH_SHIFT_REV_DIR" address="0x4" mask="0x10000000" permission="rw"
               description="If set to 1, the GTH PI will be shifted in reverse direction (this is just for debugging because I'm not sure which direction is the correct one..)"
               fw_signal="ttc_ctrl.clk_ctrl.gth_shift_rev_dir" fw_default="0b0"/>
@@ -75,6 +75,21 @@
         <node id="PA_MANUAL_SHIFT_EN" address="0x6" permission="w"
               description="Each write to this register will trigger one shift step when PA_MANUAL_OVERRIDE is set to 1"
               fw_write_pulse_signal="ttc_ctrl.clk_ctrl.pa_manual_shift_en"/>
+        <node id="PA_GTH_MANUAL_SEL_OVERRIDE" address="0x7" mask="0x00000001" permission="rw"
+              description="If this is set to 1 then GBT GTH PIPPMSEL will be forced to 1"
+              fw_signal="ttc_ctrl.clk_ctrl.gth_sel_ovrd" fw_default="0b0"/>
+        <node id="PA_GTH_MANUAL_OVERRIDE" address="0x7" mask="0x00000002" permission="rw"
+              description="GTH PI manual phase shifting override"
+              fw_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_ovrd" fw_default="0b0"/>
+        <node id="PA_GTH_MANUAL_SHIFT_DIR" address="0x7" mask="0x00000004" permission="rw"
+              description="GTH PI Manual phase shifting direction"
+              fw_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_dir" fw_default="0b0"/>
+        <node id="PA_GTH_MANUAL_SHIFT_STEP" address="0x7" mask="0x000000f0" permission="rw"
+              description="GTH PI Manual phase shifting step size"
+              fw_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_step" fw_default="0x1"/>
+        <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w"
+              description="Each write to this register will trigger one GTH PI shift of size PA_GTH_MANUAL_SHIFT_STEP in the direction of PA_GTH_MANUAL_SHIFT_DIR when PA_GTH_MANUAL_OVERRIDE is set to 1"
+              fw_write_pulse_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_en"/>
       </node>
 
       <node id="CONFIG" address="0x10"
@@ -227,9 +242,12 @@
           <node id="GTH_RESET_CNT" address="0xd" mask="0x0000ffff" permission="r"
                 description="Number of times the GTH was reset"
                 fw_signal="ttc_clks_status_i.gth_reset_cnt"/>
-          <node id="PA_MANUAL_SHIFT_CNT" address="0xd" mask="0xffff0000" permission="r"
+          <node id="PA_MANUAL_SHIFT_CNT" address="0xe" mask="0x0000ffff" permission="r"
                 description="Number of manual shifts done after counter reset"
                 fw_signal="ttc_clks_status_i.pa_manual_shift_cnt"/>
+          <node id="PA_MANUAL_GTH_SHIFT_CNT" address="0xe" mask="0xffff0000" permission="r"
+                description="Number of manual GTH PI shifts done after counter reset"
+                fw_signal="ttc_clks_status_i.gth_pi_man_shift_cnt"/>
         </node>
 
         <node id="TTC_SINGLE_ERROR_CNT" address="0x10" mask="0x0000ffff" permission="r"

@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 40;
+    constant REG_TTC_NUM_REGS : integer := 43;
     constant REG_TTC_ADDRESS_MSB : integer := 7;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(7 downto 0) := x"00";
@@ -57,7 +57,7 @@ package registers is
 
     constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_BIT    : integer := 29;
-    constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_DEFAULT : std_logic := '0';
+    constant REG_TTC_CTRL_PA_DISABLE_GTH_PHASE_TRACKING_DEFAULT : std_logic := '1';
 
     constant REG_TTC_CTRL_PA_DISABLE_INIT_SHIFT_OUT_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_PA_DISABLE_INIT_SHIFT_OUT_BIT    : integer := 30;
@@ -65,7 +65,7 @@ package registers is
 
     constant REG_TTC_CTRL_DISABLE_PHASE_ALIGNMENT_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_DISABLE_PHASE_ALIGNMENT_BIT    : integer := 31;
-    constant REG_TTC_CTRL_DISABLE_PHASE_ALIGNMENT_DEFAULT : std_logic := '0';
+    constant REG_TTC_CTRL_DISABLE_PHASE_ALIGNMENT_DEFAULT : std_logic := '1';
 
     constant REG_TTC_CTRL_PA_MANUAL_OVERRIDE_ADDR    : std_logic_vector(7 downto 0) := x"05";
     constant REG_TTC_CTRL_PA_MANUAL_OVERRIDE_BIT    : integer := 0;
@@ -78,6 +78,27 @@ package registers is
     constant REG_TTC_CTRL_PA_MANUAL_SHIFT_EN_ADDR    : std_logic_vector(7 downto 0) := x"06";
     constant REG_TTC_CTRL_PA_MANUAL_SHIFT_EN_MSB    : integer := 31;
     constant REG_TTC_CTRL_PA_MANUAL_SHIFT_EN_LSB     : integer := 0;
+
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SEL_OVERRIDE_ADDR    : std_logic_vector(7 downto 0) := x"07";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SEL_OVERRIDE_BIT    : integer := 0;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SEL_OVERRIDE_DEFAULT : std_logic := '0';
+
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_ADDR    : std_logic_vector(7 downto 0) := x"07";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_BIT    : integer := 1;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_DEFAULT : std_logic := '0';
+
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_ADDR    : std_logic_vector(7 downto 0) := x"07";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_BIT    : integer := 2;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_DEFAULT : std_logic := '0';
+
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_ADDR    : std_logic_vector(7 downto 0) := x"07";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_MSB    : integer := 7;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_LSB     : integer := 4;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_DEFAULT : std_logic_vector(7 downto 4) := x"1";
+
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_ADDR    : std_logic_vector(7 downto 0) := x"08";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_MSB    : integer := 31;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_LSB     : integer := 0;
 
     constant REG_TTC_CONFIG_CMD_BC0_ADDR    : std_logic_vector(7 downto 0) := x"10";
     constant REG_TTC_CONFIG_CMD_BC0_MSB    : integer := 7;
@@ -237,9 +258,13 @@ package registers is
     constant REG_TTC_STATUS_CLK_GTH_RESET_CNT_MSB    : integer := 15;
     constant REG_TTC_STATUS_CLK_GTH_RESET_CNT_LSB     : integer := 0;
 
-    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_ADDR    : std_logic_vector(7 downto 0) := x"2d";
-    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_MSB    : integer := 31;
-    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_LSB     : integer := 16;
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_ADDR    : std_logic_vector(7 downto 0) := x"2e";
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_MSB    : integer := 15;
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_SHIFT_CNT_LSB     : integer := 0;
+
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_GTH_SHIFT_CNT_ADDR    : std_logic_vector(7 downto 0) := x"2e";
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_GTH_SHIFT_CNT_MSB    : integer := 31;
+    constant REG_TTC_STATUS_CLK_PA_MANUAL_GTH_SHIFT_CNT_LSB     : integer := 16;
 
     constant REG_TTC_STATUS_TTC_SINGLE_ERROR_CNT_ADDR    : std_logic_vector(7 downto 0) := x"30";
     constant REG_TTC_STATUS_TTC_SINGLE_ERROR_CNT_MSB    : integer := 15;

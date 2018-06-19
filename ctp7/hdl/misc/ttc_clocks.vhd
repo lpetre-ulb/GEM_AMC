@@ -169,9 +169,17 @@ END COMPONENT  ;
     signal gth_reset_cnt            : std_logic_vector(15 downto 0);
     signal gth_txphalign_sync       : std_logic := '0';
     signal gth_txphalign_sync_prev  : std_logic := '0';
-    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'), sel => '0', txdlybypass => '0');
+--    signal gth_tx_pippm_ctrl        : t_gth_tx_pippm_ctrl := (enable => '0', direction => '0', step_size => (others => '0'), sel => '0', txdlybypass => '0');
     signal gth_shift_en_timer       : unsigned(1 downto 0) := (others => '0');
     signal gth_shift_cnt_global     : unsigned(15 downto 0) := (others => '0');
+    signal gth_pippm_auto_sel       : std_logic;
+    signal gth_pippm_auto_dir       : std_logic;
+    signal gth_pippm_auto_step      : std_logic_vector(3 downto 0);
+    signal gth_pippm_auto_en        : std_logic;
+    signal gth_pippm_manual_en_tmp  : std_logic;
+    signal gth_pippm_manual_en      : std_logic;
+    signal gth_pippm_manual_shift_cnt: unsigned(15 downto 0);
+    
         
     -- debug counters
     signal shift_back_fail_cnt      : unsigned(7 downto 0) := (others => '0');
@@ -184,8 +192,12 @@ begin
     mmcm_reset <= ctrl_i.reset_mmcm;
     fsm_reset <= ctrl_i.reset_sync_fsm;
 
-    gth_tx_pippm_ctrl_o <= gth_tx_pippm_ctrl;
-    gth_tx_pippm_ctrl.txdlybypass <= ctrl_i.gth_txdlybypass;
+    gth_tx_pippm_ctrl_o.txdlybypass <= ctrl_i.gth_txdlybypass;
+    gth_tx_pippm_ctrl_o.sel <= gth_pippm_auto_sel or ctrl_i.gth_sel_ovrd;
+    gth_tx_pippm_ctrl_o.direction <= gth_pippm_auto_dir when ctrl_i.pa_manual_gth_shift_ovrd = '1' else ctrl_i.pa_manual_gth_shift_dir;
+    gth_tx_pippm_ctrl_o.step_size <= gth_pippm_auto_step when ctrl_i.pa_manual_gth_shift_ovrd = '1' else ctrl_i.pa_manual_gth_shift_step;
+    gth_tx_pippm_ctrl_o.enable <= gth_pippm_auto_en when ctrl_i.pa_manual_gth_shift_ovrd = '1' else gth_pippm_manual_en;
+    
 
     -- Input buffering
     --------------------------------------
@@ -672,6 +684,46 @@ begin
         end if;
     end process;
 
+    -------------- Manual GTH PIPPM shifting -------------
+    
+    i_gth_ps_en_manual_oneshot : entity work.oneshot_cross_domain
+        port map(
+            reset_i       => mmcm_reset,
+            input_clk_i   => ttc_clocks_bufg.clk_40,
+            oneshot_clk_i => ttc_clocks_bufg.clk_120,
+            input_i       => ctrl_i.pa_manual_gth_shift_en,
+            oneshot_o     => gth_pippm_manual_en_tmp
+        );
+
+    i_gth_ps_en_extend : entity work.pulse_extend
+        generic map(
+            DELAY_CNT_LENGTH => 2
+        )
+        port map(
+            clk_i          => ttc_clocks_bufg.clk_120,
+            rst_i          => mmcm_reset,
+            pulse_length_i => "10",
+            pulse_i        => gth_pippm_manual_en_tmp,
+            pulse_o        => gth_pippm_manual_en
+        );
+
+    process (ttc_clocks_bufg.clk_120)
+    begin
+        if (rising_edge(ttc_clocks_bufg.clk_120)) then
+            if (ctrl_i.reset_cnt = '1') then
+                gth_pippm_manual_shift_cnt <= (others => '0');
+            else
+                if ((gth_pippm_manual_en_tmp and ctrl_i.pa_manual_gth_shift_ovrd) = '1') then
+                    if (ctrl_i.pa_manual_gth_shift_dir = '1') then
+                        gth_pippm_manual_shift_cnt <= gth_pippm_manual_shift_cnt + 1;
+                    else
+                        gth_pippm_manual_shift_cnt <= gth_pippm_manual_shift_cnt - 1;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
     -------------- GTH PI PPM shifting --------------
     
     -- transfer the mmcm_ps_en and mmcm_ps_incdec from mmcm_ps_clk to TXUSRCLK (ttc_clocks_bufg.clk_120) domain
@@ -687,9 +739,13 @@ begin
                 gth_shift_req_dly <= gth_shift_req;
                 
                 if (gth_shift_req = '0') then
-                    if (mmcm_ps_en = '1') then
+                    if ((mmcm_ps_en and not ctrl_i.pa_manual_shift_ovrd) or (mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd)) = '1' then
                         gth_shift_req <= '1';
-                        gth_shift_dir <= mmcm_ps_incdec;
+                        if (ctrl_i.pa_manual_shift_ovrd = '0') then
+                            gth_shift_dir <= mmcm_ps_incdec;
+                        else
+                            gth_shift_dir <= ctrl_i.pa_manual_shift_dir;
+                        end if;
                     else
                         gth_shift_req <= '0';
                     end if; 
@@ -697,7 +753,7 @@ begin
 --                        gth_shift_error <= x"1";
 --                    end if;
                 else
-                    if (mmcm_ps_en = '1') then
+                    if ((mmcm_ps_en and not ctrl_i.pa_manual_shift_ovrd) or (mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd)) = '1' then
                         gth_shift_error <= x"2";
                     end if;
                     if (gth_shift_ack = '1') then
@@ -756,62 +812,62 @@ begin
             if (gth_reset_done = '1' or gth_reset_cnt = x"0000") then
                 gth_shift_ack <= '0';
                 gth_shift_cnt <= (others => '0');
-                gth_tx_pippm_ctrl.enable <= '0';
-                gth_tx_pippm_ctrl.direction <= '0';
-                gth_tx_pippm_ctrl.step_size <= (others => '0');
-                gth_tx_pippm_ctrl.sel <= '0';
+                gth_pippm_auto_en <= '0';
+                gth_pippm_auto_dir <= '0';
+                gth_pippm_auto_step <= (others => '0');
+                gth_pippm_auto_sel <= '0';
                 gth_shift_en_timer <= (others => '0');
                 gth_shift_cnt_global <= (others => '0');
             elsif ((fsm_reset = '1') or (ctrl_i.force_sync_done = '1') or (ctrl_i.gth_phalign_disable = '1')) then
                 gth_shift_ack <= '0';
-                gth_tx_pippm_ctrl.enable <= '0';
-                gth_tx_pippm_ctrl.direction <= '0';
-                gth_tx_pippm_ctrl.sel <= '0';
-                gth_tx_pippm_ctrl.step_size <= (others => '0');
+                gth_pippm_auto_en <= '0';
+                gth_pippm_auto_dir <= '0';
+                gth_pippm_auto_sel <= '0';
+                gth_pippm_auto_step <= (others => '0');
                 gth_shift_en_timer <= (others => '0');
                 gth_shift_cnt_global <= (others => '0');
             else
 
-                gth_tx_pippm_ctrl.sel <= ctrl_i.gth_shift_use_sel;
+                gth_pippm_auto_sel <= ctrl_i.gth_shift_use_sel;
 
                 if (gth_shift_req_dly = '1' and gth_shift_ack = '0') then
                     gth_shift_ack <= '1';
                     
                     if (ctrl_i.gth_shift_rev_dir = '0') then
-                        gth_tx_pippm_ctrl.direction <= not gth_shift_dir; -- shifting the MMCM feedback clock forward, actually shifts the outputs backwards.. so in this case we have to shift the PMA clock also backwards..
+                        gth_pippm_auto_dir <= not gth_shift_dir; -- shifting the MMCM feedback clock forward, actually shifts the outputs backwards.. so in this case we have to shift the PMA clock also backwards..
                     else 
-                        gth_tx_pippm_ctrl.direction <= gth_shift_dir;
+                        gth_pippm_auto_dir <= gth_shift_dir;
                     end if;
-                    gth_tx_pippm_ctrl.enable <= '1';
+                    gth_pippm_auto_en <= '1';
                     gth_shift_en_timer <= "01";
                     
                     -- set the GTH PI shift amount (we normally do 3 steps, except in the middle of every 7 shifts we do 2 steps)
                     if (gth_shift_dir = '1') then
                         if (gth_shift_cnt = 2) then
                             gth_shift_cnt <= gth_shift_cnt + 1;
-                            gth_tx_pippm_ctrl.step_size <= x"2";
+                            gth_pippm_auto_step <= x"2";
                             gth_shift_cnt_global <= gth_shift_cnt_global + x"0002";
                         elsif (gth_shift_cnt = 6) then
                             gth_shift_cnt <= (others => '0');
-                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_pippm_auto_step <= x"3";
                             gth_shift_cnt_global <= gth_shift_cnt_global + x"0003";
                         else
                             gth_shift_cnt <= gth_shift_cnt + 1;
-                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_pippm_auto_step <= x"3";
                             gth_shift_cnt_global <= gth_shift_cnt_global + x"0003";
                         end if;
                     else
                         if (gth_shift_cnt = 3) then
                             gth_shift_cnt <= gth_shift_cnt - 1;
-                            gth_tx_pippm_ctrl.step_size <= x"2";
+                            gth_pippm_auto_step <= x"2";
                             gth_shift_cnt_global <= gth_shift_cnt_global - x"0002";
                         elsif (gth_shift_cnt = 0) then
                             gth_shift_cnt <= "110";
-                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_pippm_auto_step <= x"3";
                             gth_shift_cnt_global <= gth_shift_cnt_global - x"0003";
                         else
                             gth_shift_cnt <= gth_shift_cnt - 1;
-                            gth_tx_pippm_ctrl.step_size <= x"3";
+                            gth_pippm_auto_step <= x"3";
                             gth_shift_cnt_global <= gth_shift_cnt_global - x"0003";
                         end if;
                     end if;
@@ -823,10 +879,10 @@ begin
                 end if;
                 
                 -- hold the enable signal high for 2 clock cycles
-                if (gth_tx_pippm_ctrl.enable = '1' and gth_shift_en_timer /= "10") then
+                if (gth_pippm_auto_en = '1' and gth_shift_en_timer /= "10") then
                     gth_shift_en_timer <= gth_shift_en_timer + 1;
                 elsif (gth_shift_en_timer = "10") then
-                    gth_tx_pippm_ctrl.enable <= '0';
+                    gth_pippm_auto_en <= '0';
                 end if;
                 
             end if;
@@ -836,6 +892,7 @@ begin
     status_o.gth_pi_shift_error <= gth_shift_error;
     status_o.gth_pi_shift_cnt <= std_logic_vector(gth_shift_cnt_global);
     status_o.gth_reset_cnt <= gth_reset_cnt;
+    status_o.gth_pi_man_shift_cnt <= std_logic_vector(gth_pippm_manual_shift_cnt);
         
     -------------- Phase monitoring of the TX 40MHz derived from TXOUTCLK vs TTC backplane -------------- 
     

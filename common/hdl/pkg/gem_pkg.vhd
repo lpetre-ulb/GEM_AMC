@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180614";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180615";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 7;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 9;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -50,7 +50,9 @@ package gem_pkg is
     -- 1.12.5 Inverted the GTH shift direction w.r.t. MMCM shift direction, because in MMCM we're shifting the feedback clock, which actually shifts the outputs in the opposite direction..
     -- 1.12.6 Set TXDLYBYPASS back to 0, and set TXPIPPMSEL to 1 only when shifting the PI phase and only if PA_GTH_SHIFT_USE_SEL is set to 1 (GTH reset doesn't complete if it's set to 1).
     --        Also GTH PIPPM shift direction is configurable now. The delay between phase shifts is also configurable.
-    -- 1.12.7 Configurable TXDLYBYPASS, and a possibility to do manual shifts using registers 
+    -- 1.12.7 Configurable TXDLYBYPASS, and a possibility to do manual shifts using registers
+    -- 1.12.8 Fixed a bug which previously prevented the GTH PIPPM shifting when doing a manual shift, so only the MMCM would be shifted
+    -- 1.12.9 Fix manual shift pulse length, and add manual shift support for GTH PIPPM only
 
     --======================--
     --==      General     ==--
