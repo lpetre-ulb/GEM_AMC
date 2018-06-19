@@ -52,7 +52,7 @@ package gem_pkg is
     --        Also GTH PIPPM shift direction is configurable now. The delay between phase shifts is also configurable.
     -- 1.12.7 Configurable TXDLYBYPASS, and a possibility to do manual shifts using registers
     -- 1.12.8 Fixed a bug which previously prevented the GTH PIPPM shifting when doing a manual shift, so only the MMCM would be shifted
-    -- 1.12.9 Fix manual shift pulse length, and add manual shift support for GTH PIPPM only
+    -- 1.12.9 Fix manual shift pulse length, and add manual shift support for GTH PIPPM only. Also set TXDLYBYPASS to 1 by default, because it really messes up the MMCM shifting
 
     --======================--
     --==      General     ==--

@@ -45,7 +45,7 @@ package registers is
 
     constant REG_TTC_CTRL_GTH_TXDLYBYPASS_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_GTH_TXDLYBYPASS_BIT    : integer := 26;
-    constant REG_TTC_CTRL_GTH_TXDLYBYPASS_DEFAULT : std_logic := '0';
+    constant REG_TTC_CTRL_GTH_TXDLYBYPASS_DEFAULT : std_logic := '1';
 
     constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_ADDR    : std_logic_vector(7 downto 0) := x"04";
     constant REG_TTC_CTRL_PA_GTH_SHIFT_USE_SEL_BIT    : integer := 27;
