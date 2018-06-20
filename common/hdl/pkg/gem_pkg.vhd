@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180615";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180620";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 9;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 10;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -53,6 +53,7 @@ package gem_pkg is
     -- 1.12.7 Configurable TXDLYBYPASS, and a possibility to do manual shifts using registers
     -- 1.12.8 Fixed a bug which previously prevented the GTH PIPPM shifting when doing a manual shift, so only the MMCM would be shifted
     -- 1.12.9 Fix manual shift pulse length, and add manual shift support for GTH PIPPM only. Also set TXDLYBYPASS to 1 by default, because it really messes up the MMCM shifting
+    -- 1.12.10 Fix a bug in MMCM manual shifting, where a single write to manual shift enable register would sometimes not work or do multiple shifts
 
     --======================--
     --==      General     ==--
