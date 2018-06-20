@@ -70,6 +70,7 @@ package ttc_pkg is
         reset_cnt               : std_logic; -- reset the counters
         reset_sync_fsm          : std_logic; -- reset the sync FSM, this will restart the phase alignment procedure
         reset_mmcm              : std_logic; -- reset the MMCM, this will reset the MMCM and also restart the phase alignment procedure
+        reset_pll               : std_logic; -- reset the phase check PLL
         force_sync_done         : std_logic; -- force the sync_done signal high -- this may be useful in setups where backplane clock does not exist (no AMC13), and only the jitter cleaned clock is available
         no_init_shift_out       : std_logic; -- if this is set to 0 (default), then when the phase alignment FSM is reset, it will first shift the phase out of lock if it is currently locked, and then start searching for lock as usual
         gth_phalign_disable     : std_logic; -- if this is set to 0 (default), then the GTH PI PPM controller will be used to track the phase of the TXUSRCLK every time the TXUSRCLK is shifted, this may help to keep the fiber links alive while resetting the phase alignment FSM

@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 43;
+    constant REG_TTC_NUM_REGS : integer := 44;
     constant REG_TTC_ADDRESS_MSB : integer := 7;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(7 downto 0) := x"00";
@@ -99,6 +99,10 @@ package registers is
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_ADDR    : std_logic_vector(7 downto 0) := x"08";
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_MSB    : integer := 31;
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_LSB     : integer := 0;
+
+    constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_ADDR    : std_logic_vector(7 downto 0) := x"09";
+    constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_MSB    : integer := 31;
+    constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_LSB     : integer := 0;
 
     constant REG_TTC_CONFIG_CMD_BC0_ADDR    : std_logic_vector(7 downto 0) := x"10";
     constant REG_TTC_CONFIG_CMD_BC0_MSB    : integer := 7;

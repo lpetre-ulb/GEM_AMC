@@ -374,7 +374,7 @@ begin
             CLKFBIN  => ttc_clocks_bufg.clk_40,
             CLKIN1   => clk_40_ttc_bufg,
             PWRDWN   => '0',
-            RST      => pll_reset
+            RST      => (pll_reset and not ctrl_i.force_sync_done) or ctrl_i.reset_pll
         );  
 
     -- detect stable MMCM and PLL lock signals 
@@ -912,7 +912,7 @@ begin
             PHASE_JUMP_THRESH => x"035" -- 1ns
         )
         port map(
-            reset_i             => (not sync_good) or ctrl_i.reset_cnt,
+            reset_i             => (not sync_good and not ctrl_i.force_sync_done) or ctrl_i.reset_cnt,
             clk1_i              => gth_master_pcs_clk_i,
             clk2_i              => ttc_clocks_bufg.clk_120,
             phase_o             => gth_phase,
@@ -944,7 +944,7 @@ begin
             PHASE_JUMP_THRESH => x"06c" -- 2ns
         )
         port map(
-            reset_i             => (not sync_good) or ctrl_i.reset_cnt,
+            reset_i             => (not sync_good and not ctrl_i.force_sync_done) or ctrl_i.reset_cnt,
             clk1_i              => clk_40_ttc_bufg,
             clk2_i              => ttc_clocks_bufg.clk_40,
             phase_o             => ttc_phase,

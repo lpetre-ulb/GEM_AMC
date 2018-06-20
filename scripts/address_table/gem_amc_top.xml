@@ -90,6 +90,10 @@
         <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w"
               description="Each write to this register will trigger one GTH PI shift of size PA_GTH_MANUAL_SHIFT_STEP in the direction of PA_GTH_MANUAL_SHIFT_DIR when PA_GTH_MANUAL_OVERRIDE is set to 1"
               fw_write_pulse_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_en"/>
+        <node id="PA_MANUAL_PLL_RESET" address="0x9" permission="w"
+              description="Resets the phase check PLL. This is to be used for manual phase alignment with software."
+              fw_write_pulse_signal="ttc_ctrl.clk_ctrl.reset_pll"/>
+
       </node>
 
       <node id="CONFIG" address="0x10"
