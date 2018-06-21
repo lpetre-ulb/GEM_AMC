@@ -22,14 +22,17 @@ class Colors:
 REG_PA_SHIFT_EN = None
 REG_PA_SHIFT_CNT = None
 REG_PA_PHASE = None
+REG_PA_PHASE_MEAN = None
 REG_PA_GTH_SHIFT_EN = None
 REG_PA_GTH_SHIFT_CNT = None
 REG_PA_GTH_PHASE = None
+REG_PA_GTH_PHASE_MEAN = None
 REG_PLL_RESET = None
 REG_PLL_LOCKED = None
 
-PHASE_CHECK_AVERAGE_CNT = 10
-PLL_LOCK_WAIT_TIME = 0.0001 # wait 100us to allow the PLL to lock
+PHASE_CHECK_AVERAGE_CNT = 100
+PLL_LOCK_WAIT_TIME = 0.00001 # wait 100us to allow the PLL to lock
+PLL_LOCK_READ_ATTEMPTS = 10
 
 def main():
 
@@ -39,24 +42,28 @@ def main():
     # paShiftTest()
     # paCombinedSwShiftTest()
     # paCombinedHwShiftTest()
-    alignToTtcPhase()
+    alignToTtcPhase(True)
 
 def initRegAddrs():
     global REG_PA_SHIFT_EN
     global REG_PA_SHIFT_CNT
     global REG_PA_PHASE
+    global REG_PA_PHASE_MEAN
     global REG_PA_GTH_SHIFT_EN
     global REG_PA_GTH_SHIFT_CNT
     global REG_PA_GTH_PHASE
+    global REG_PA_GTH_PHASE_MEAN
     global REG_PLL_RESET
     global REG_PLL_LOCKED
 
     REG_PA_SHIFT_EN = getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_SHIFT_EN').real_address
     REG_PA_SHIFT_CNT = getNode('GEM_AMC.TTC.STATUS.CLK.PA_MANUAL_SHIFT_CNT').real_address
     REG_PA_PHASE = getNode('GEM_AMC.TTC.STATUS.CLK.TTC_PM_PHASE').real_address
+    REG_PA_PHASE = getNode('GEM_AMC.TTC.STATUS.CLK.TTC_PM_PHASE_MEAN').real_address
     REG_PA_GTH_SHIFT_EN = getNode('GEM_AMC.TTC.CTRL.PA_GTH_MANUAL_SHIFT_EN').real_address
     REG_PA_GTH_SHIFT_CNT = getNode('GEM_AMC.TTC.STATUS.CLK.PA_MANUAL_GTH_SHIFT_CNT').real_address
     REG_PA_GTH_PHASE = getNode('GEM_AMC.TTC.STATUS.CLK.GTH_PM_PHASE').real_address
+    REG_PA_GTH_PHASE_MEAN = getNode('GEM_AMC.TTC.STATUS.CLK.GTH_PM_PHASE_MEAN').real_address
     REG_PLL_RESET = getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_PLL_RESET').real_address
     REG_PLL_LOCKED = getNode('GEM_AMC.TTC.STATUS.CLK.PHASE_LOCKED').real_address
 
@@ -230,7 +237,7 @@ def paCombinedHwShiftTest():
 
     f.close()
 
-def alignToTtcPhase():
+def alignToTtcPhase(shiftOutOfLockFirst):
     writeReg(getNode('GEM_AMC.TTC.CTRL.DISABLE_PHASE_ALIGNMENT'), 1)
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_DISABLE_GTH_PHASE_TRACKING'), 1)
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_OVERRIDE'), 1)
@@ -248,17 +255,18 @@ def alignToTtcPhase():
         printRed("fail: automatic phase alignment is turned on!!")
         return
 
-    f = open('phaseShiftCombinedHw.csv', 'w')
+    f = open('phaseShiftCombinedHwFindLock.csv', 'w')
 
     mmcmShiftCnt = rReg(REG_PA_SHIFT_CNT) & 0xffff
     gthShiftCnt = (rReg(REG_PA_GTH_SHIFT_CNT) & 0xffff0000) >> 16
-    pllLocked = False
+    pllLockCnt = checkPllLock()
+    firstUnlockFound = False
     phase = 0
     phaseNs = 0.0
 
     mmcmShiftTable = getMmcmShiftTable()
 
-    for i in range(0, 23040): # this will allow up to 3 times 360 degree shifts to find the lock (should only require 1x 360 in theory)
+    for i in range(0, 7680): # 23040 will allow up to 3 times 360 degree shifts to find the lock (should only require 1x 360 in theory)
         wReg(REG_PA_GTH_SHIFT_EN, 1)
         mmcmShiftRequired = mmcmShiftTable[gthShiftCnt+1]
 
@@ -280,22 +288,26 @@ def alignToTtcPhase():
         if mmcmShiftCnt != (rReg(REG_PA_SHIFT_CNT) & 0xffff):
             printRed("Reported MMCM shift count doesn't match the expected MMCM shift count. Expected shift cnt = %d, ctp7 returned %d" % (mmcmShiftCnt, (rReg(REG_PA_SHIFT_CNT) & 0xffff)))
 
-        pllLocked = checkPllLock()
-        phase = getPhase(PHASE_CHECK_AVERAGE_CNT)
+        pllLockCnt = checkPllLock()
+        phase = getPhaseMedian(PHASE_CHECK_AVERAGE_CNT)
         phaseNs = phase * 0.01860119
-        gthPhase = getGthPhase(PHASE_CHECK_AVERAGE_CNT)
+        gthPhase = getGthPhaseMedian(PHASE_CHECK_AVERAGE_CNT)
         gthPhaseNs = gthPhase * 0.01860119
-        printCyan("GTH shift #%d (mmcm shift cnt = %d), mmcm phase counts = %f, mmcm phase = %fns, gth phase counts = %f, gth phase = %f, PLL locked = %r" % (i, mmcmShiftCnt, phase, phaseNs, gthPhase, gthPhaseNs, pllLocked))
-        f.write("%d,%f,%f,%f,%f\n" % (i, phase, phaseNs, gthPhase, gthPhaseNs))
+        printCyan("GTH shift #%d (mmcm shift cnt = %d), mmcm phase counts = %f, mmcm phase = %fns, gth phase counts = %f, gth phase = %f, PLL lock count = %d" % (i, mmcmShiftCnt, phase, phaseNs, gthPhase, gthPhaseNs, pllLockCnt))
+        f.write("%d,%f,%f,%f,%f,%d\n" % (i, phase, phaseNs, gthPhase, gthPhaseNs, pllLockCnt))
 
-        if (pllLocked):
-            break;
+        if shiftOutOfLockFirst and (pllLockCnt < PLL_LOCK_READ_ATTEMPTS) and not firstUnlockFound:
+            firstUnlockFound = True
+            printRed("Unlocked after %d shifts, mmcm phase count = %d, mmcm phase ns = %fns" % (i+1, phase, phaseNs))
+
+        # if ((pllLockCnt == PLL_LOCK_READ_ATTEMPTS) and (firstUnlockFound or not shiftOutOfLockFirst)):
+        #     break;
 
     f.close()
 
     print("")
     print("=============================================================")
-    if (pllLocked):
+    if (pllLockCnt == PLL_LOCK_READ_ATTEMPTS):
         printGreen("==== Lock was found at phase count = %d, phase ns = %fns ====" % (phase, phaseNs))
     else:
         printRed("====              Lock was not found.... :(              ====")
@@ -334,33 +346,61 @@ def getMmcmShiftTable():
     return res
 
 def checkPllLock():
-    wReg(REG_PLL_RESET, 1)
-    sleep(PLL_LOCK_WAIT_TIME)
-    if ((rReg(REG_PLL_LOCKED) & 0x4) >> 2) == 0:
-        return False
-    else:
-        return True
+    lockCnt = 0
+    for i in range(0, PLL_LOCK_READ_ATTEMPTS):
+        wReg(REG_PLL_RESET, 1)
+        sleep(PLL_LOCK_WAIT_TIME)
+        if ((rReg(REG_PLL_LOCKED) & 0x4) >> 2) != 0:
+            lockCnt += 1
+    return lockCnt
 
-def getPhase(numIterations):
+def getPhaseMean(numIterations):
     phase = 0
     for i in range(0, numIterations):
-        phase += rReg(REG_PA_PHASE) & 0xfff
+        phase += rReg(REG_PA_PHASE_MEAN) & 0xfff
+        sleep(0.001126) #takes 1.126ms for the firmware to update the phase mean register
 
     phase = phase / numIterations
     return phase
 
-def getGthPhase(numIterations):
+def getPhaseMedian(numIterations):
+    phases = []
+    for i in range(0, numIterations):
+        phases.append(rReg(REG_PA_PHASE) & 0xfff)
+
+    phase = median(phases)
+    return phase
+
+def getGthPhaseMean(numIterations):
     phase = 0
     for i in range(0, numIterations):
-        phase += rReg(REG_PA_GTH_PHASE) & 0xfff
+        phase += rReg(REG_PA_GTH_PHASE_MEAN) & 0xfff
+        sleep(0.000375) #takes 375us for the firmware to update the phase mean register
 
     phase = phase / numIterations
+    return phase
+
+def getGthPhaseMedian(numIterations):
+    phases = []
+    for i in range(0, numIterations):
+        phases.append(rReg(REG_PA_GTH_PHASE_MEAN) & 0xfff)
+
+    phase = median(phases)
     return phase
 
 def checkStatus():
     rxReady       = parseInt(readReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.STATUS.READY')))
     criticalError = parseInt(readReg(getNode('GEM_AMC.SLOW_CONTROL.SCA.STATUS.CRITICAL_ERROR')))
     return (rxReady == 1) and (criticalError == 0)
+
+def median(lst):
+    n = len(lst)
+    if n < 1:
+            return None
+    if n % 2 == 1:
+            return sorted(lst)[n//2]
+    else:
+            return sum(sorted(lst)[n//2-1:n//2+1])/2.0
 
 def check_bit(byteval,idx):
     return ((byteval&(1<<idx))!=0);
