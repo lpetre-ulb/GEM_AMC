@@ -678,11 +678,21 @@ begin
             if (ctrl_i.reset_cnt = '1') then
                 manual_shift_cnt <= (others => '0');
             else
-                if ((mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd) = '1') then
-                    if (ctrl_i.pa_manual_shift_dir = '1') then
-                        manual_shift_cnt <= manual_shift_cnt + 1;
-                    else
-                        manual_shift_cnt <= manual_shift_cnt - 1;
+                if (ctrl_i.pa_manual_combined = '0') then
+                    if ((mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd) = '1') then
+                        if (ctrl_i.pa_manual_shift_dir = '1') then
+                            manual_shift_cnt <= manual_shift_cnt + 1;
+                        else
+                            manual_shift_cnt <= manual_shift_cnt - 1;
+                        end if;
+                    end if;
+                else
+                    if ((mmcm_ps_en_manual_comb and ctrl_i.pa_manual_shift_ovrd) = '1') then
+                        if (ctrl_i.pa_manual_gth_shift_dir = '0') then
+                            manual_shift_cnt <= manual_shift_cnt + 1;
+                        else
+                            manual_shift_cnt <= manual_shift_cnt - 1;
+                        end if;
                     end if;
                 end if;
             end if;
