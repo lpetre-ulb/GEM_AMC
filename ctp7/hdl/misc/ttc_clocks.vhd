@@ -393,7 +393,7 @@ begin
                 mmcm_locked <= '0';
             end if;
             
-            if ((pll_lock_stable_cnt = LOCK_STABLE_TIMEOUT) and (pll_locked_raw = '1') and (pll_reset = '0')) then
+            if ((pll_lock_stable_cnt = LOCK_STABLE_TIMEOUT) and (pll_locked_raw = '1') and (pll_reset = '0' or ctrl_i.force_sync_done = '1') and (ctrl_i.reset_pll = '0')) then
                 pll_locked <= '1';
             else
                 pll_locked <= '0';
@@ -417,13 +417,13 @@ begin
                 mmcm_lock_stable_cnt <= mmcm_lock_stable_cnt + 1;
             end if;
 
-            if ((pll_locked_raw = '0') or (pll_reset = '1')) then
+            if ((pll_locked_raw = '0') or (pll_reset = '1' and ctrl_i.force_sync_done = '0') or (ctrl_i.reset_pll = '1')) then
                 pll_lock_stable_cnt <= 0;
             elsif (pll_lock_stable_cnt < LOCK_STABLE_TIMEOUT) then
                 pll_lock_stable_cnt <= pll_lock_stable_cnt + 1;
             end if;
 
-            if ((pll_locked_raw = '1') or (pll_reset = '1')) then
+            if ((pll_locked_raw = '1') or (pll_reset = '1' and ctrl_i.force_sync_done = '0') or (ctrl_i.reset_pll = '1')) then
                 pll_unlock_stable_cnt <= 0;
             elsif (pll_unlock_stable_cnt < UNLOCK_STABLE_TIMEOUT + 1) then
                 pll_unlock_stable_cnt <= pll_unlock_stable_cnt + 1;

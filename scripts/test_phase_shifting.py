@@ -28,7 +28,7 @@ REG_PA_GTH_PHASE = None
 REG_PLL_RESET = None
 REG_PLL_LOCKED = None
 
-PHASE_CHECK_AVERAGE_CNT = 100
+PHASE_CHECK_AVERAGE_CNT = 10
 PLL_LOCK_WAIT_TIME = 0.0001 # wait 100us to allow the PLL to lock
 
 def main():
@@ -114,7 +114,10 @@ def paGthShiftTest():
     f.close()
 
 def paCombinedSwShiftTest():
-    writeReg(getNode('GEM_AMC.TTC.CTRL.DISABLE_PHASE_ALIGNMENT'), 1)
+    writeReg(getNode('GEM_AMC.TTC.CTRL.PA_DISABLE_GTH_PHASE_TRACKING'), 1)
+    writeReg(getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_OVERRIDE'), 0)
+    writeReg(getNode('GEM_AMC.TTC.CTRL.DISABLE_PHASE_ALIGNMENT'), 0)
+    sleep(2)
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_DISABLE_GTH_PHASE_TRACKING'), 1)
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_OVERRIDE'), 1)
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_SHIFT_DIR'), 1)
@@ -135,12 +138,12 @@ def paCombinedSwShiftTest():
     localIdx = 1
     mmcmShiftTable = getMmcmShiftTable()
 
-    for i in range(0, 2560):
+    for i in range(0, 256000):
         wReg(REG_PA_GTH_SHIFT_EN, 1)
-        if gthShiftCnt == 0:
-            gthShiftCnt = 0xffff
+        if gthShiftCnt == 39:
+            gthShiftCnt = 0
         else:
-            gthShiftCnt -= 1
+            gthShiftCnt += 1
 
         while gthShiftCnt != ((rReg(REG_PA_GTH_SHIFT_CNT) & 0xffff0000) >> 16):
             wReg(REG_PA_GTH_SHIFT_EN, 1)
@@ -185,6 +188,10 @@ def paCombinedHwShiftTest():
     writeReg(getNode('GEM_AMC.TTC.CTRL.CNT_RESET'), 1)
 
 
+    if (parseInt(readReg(getNode('GEM_AMC.TTC.CTRL.DISABLE_PHASE_ALIGNMENT'))) == 0):
+        printRed("fail: automatic phase alignment is turned on!!")
+        return
+
     f = open('phaseShiftCombinedHw.csv', 'w')
 
     mmcmShiftCnt = rReg(REG_PA_SHIFT_CNT) & 0xffff
@@ -192,8 +199,10 @@ def paCombinedHwShiftTest():
 
     mmcmShiftTable = getMmcmShiftTable()
 
-    for i in range(0, 2560):
+    for i in range(0, 256000):
         wReg(REG_PA_GTH_SHIFT_EN, 1)
+        mmcmShiftRequired = mmcmShiftTable[gthShiftCnt+1]
+
         if gthShiftCnt == 39:
             gthShiftCnt = 0
         else:
@@ -203,21 +212,20 @@ def paCombinedHwShiftTest():
             wReg(REG_PA_GTH_SHIFT_EN, 1)
             printRed("Repeating a GTH PI shift because the shift count doesn't match the expected value. Expected shift cnt = %d, ctp7 returned %d" % (gthShiftCnt, ((rReg(REG_PA_GTH_SHIFT_CNT) & 0xffff0000) >> 16)))
 
-        if mmcmShiftTable[gthShiftCnt+1]:
+        if mmcmShiftRequired:
             if (mmcmShiftCnt == 0xffff):
                 mmcmShiftCnt = 0
             else:
                 mmcmShiftCnt += 1
 
         if mmcmShiftCnt != (rReg(REG_PA_SHIFT_CNT) & 0xffff):
-            printRed("Reported MMCM shift count doesn't match the expected MMCM shift count. Expected shift cnt = %d, ctp7 returned %d" % (mmcmShiftCnt, (rReg(REG_PA_SHIFT_CNT) & 0xffff)))
-
+            printRed("Reported MMCM shift count doesn't match the expected MMCM shift count. Expected shift cnt = %d, ctp7 returned %d, gth shift cnt = %d" % (mmcmShiftCnt, (rReg(REG_PA_SHIFT_CNT) & 0xffff), gthShiftCnt))
 
         phase = getPhase(PHASE_CHECK_AVERAGE_CNT)
         phaseNs = phase * 0.01860119
         gthPhase = getGthPhase(PHASE_CHECK_AVERAGE_CNT)
         gthPhaseNs = gthPhase * 0.01860119
-        printCyan("GTH shift #%d (mmcm shift cnt = %d), mmcm phase counts = %f, mmcm phase = %fns, gth phase counts = %f, gth phase = %f" % (i, mmcmShiftCnt, phase, phaseNs, gthPhase, gthPhaseNs))
+        printCyan("GTH shift #%d (mmcm shift cnt = %d, gth shift cnt = %d), mmcm phase counts = %f, mmcm phase = %fns, gth phase counts = %f, gth phase = %f" % (i, mmcmShiftCnt, gthShiftCnt, phase, phaseNs, gthPhase, gthPhaseNs))
         f.write("%d,%f,%f,%f,%f\n" % (i, phase, phaseNs, gthPhase, gthPhaseNs))
 
     f.close()
@@ -236,6 +244,9 @@ def alignToTtcPhase():
     writeReg(getNode('GEM_AMC.TTC.CTRL.PA_MANUAL_PLL_RESET'), 1)
     writeReg(getNode('GEM_AMC.TTC.CTRL.CNT_RESET'), 1)
 
+    if (parseInt(readReg(getNode('GEM_AMC.TTC.CTRL.DISABLE_PHASE_ALIGNMENT'))) == 0):
+        printRed("fail: automatic phase alignment is turned on!!")
+        return
 
     f = open('phaseShiftCombinedHw.csv', 'w')
 
@@ -247,8 +258,10 @@ def alignToTtcPhase():
 
     mmcmShiftTable = getMmcmShiftTable()
 
-    for i in range(0, 2560):
+    for i in range(0, 23040): # this will allow up to 3 times 360 degree shifts to find the lock (should only require 1x 360 in theory)
         wReg(REG_PA_GTH_SHIFT_EN, 1)
+        mmcmShiftRequired = mmcmShiftTable[gthShiftCnt+1]
+
         if gthShiftCnt == 39:
             gthShiftCnt = 0
         else:
@@ -258,7 +271,7 @@ def alignToTtcPhase():
             wReg(REG_PA_GTH_SHIFT_EN, 1)
             printRed("Repeating a GTH PI shift because the shift count doesn't match the expected value. Expected shift cnt = %d, ctp7 returned %d" % (gthShiftCnt, ((rReg(REG_PA_GTH_SHIFT_CNT) & 0xffff0000) >> 16)))
 
-        if mmcmShiftTable[gthShiftCnt+1]:
+        if mmcmShiftRequired:
             if (mmcmShiftCnt == 0xffff):
                 mmcmShiftCnt = 0
             else:
