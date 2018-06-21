@@ -86,6 +86,7 @@ package ttc_pkg is
         pa_manual_gth_shift_dir : std_logic; -- controls the GTH PIPPM shift direction in when manual override is set
         pa_manual_gth_shift_step: std_logic_vector(3 downto 0); -- controls the GTH PIPPM shift step size
         pa_manual_gth_shift_en  : std_logic; -- when pulsed, it will shift the GTH PIPPM by one step
+        pa_manual_combined      : std_logic; -- when this is 1 then shifting the gth will also shift the MMCM when necessary to keep the GTH phase constant (7 mmcm manual shifts in every 40 gth shifts)
     end record;
 
     type t_ttc_cmds is record

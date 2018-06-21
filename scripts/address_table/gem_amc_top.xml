@@ -87,6 +87,9 @@
         <node id="PA_GTH_MANUAL_SHIFT_STEP" address="0x7" mask="0x000000f0" permission="rw"
               description="GTH PI Manual phase shifting step size"
               fw_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_step" fw_default="0x1"/>
+        <node id="PA_GTH_MANUAL_COMBINED" address="0x7" mask="0x00000100" permission="rw"
+              description="when this is 1 then shifting the gth will also shift the MMCM when necessary to keep the GTH phase constant (7 mmcm manual shifts in every 40 gth shifts)"
+              fw_signal="ttc_ctrl.clk_ctrl.pa_manual_combined" fw_default="0b1"/>
         <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w"
               description="Each write to this register will trigger one GTH PI shift of size PA_GTH_MANUAL_SHIFT_STEP in the direction of PA_GTH_MANUAL_SHIFT_DIR when PA_GTH_MANUAL_OVERRIDE is set to 1"
               fw_write_pulse_signal="ttc_ctrl.clk_ctrl.pa_manual_gth_shift_en"/>

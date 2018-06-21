@@ -96,6 +96,10 @@ package registers is
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_LSB     : integer := 4;
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_DEFAULT : std_logic_vector(7 downto 4) := x"1";
 
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_ADDR    : std_logic_vector(7 downto 0) := x"07";
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_BIT    : integer := 8;
+    constant REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_DEFAULT : std_logic := '1';
+
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_ADDR    : std_logic_vector(7 downto 0) := x"08";
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_MSB    : integer := 31;
     constant REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_EN_LSB     : integer := 0;

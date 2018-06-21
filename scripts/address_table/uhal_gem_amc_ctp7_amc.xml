@@ -22,6 +22,7 @@
         <node id="PA_GTH_MANUAL_OVERRIDE" address="0x7" permission="rw" mask="0x2"/>
         <node id="PA_GTH_MANUAL_SHIFT_DIR" address="0x7" permission="rw" mask="0x4"/>
         <node id="PA_GTH_MANUAL_SHIFT_STEP" address="0x7" permission="rw" mask="0xf0"/>
+        <node id="PA_GTH_MANUAL_COMBINED" address="0x7" permission="rw" mask="0x100"/>
         <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w" />
         <node id="PA_MANUAL_PLL_RESET" address="0x9" permission="w" />
       </node>

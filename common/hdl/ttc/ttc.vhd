@@ -490,6 +490,7 @@ begin
     regs_read_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_BIT) <= ttc_ctrl.clk_ctrl.pa_manual_gth_shift_ovrd;
     regs_read_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_BIT) <= ttc_ctrl.clk_ctrl.pa_manual_gth_shift_dir;
     regs_read_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_MSB downto REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_LSB) <= ttc_ctrl.clk_ctrl.pa_manual_gth_shift_step;
+    regs_read_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_BIT) <= ttc_ctrl.clk_ctrl.pa_manual_combined;
     regs_read_arr(10)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= ttc_conf.cmd_bc0;
     regs_read_arr(10)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= ttc_conf.cmd_ec0;
     regs_read_arr(10)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB) <= ttc_conf.cmd_resync;
@@ -564,6 +565,7 @@ begin
     ttc_ctrl.clk_ctrl.pa_manual_gth_shift_ovrd <= regs_write_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_BIT);
     ttc_ctrl.clk_ctrl.pa_manual_gth_shift_dir <= regs_write_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_BIT);
     ttc_ctrl.clk_ctrl.pa_manual_gth_shift_step <= regs_write_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_MSB downto REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_LSB);
+    ttc_ctrl.clk_ctrl.pa_manual_combined <= regs_write_arr(7)(REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_BIT);
     ttc_conf.cmd_bc0 <= regs_write_arr(10)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB);
     ttc_conf.cmd_ec0 <= regs_write_arr(10)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB);
     ttc_conf.cmd_resync <= regs_write_arr(10)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB);
@@ -604,6 +606,7 @@ begin
     regs_defaults(7)(REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_BIT) <= REG_TTC_CTRL_PA_GTH_MANUAL_OVERRIDE_DEFAULT;
     regs_defaults(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_BIT) <= REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_DIR_DEFAULT;
     regs_defaults(7)(REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_MSB downto REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_LSB) <= REG_TTC_CTRL_PA_GTH_MANUAL_SHIFT_STEP_DEFAULT;
+    regs_defaults(7)(REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_BIT) <= REG_TTC_CTRL_PA_GTH_MANUAL_COMBINED_DEFAULT;
     regs_defaults(10)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= REG_TTC_CONFIG_CMD_BC0_DEFAULT;
     regs_defaults(10)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= REG_TTC_CONFIG_CMD_EC0_DEFAULT;
     regs_defaults(10)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB) <= REG_TTC_CONFIG_CMD_RESYNC_DEFAULT;

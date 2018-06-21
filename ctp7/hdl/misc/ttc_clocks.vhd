@@ -95,6 +95,8 @@ END COMPONENT  ;
     constant MMCM_PS_DONE_TIMEOUT : unsigned(15 downto 0) := x"ffff"; -- datasheet says MMCM should complete a phase shift in 12 clocks, but we check it with some margin, just in case
     type pa_state_t is (IDLE, CHECK_FOR_LOCK, SHIFT_PHASE, WAIT_SHIFT_DONE, CHECK_FOR_UNLOCK, SHIFT_BACK, SYNC_DONE, DEAD);
 
+    constant MMCM_PS_EN_GTH_COMB : std_logic_vector(39 downto 0) := "0010000010000010000100000100000100000100";
+
     signal mmcm_ps_clk              : std_logic;
     signal mmcm_ps_en               : std_logic;
     signal mmcm_ps_incdec           : std_logic;
@@ -104,6 +106,9 @@ END COMPONENT  ;
     signal mmcm_locked              : std_logic;
     signal mmcm_reset               : std_logic;
     signal mmcm_ps_en_manual        : std_logic;
+    signal mmcm_ps_en_manual_comb120: std_logic := '0';
+    signal mmcm_ps_en_manual_combdly: std_logic := '0';
+    signal mmcm_ps_en_manual_comb   : std_logic := '0';
 
     signal pll_locked_raw           : std_logic;
     signal pll_locked               : std_logic;
@@ -279,8 +284,8 @@ begin
             DWE          => '0',
             -- Ports for dynamic phase shift
             PSCLK        => mmcm_ps_clk,
-            PSEN         => (mmcm_ps_en and not ctrl_i.pa_manual_shift_ovrd) or (mmcm_ps_en_manual and ctrl_i.pa_manual_shift_ovrd),
-            PSINCDEC     => (mmcm_ps_incdec and not ctrl_i.pa_manual_shift_ovrd) or (ctrl_i.pa_manual_shift_dir and ctrl_i.pa_manual_shift_ovrd),
+            PSEN         => (mmcm_ps_en and not ctrl_i.pa_manual_shift_ovrd) or ((mmcm_ps_en_manual or (mmcm_ps_en_manual_comb and ctrl_i.pa_manual_combined)) and ctrl_i.pa_manual_shift_ovrd),
+            PSINCDEC     => (mmcm_ps_incdec and not ctrl_i.pa_manual_shift_ovrd) or (ctrl_i.pa_manual_shift_dir and ctrl_i.pa_manual_shift_ovrd and not ctrl_i.pa_manual_combined) or (not ctrl_i.pa_manual_gth_shift_dir and ctrl_i.pa_manual_shift_ovrd and ctrl_i.pa_manual_combined),
             PSDONE       => mmcm_ps_done,
             -- Other control and status signals
             LOCKED       => mmcm_locked_raw,
@@ -710,12 +715,16 @@ begin
     process (ttc_clocks_bufg.clk_120)
     begin
         if (rising_edge(ttc_clocks_bufg.clk_120)) then
-            if (ctrl_i.reset_cnt = '1') then
+            if (gth_reset_done = '1') then
                 gth_pippm_manual_shift_cnt <= (others => '0');
             else
                 if ((gth_pippm_manual_en_tmp and ctrl_i.pa_manual_gth_shift_ovrd) = '1') then
-                    if (ctrl_i.pa_manual_gth_shift_dir = '1') then
+                    if (ctrl_i.pa_manual_gth_shift_dir = '0' and gth_pippm_manual_shift_cnt = x"0027") then
+                        gth_pippm_manual_shift_cnt <= (others => '0');
+                    elsif (ctrl_i.pa_manual_gth_shift_dir = '0') then
                         gth_pippm_manual_shift_cnt <= gth_pippm_manual_shift_cnt + 1;
+                    elsif (ctrl_i.pa_manual_gth_shift_dir = '1' and gth_pippm_manual_shift_cnt = x"0000") then
+                        gth_pippm_manual_shift_cnt <= x"0027";
                     else
                         gth_pippm_manual_shift_cnt <= gth_pippm_manual_shift_cnt - 1;
                     end if;
@@ -724,6 +733,48 @@ begin
         end if;
     end process;
 
+    -------------- Combined GTH and MMCM manual shifting --------------
+    
+    process (ttc_clocks_bufg.clk_120)
+    begin
+        if (rising_edge(ttc_clocks_bufg.clk_120)) then
+            if (ctrl_i.pa_manual_gth_shift_ovrd = '0') then
+                mmcm_ps_en_manual_comb120 <= '0';
+            else
+                if (gth_pippm_manual_en_tmp = '1') then
+                    if (gth_pippm_manual_shift_cnt = x"0000" and ctrl_i.pa_manual_gth_shift_dir = '1') then
+                        mmcm_ps_en_manual_comb120 <= MMCM_PS_EN_GTH_COMB(39); 
+                    elsif (ctrl_i.pa_manual_gth_shift_dir = '1') then
+                        mmcm_ps_en_manual_comb120 <= MMCM_PS_EN_GTH_COMB(to_integer(gth_pippm_manual_shift_cnt - 1));
+                    else
+                        mmcm_ps_en_manual_comb120 <= MMCM_PS_EN_GTH_COMB(to_integer(gth_pippm_manual_shift_cnt));
+                    end if;
+                else
+                    mmcm_ps_en_manual_comb120 <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    i_mmcm_ps_en_manual_combined_delay : entity work.synchronizer
+        generic map(
+            N_STAGES => 5
+        )
+        port map(
+            async_i => mmcm_ps_en_manual_comb120,
+            clk_i   => ttc_clocks_bufg.clk_120,
+            sync_o  => mmcm_ps_en_manual_combdly
+        );
+
+    i_mmcm_ps_en_manual_combined_oneshot : entity work.oneshot_cross_domain
+        port map(
+            reset_i       => mmcm_reset,
+            input_clk_i   => ttc_clocks_bufg.clk_120,
+            oneshot_clk_i => mmcm_ps_clk,
+            input_i       => mmcm_ps_en_manual_combdly,
+            oneshot_o     => mmcm_ps_en_manual_comb
+        );
+        
     -------------- GTH PI PPM shifting --------------
     
     -- transfer the mmcm_ps_en and mmcm_ps_incdec from mmcm_ps_clk to TXUSRCLK (ttc_clocks_bufg.clk_120) domain

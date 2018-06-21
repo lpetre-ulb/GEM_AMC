@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180620";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180621";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 11;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 12;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -55,6 +55,9 @@ package gem_pkg is
     -- 1.12.9 Fix manual shift pulse length, and add manual shift support for GTH PIPPM only. Also set TXDLYBYPASS to 1 by default, because it really messes up the MMCM shifting
     -- 1.12.10 Fix a bug in MMCM manual shifting, where a single write to manual shift enable register would sometimes not work or do multiple shifts
     -- 1.12.11 Added a manual PLL reset control
+    -- 1.12.12 Added a way to do combined shifts: when PA_GTH_MANUAL_COMBINED, PA_GTH_MANUAL_OVERRIDE, and PA_MANUAL_OVERRIDE are set,
+    --         then pulsing the PA_GTH_MANUAL_SHIFT_EN will shift the GTH and also when necessary it will shift the MMCM in a way that keeps the internal GTH phase unchanged, but results in MMCM shift w.r.t. TTC backplane clock
+    --         (the MMCM shift direction is controlled automatically based on selected PA_GTH_MANUAL_SHIFT_DIR)
 
     --======================--
     --==      General     ==--
