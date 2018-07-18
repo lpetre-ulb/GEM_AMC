@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180621";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180719";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 12;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 13;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -58,7 +58,8 @@ package gem_pkg is
     -- 1.12.12 Added a way to do combined shifts: when PA_GTH_MANUAL_COMBINED, PA_GTH_MANUAL_OVERRIDE, and PA_MANUAL_OVERRIDE are set,
     --         then pulsing the PA_GTH_MANUAL_SHIFT_EN will shift the GTH and also when necessary it will shift the MMCM in a way that keeps the internal GTH phase unchanged, but results in MMCM shift w.r.t. TTC backplane clock
     --         (the MMCM shift direction is controlled automatically based on selected PA_GTH_MANUAL_SHIFT_DIR)
-
+    -- 1.12.13 Added flipflops for ipb_mosi inputs in the ipbus_slave.vhd to ease the timing on the ipbus path
+    
     --======================--
     --==      General     ==--
     --======================-- 
