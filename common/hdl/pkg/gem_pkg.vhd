@@ -64,7 +64,7 @@ package gem_pkg is
     --         Whenever the buffer depth exceeds a specified maximum depth (BUF_OOS_MAX_DEPTH, default = 9) or falls below a specified minimum depth level (BUF_OOS_MIN_DEPTH, default = 7), a TTS out-of-sync condition is triggered.
     --         While the buffer is being filled initially after a reset, a TTS busy state is asserted (this should only last for BUF_DEPTH_AFTER_RESET clock cycles, which is 8 by default).
     --         There are status registers to monitor the current buffer depth, buffer out of sync condition, and buffer busy condition.
-    --         Note that this introduces additional L1A latency, equal to BUF_DEPTH_AFTER_RESET, so frontend latency should be adjusted accordingly.
+    --         Note that this introduces additional L1A latency, equal to BUF_DEPTH_AFTER_RESET + 1, so frontend latency should be adjusted accordingly.
     
     --======================--
     --==      General     ==--

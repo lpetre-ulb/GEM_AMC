@@ -86,6 +86,7 @@ architecture ttc_cmd_arch of ttc_cmd is
     signal s_ttc_err_single, s_ttc_err_double         : std_logic;
     signal s_ttc_err_single_cnt, s_ttc_err_double_cnt : unsigned(15 downto 0);
 
+    signal s_reset_sync_fabric  : std_logic;
     signal s_buf_reset          : std_logic;
     signal s_buf_rd_en          : std_logic;
     signal s_buf_ovf            : std_logic;
@@ -141,8 +142,6 @@ begin
             rd_data_count => s_buf_data_cnt
         );
 
-    s_ttc_data_fabric <= s_buf_dout when s_buf_valid = '1' else "00"; 
-
     i_buf_reset_sync : entity work.synchronizer
         generic map(
             N_STAGES => 2
@@ -150,24 +149,28 @@ begin
         port map(
             async_i => reset_i,
             clk_i   => clk_40_fabric_i,
-            sync_o  => s_buf_reset
+            sync_o  => s_reset_sync_fabric
         );
 
     p_buffer_manage : process(clk_40_fabric_i)
     begin
         if (rising_edge(clk_40_fabric_i)) then
-            if (s_buf_reset = '1') then
+            if (s_reset_sync_fabric = '1') then
                 s_buf_data_cnt_min <= (others => '1');
                 s_buf_data_cnt_max <= (others => '0');
                 s_buf_oos          <= '0';
                 s_buf_busy         <= '1';
                 s_buf_reset_done   <= '0';
                 s_buf_rd_en        <= '0';
+                s_ttc_data_fabric  <= "00";
+                s_buf_reset        <= '1';
             elsif (s_buf_reset_done = '0') then
                 
+                s_buf_reset        <= '0';
                 s_buf_data_cnt_min <= (others => '1');
                 s_buf_data_cnt_max <= (others => '0');
                 s_buf_oos          <= '0';
+                s_ttc_data_fabric  <= "00";
     
                 if (unsigned(s_buf_data_cnt) >= (unsigned(buf_depth_after_reset_i) - 1)) then
                     s_buf_busy         <= '0';
@@ -179,9 +182,17 @@ begin
                     s_buf_rd_en        <= '0';
                 end if;
             else
+
+                s_buf_reset <= '0';
                 s_buf_rd_en <= '1';
                 s_buf_reset_done <= '1';
                 s_buf_busy <= '0';
+                
+                if (s_buf_valid = '1') then
+                    s_ttc_data_fabric  <= s_buf_dout;
+                else
+                    s_ttc_data_fabric <= "00";
+                end if;
                 
                 if (unsigned(s_buf_data_cnt) < unsigned(s_buf_data_cnt_min)) then
                     s_buf_data_cnt_min <= s_buf_data_cnt;
