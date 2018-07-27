@@ -71,6 +71,28 @@ architecture ttc_cmd_arch of ttc_cmd is
         );
     end component;
 
+    COMPONENT ila_ttc_cmd_buffer
+        PORT(
+            clk     : IN STD_LOGIC;
+            probe0  : IN STD_LOGIC;
+            probe1  : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            probe2  : IN STD_LOGIC;
+            probe3  : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            probe4  : IN STD_LOGIC;
+            probe5  : IN STD_LOGIC;
+            probe6  : IN STD_LOGIC;
+            probe7  : IN STD_LOGIC;
+            probe8  : IN STD_LOGIC;
+            probe9  : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            probe10 : IN STD_LOGIC;
+            probe11 : IN STD_LOGIC;
+            probe12 : IN STD_LOGIC;
+            probe13 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            probe14 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            probe15 : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+        );
+    END COMPONENT;
+
     --============================================================================
     --                                                         Signal declarations
     --============================================================================
@@ -88,9 +110,12 @@ architecture ttc_cmd_arch of ttc_cmd is
 
     signal s_reset_sync_fabric  : std_logic;
     signal s_buf_reset          : std_logic;
+    signal s_buf_wr_en          : std_logic;
     signal s_buf_rd_en          : std_logic;
     signal s_buf_ovf            : std_logic;
     signal s_buf_unf            : std_logic;
+    signal s_buf_full           : std_logic;
+    signal s_buf_empty          : std_logic;
     signal s_buf_valid          : std_logic;
     signal s_buf_dout           : std_logic_vector(1 downto 0);
     signal s_buf_data_cnt       : std_logic_vector(3 downto 0);
@@ -131,12 +156,12 @@ begin
             wr_clk        => clk_40_backplane_i,
             rd_clk        => clk_40_fabric_i,
             din           => s_ttc_data_backplane,
-            wr_en         => '1',
+            wr_en         => s_buf_wr_en,
             rd_en         => s_buf_rd_en,
             dout          => s_buf_dout,
-            full          => open,
+            full          => s_buf_full,
             overflow      => s_buf_ovf,
-            empty         => open,
+            empty         => s_buf_empty,
             valid         => s_buf_valid,
             underflow     => s_buf_unf,
             rd_data_count => s_buf_data_cnt
@@ -164,6 +189,7 @@ begin
                 s_buf_rd_en        <= '0';
                 s_ttc_data_fabric  <= "00";
                 s_buf_reset        <= '1';
+                s_buf_wr_en <= '0';
             elsif (s_buf_reset_done = '0') then
                 
                 s_buf_reset        <= '0';
@@ -172,7 +198,17 @@ begin
                 s_buf_oos          <= '0';
                 s_ttc_data_fabric  <= "00";
     
-                if (unsigned(s_buf_data_cnt) >= (unsigned(buf_depth_after_reset_i) - 1)) then
+                if (s_buf_full = '1' and s_buf_empty = '1') then
+                    s_buf_wr_en <= '0';
+                else
+                    s_buf_wr_en <= '1';
+                end if;
+    
+                if (unsigned(s_buf_data_cnt) = (unsigned(buf_depth_after_reset_i) - 1)) then
+                    s_buf_busy         <= '1';
+                    s_buf_reset_done   <= '0';
+                    s_buf_rd_en        <= '1';
+                elsif (unsigned(s_buf_data_cnt) > (unsigned(buf_depth_after_reset_i) - 1)) then
                     s_buf_busy         <= '0';
                     s_buf_reset_done   <= '1';
                     s_buf_rd_en        <= '1';
@@ -187,6 +223,7 @@ begin
                 s_buf_rd_en <= '1';
                 s_buf_reset_done <= '1';
                 s_buf_busy <= '0';
+                s_buf_wr_en <= '1';
                 
                 if (s_buf_valid = '1') then
                     s_ttc_data_fabric  <= s_buf_dout;
@@ -219,6 +256,28 @@ begin
     buf_depth_max_o <= s_buf_data_cnt_max;
     buf_oos_o       <= s_buf_oos;
     buf_busy_o      <= s_buf_busy;
+
+    i_buf_ila : component ila_ttc_cmd_buffer
+        port map(
+            clk     => clk_40_fabric_i,
+            probe0  => s_buf_reset,
+            probe1  => s_ttc_data_backplane,
+            probe2  => s_buf_rd_en,
+            probe3  => s_buf_dout,
+            probe4  => s_buf_full,
+            probe5  => s_buf_ovf,
+            probe6  => s_buf_empty,
+            probe7  => s_buf_valid,
+            probe8  => s_buf_unf,
+            probe9  => s_buf_data_cnt,
+            probe10 => s_buf_oos,
+            probe11 => s_buf_busy,
+            probe12 => s_buf_reset_done,
+            probe13 => s_ttc_data_fabric,
+            probe14 => s_buf_data_cnt_min,
+            probe15 => s_buf_data_cnt_max
+        );
+
 
     i_ttc_decoder : entity work.ttc_decoder
         port map(

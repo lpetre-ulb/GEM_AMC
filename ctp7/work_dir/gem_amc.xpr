@@ -40,13 +40,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="65"/>
-    <Option Name="WTModelSimExportSim" Val="65"/>
-    <Option Name="WTQuestaExportSim" Val="65"/>
-    <Option Name="WTIesExportSim" Val="65"/>
-    <Option Name="WTVcsExportSim" Val="65"/>
-    <Option Name="WTRivieraExportSim" Val="65"/>
-    <Option Name="WTActivehdlExportSim" Val="65"/>
+    <Option Name="WTXSimExportSim" Val="70"/>
+    <Option Name="WTModelSimExportSim" Val="70"/>
+    <Option Name="WTQuestaExportSim" Val="70"/>
+    <Option Name="WTIesExportSim" Val="70"/>
+    <Option Name="WTVcsExportSim" Val="70"/>
+    <Option Name="WTRivieraExportSim" Val="70"/>
+    <Option Name="WTActivehdlExportSim" Val="70"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -1272,6 +1272,26 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
+    <FileSet Name="ila_ttc_cmd_buffer" Type="BlockSrcs" RelSrcDir="$PSRCDIR/ila_ttc_cmd_buffer">
+      <File Path="$PSRCDIR/sources_1/ip/ila_ttc_cmd_buffer.xcix">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/ip/ila_ttc_cmd_buffer/ila_ttc_cmd_buffer.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="ila_ttc_cmd_buffer"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
   </FileSets>
   <Simulators>
     <Simulator Name="XSim">
@@ -1324,9 +1344,16 @@
     </Run>
     <Run Id="ttc_command_fifo_synth_1" Type="Ft3:Synth" SrcSet="ttc_command_fifo" Part="xc7vx690tffg1927-2" ConstrsSet="ttc_command_fifo" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ttc_command_fifo_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_ttc_cmd_buffer_synth_1" Type="Ft3:Synth" SrcSet="ila_ttc_cmd_buffer" Part="xc7vx690tffg1927-2" ConstrsSet="ila_ttc_cmd_buffer" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_ttc_cmd_buffer_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -1384,9 +1411,23 @@
     </Run>
     <Run Id="ttc_command_fifo_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ttc_command_fifo" Description="Default settings for Implementation." SynthRun="ttc_command_fifo_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="ila_ttc_cmd_buffer_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_ttc_cmd_buffer" Description="Default settings for Implementation." SynthRun="ila_ttc_cmd_buffer_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

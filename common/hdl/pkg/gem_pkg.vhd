@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180727";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180728";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 13;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -65,6 +65,9 @@ package gem_pkg is
     --         While the buffer is being filled initially after a reset, a TTS busy state is asserted (this should only last for BUF_DEPTH_AFTER_RESET clock cycles, which is 8 by default).
     --         There are status registers to monitor the current buffer depth, buffer out of sync condition, and buffer busy condition.
     --         Note that this introduces additional L1A latency, equal to BUF_DEPTH_AFTER_RESET + 1, so frontend latency should be adjusted accordingly.
+    -- 1.13.1  Wait until the TTC command FIFO has reset before enabling the writing
+    -- 1.13.2  Switched to distributed RAM FIFO for TTC command buffer
+    -- 1.13.3  Delay the check of OOS by 1 clock by starting to read 1 clock before asserting reset_done in the ttc command buffer logic
     
     --======================--
     --==      General     ==--

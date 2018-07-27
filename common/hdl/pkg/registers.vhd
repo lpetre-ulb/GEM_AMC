@@ -111,17 +111,17 @@ package registers is
     constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_ADDR    : std_logic_vector(7 downto 0) := x"0d";
     constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_MSB    : integer := 3;
     constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_LSB     : integer := 0;
-    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_DEFAULT : std_logic_vector(3 downto 0) := x"8";
+    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_DEFAULT : std_logic_vector(3 downto 0) := x"2";
 
     constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"0d";
     constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_MSB    : integer := 7;
     constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_LSB     : integer := 4;
-    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_DEFAULT : std_logic_vector(7 downto 4) := x"7";
+    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_DEFAULT : std_logic_vector(7 downto 4) := x"3";
 
     constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"0d";
     constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_MSB    : integer := 11;
     constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_LSB     : integer := 8;
-    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_DEFAULT : std_logic_vector(11 downto 8) := x"9";
+    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_DEFAULT : std_logic_vector(11 downto 8) := x"3";
 
     constant REG_TTC_CONFIG_CMD_BC0_ADDR    : std_logic_vector(7 downto 0) := x"10";
     constant REG_TTC_CONFIG_CMD_BC0_MSB    : integer := 7;
