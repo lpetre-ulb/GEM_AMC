@@ -24,11 +24,11 @@ package ttc_pkg is
     constant C_TTC_NUM_BXs              : std_logic_vector(11 downto 0) := x"dec";
 
     type t_ttc_clks is record
-        clk_40  : std_logic;
-        clk_80  : std_logic;
-        clk_120 : std_logic;
-        clk_160 : std_logic;
-        clk_40_backplane : std_logic;
+        clk_40              : std_logic;
+        clk_80              : std_logic;
+        clk_120             : std_logic;
+        clk_160             : std_logic;
+        clk_40_backplane    : std_logic;
     end record;
 
     type t_phase_monitor_status is record
@@ -128,11 +128,20 @@ package ttc_pkg is
         err          : std_logic;
     end record;
 
+    type t_ttc_buffer_status is record
+        depth       : std_logic_vector(3 downto 0);
+        min_depth   : std_logic_vector(3 downto 0);
+        max_depth   : std_logic_vector(3 downto 0);
+        out_of_sync : std_logic;
+        busy        : std_logic;
+    end record;
+
     type t_ttc_status is record
-        clk_status  : t_ttc_clk_status;
-        bc0_status  : t_bc0_status;
-        single_err  : std_logic_vector(15 downto 0);
-        double_err  : std_logic_vector(15 downto 0);
+        clk_status      : t_ttc_clk_status;
+        bc0_status      : t_bc0_status;
+        buffer_status   : t_ttc_buffer_status;
+        single_err      : std_logic_vector(15 downto 0);
+        double_err      : std_logic_vector(15 downto 0);
     end record;
 
     type t_ttc_cmd_cntrs is record

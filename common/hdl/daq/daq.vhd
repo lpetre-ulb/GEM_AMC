@@ -655,9 +655,9 @@ begin
 
     tts_state <= tts_override when (tts_override /= x"0") else
                  x"8" when (daq_enable = '0') else
-                 x"4" when (tts_busy = '1' or resync_mode = '1') else
+                 x"4" when (tts_busy = '1' or resync_mode = '1' or ttc_status_i.buffer_status.busy = '1') else
                  x"c" when (tts_critical_error = '1') else
-                 x"2" when (tts_out_of_sync = '1') else
+                 x"2" when (tts_out_of_sync = '1' or ttc_status_i.buffer_status.out_of_sync = '1') else
                  x"1" when (tts_warning = '1') else
                  x"8"; 
         

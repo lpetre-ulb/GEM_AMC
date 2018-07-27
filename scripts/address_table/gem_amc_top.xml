@@ -97,6 +97,16 @@
               description="Resets the phase check PLL. This is to be used for manual phase alignment with software."
               fw_write_pulse_signal="ttc_ctrl.clk_ctrl.reset_pll"/>
 
+        <node id="BUF_DEPTH_AFTER_RESET" address="0xd" mask="0x0000000f" permission="rw"
+              description="Sets the desired buffer depth on the TTC buffer after a buffer reset (which happens after a TTC module reset or a TTC resync command)."
+              fw_signal="buf_depth_after_reset" fw_default="0x08"/>
+        <node id="BUF_OOS_MIN_DEPTH" address="0xd" mask="0x000000f0" permission="rw"
+              description="Minimum buffer depth setting. TTS out of sync state will be triggered if the buffer depth falls below this value."
+              fw_signal="buf_oos_min_depth" fw_default="0x07"/>
+        <node id="BUF_OOS_MAX_DEPTH" address="0xd" mask="0x00000f00" permission="rw"
+              description="Maximum buffer depth setting. TTS out of sync state will be triggered if the buffer depth exceeds this value."
+              fw_signal="buf_oos_max_depth" fw_default="0x09"/>
+
       </node>
 
       <node id="CONFIG" address="0x10"
@@ -267,7 +277,7 @@
               sw_monitor_error_min_threshold="1"/>
 
         <node id="BC0" address="0x11"
-              description="TTC status">
+              description="BC0 status">
           <node id="LOCKED" address="0x0" mask="0x00000001" permission="r"
                 description="BC0 locked flag"
                 fw_signal="ttc_status.bc0_status.locked"
@@ -285,6 +295,25 @@
                              TTC module reset, but this should be reset by control software before each run)"
                 fw_signal="ttc_status.bc0_status.udf_cnt"
                 sw_monitor_error_min_threshold="1"/>
+        </node>
+
+        <node id="BUFFER" address="0x15"
+              description="TTC buffer status">
+          <node id="DEPTH" address="0x0" mask="0x0000000f" permission="r"
+                description="Current depth of the TTC buffer"
+                fw_signal="ttc_status.buffer_status.depth"/>
+          <node id="MIN_DEPTH" address="0x0" mask="0x000000f0" permission="r"
+                description="Minimum depth of the TTC buffer since the last TTC module reset or TTC resync command"
+                fw_signal="ttc_status.buffer_status.min_depth"/>
+          <node id="MAX_DEPTH" address="0x0" mask="0x00000f00" permission="r"
+                description="Maximum depth of the TTC buffer since the last TTC module reset or TTC resync command"
+                fw_signal="ttc_status.buffer_status.max_depth"/>
+          <node id="OOS" address="0x0" mask="0x00001000" permission="r"
+                description="When this bit is set, it means that the TTS out of sync condition has been set due to the TTC buffer depth exceeding max depth setting or falling below the min depth setting"
+                fw_signal="ttc_status.buffer_status.out_of_sync"/>
+          <node id="BUSY" address="0x0" mask="0x00002000" permission="r"
+                description="When this bit is set, it means that we are currently holding TTS busy state because we're waiting for the TTC buffer to reach it's initial depth value defined by BUF_DEPTH_AFTER_RESET control register (note that this condition should only last for BUF_DEPTH_AFTER_RESET clock cycles)"
+                fw_signal="ttc_status.buffer_status.busy"/>
         </node>
       </node>
 

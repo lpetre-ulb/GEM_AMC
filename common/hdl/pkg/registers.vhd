@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 44;
+    constant REG_TTC_NUM_REGS : integer := 46;
     constant REG_TTC_ADDRESS_MSB : integer := 7;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(7 downto 0) := x"00";
@@ -107,6 +107,21 @@ package registers is
     constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_ADDR    : std_logic_vector(7 downto 0) := x"09";
     constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_MSB    : integer := 31;
     constant REG_TTC_CTRL_PA_MANUAL_PLL_RESET_LSB     : integer := 0;
+
+    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_ADDR    : std_logic_vector(7 downto 0) := x"0d";
+    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_MSB    : integer := 3;
+    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_LSB     : integer := 0;
+    constant REG_TTC_CTRL_BUF_DEPTH_AFTER_RESET_DEFAULT : std_logic_vector(3 downto 0) := x"8";
+
+    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"0d";
+    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_MSB    : integer := 7;
+    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_LSB     : integer := 4;
+    constant REG_TTC_CTRL_BUF_OOS_MIN_DEPTH_DEFAULT : std_logic_vector(7 downto 4) := x"7";
+
+    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"0d";
+    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_MSB    : integer := 11;
+    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_LSB     : integer := 8;
+    constant REG_TTC_CTRL_BUF_OOS_MAX_DEPTH_DEFAULT : std_logic_vector(11 downto 8) := x"9";
 
     constant REG_TTC_CONFIG_CMD_BC0_ADDR    : std_logic_vector(7 downto 0) := x"10";
     constant REG_TTC_CONFIG_CMD_BC0_MSB    : integer := 7;
@@ -296,6 +311,24 @@ package registers is
     constant REG_TTC_STATUS_BC0_UNDERFLOW_CNT_ADDR    : std_logic_vector(7 downto 0) := x"33";
     constant REG_TTC_STATUS_BC0_UNDERFLOW_CNT_MSB    : integer := 31;
     constant REG_TTC_STATUS_BC0_UNDERFLOW_CNT_LSB     : integer := 16;
+
+    constant REG_TTC_STATUS_BUFFER_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_DEPTH_MSB    : integer := 3;
+    constant REG_TTC_STATUS_BUFFER_DEPTH_LSB     : integer := 0;
+
+    constant REG_TTC_STATUS_BUFFER_MIN_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_MIN_DEPTH_MSB    : integer := 7;
+    constant REG_TTC_STATUS_BUFFER_MIN_DEPTH_LSB     : integer := 4;
+
+    constant REG_TTC_STATUS_BUFFER_MAX_DEPTH_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_MAX_DEPTH_MSB    : integer := 11;
+    constant REG_TTC_STATUS_BUFFER_MAX_DEPTH_LSB     : integer := 8;
+
+    constant REG_TTC_STATUS_BUFFER_OOS_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_OOS_BIT    : integer := 12;
+
+    constant REG_TTC_STATUS_BUFFER_BUSY_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_BUSY_BIT    : integer := 13;
 
     constant REG_TTC_CMD_COUNTERS_L1A_ADDR    : std_logic_vector(7 downto 0) := x"40";
     constant REG_TTC_CMD_COUNTERS_L1A_MSB    : integer := 31;

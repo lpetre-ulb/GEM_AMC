@@ -322,6 +322,8 @@ begin
             I => clk_120
         );
 
+    ttc_clocks_bufg.clk_40_backplane <= clk_40_ttc_bufg;
+
     clocks_o <= ttc_clocks_bufg;
 
     ----------------------------------------------------------

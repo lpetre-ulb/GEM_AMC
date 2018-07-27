@@ -25,6 +25,9 @@
         <node id="PA_GTH_MANUAL_COMBINED" address="0x7" permission="rw" mask="0x100"/>
         <node id="PA_GTH_MANUAL_SHIFT_EN" address="0x8" permission="w" />
         <node id="PA_MANUAL_PLL_RESET" address="0x9" permission="w" />
+        <node id="BUF_DEPTH_AFTER_RESET" address="0xd" permission="rw" mask="0xf"/>
+        <node id="BUF_OOS_MIN_DEPTH" address="0xd" permission="rw" mask="0xf0"/>
+        <node id="BUF_OOS_MAX_DEPTH" address="0xd" permission="rw" mask="0xf00"/>
       </node>
       <node id="CONFIG" address="0x10" >
         <node id="CMD_BC0" address="0x0" permission="rw" mask="0xff"/>
@@ -78,6 +81,13 @@
           <node id="UNLOCK_CNT" address="0x1" permission="r" mask="0xffff"/>
           <node id="OVERFLOW_CNT" address="0x2" permission="r" mask="0xffff"/>
           <node id="UNDERFLOW_CNT" address="0x2" permission="r" mask="0xffff0000"/>
+        </node>
+        <node id="BUFFER" address="0x15" >
+          <node id="DEPTH" address="0x0" permission="r" mask="0xf"/>
+          <node id="MIN_DEPTH" address="0x0" permission="r" mask="0xf0"/>
+          <node id="MAX_DEPTH" address="0x0" permission="r" mask="0xf00"/>
+          <node id="OOS" address="0x0" permission="r" mask="0x1000"/>
+          <node id="BUSY" address="0x0" permission="r" mask="0x2000"/>
         </node>
       </node>
       <node id="CMD_COUNTERS" address="0x40" >

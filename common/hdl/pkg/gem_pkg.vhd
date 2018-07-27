@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180719";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180727";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 12;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 13;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 13;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -59,6 +59,12 @@ package gem_pkg is
     --         then pulsing the PA_GTH_MANUAL_SHIFT_EN will shift the GTH and also when necessary it will shift the MMCM in a way that keeps the internal GTH phase unchanged, but results in MMCM shift w.r.t. TTC backplane clock
     --         (the MMCM shift direction is controlled automatically based on selected PA_GTH_MANUAL_SHIFT_DIR)
     -- 1.12.13 Added flipflops for ipb_mosi inputs in the ipbus_slave.vhd to ease the timing on the ipbus path
+    -- 1.13.0  TTC commands are now latched using the backplane clock and buffered before decoding. The buffer is reset after a TTC module reset or a TTC resync command. This should avoid sampling bad TTC commands if the fabric clock phase shifts w.r.t. the backplane clock phase.
+    --         After a reset the buffer is filled up to a specified amount controlled by the BUF_DEPTH_AFTER_RESET register, which is set to 8 by default (total available buffer depth is 16).
+    --         Whenever the buffer depth exceeds a specified maximum depth (BUF_OOS_MAX_DEPTH, default = 9) or falls below a specified minimum depth level (BUF_OOS_MIN_DEPTH, default = 7), a TTS out-of-sync condition is triggered.
+    --         While the buffer is being filled initially after a reset, a TTS busy state is asserted (this should only last for BUF_DEPTH_AFTER_RESET clock cycles, which is 8 by default).
+    --         There are status registers to monitor the current buffer depth, buffer out of sync condition, and buffer busy condition.
+    --         Note that this introduces additional L1A latency, equal to BUF_DEPTH_AFTER_RESET, so frontend latency should be adjusted accordingly.
     
     --======================--
     --==      General     ==--
