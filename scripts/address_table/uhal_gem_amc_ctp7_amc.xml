@@ -959,6 +959,7 @@
         <node id="TTS_OVERRIDE" address="0x0" permission="rw" mask="0xf0"/>
         <node id="INPUT_ENABLE_MASK" address="0x0" permission="rw" mask="0xffffff00"/>
         <node id="DAV_TIMEOUT" address="0x6" permission="rw" mask="0xffffff"/>
+        <node id="EOE_USE_OH_EC_BC" address="0x6" permission="rw" mask="0x1000000"/>
       </node>
       <node id="STATUS" address="0x1" >
         <node id="DAQ_LINK_RDY" address="0x0" permission="r" mask="0x1"/>

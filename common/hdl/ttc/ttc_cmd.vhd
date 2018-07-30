@@ -257,26 +257,26 @@ begin
     buf_oos_o       <= s_buf_oos;
     buf_busy_o      <= s_buf_busy;
 
-    i_buf_ila : component ila_ttc_cmd_buffer
-        port map(
-            clk     => clk_40_fabric_i,
-            probe0  => s_buf_reset,
-            probe1  => s_ttc_data_backplane,
-            probe2  => s_buf_rd_en,
-            probe3  => s_buf_dout,
-            probe4  => s_buf_full,
-            probe5  => s_buf_ovf,
-            probe6  => s_buf_empty,
-            probe7  => s_buf_valid,
-            probe8  => s_buf_unf,
-            probe9  => s_buf_data_cnt,
-            probe10 => s_buf_oos,
-            probe11 => s_buf_busy,
-            probe12 => s_buf_reset_done,
-            probe13 => s_ttc_data_fabric,
-            probe14 => s_buf_data_cnt_min,
-            probe15 => s_buf_data_cnt_max
-        );
+--    i_buf_ila : component ila_ttc_cmd_buffer
+--        port map(
+--            clk     => clk_40_fabric_i,
+--            probe0  => s_buf_reset,
+--            probe1  => s_ttc_data_backplane,
+--            probe2  => s_buf_rd_en,
+--            probe3  => s_buf_dout,
+--            probe4  => s_buf_full,
+--            probe5  => s_buf_ovf,
+--            probe6  => s_buf_empty,
+--            probe7  => s_buf_valid,
+--            probe8  => s_buf_unf,
+--            probe9  => s_buf_data_cnt,
+--            probe10 => s_buf_oos,
+--            probe11 => s_buf_busy,
+--            probe12 => s_buf_reset_done,
+--            probe13 => s_ttc_data_fabric,
+--            probe14 => s_buf_data_cnt_min,
+--            probe15 => s_buf_data_cnt_max
+--        );
 
 
     i_ttc_decoder : entity work.ttc_decoder

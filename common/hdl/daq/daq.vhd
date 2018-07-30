@@ -185,6 +185,7 @@ architecture Behavioral of daq is
     signal run_type             : std_logic_vector(3 downto 0) := x"0"; -- run type (set by software and included in the AMC header)
     signal run_params           : std_logic_vector(23 downto 0) := x"000000"; -- optional run parameters (set by software and included in the AMC header)
     signal zero_suppression_en  : std_logic;
+    signal eoe_use_oh_ec_bc     : std_logic;
     
     -- DAQ counters
     signal cnt_sent_events      : unsigned(31 downto 0) := (others => '0');
@@ -596,6 +597,7 @@ begin
         );
     
         input_control_arr(I).eb_zero_supression_en <= zero_suppression_en;
+        input_control_arr(I).eb_eoe_use_oh_ec_bc <= eoe_use_oh_ec_bc;
         chmb_evtfifos_empty(I) <= chamber_evtfifos(I).empty;
         chamber_evtfifos(I).rd_en <= chmb_evtfifos_rd_en(I);
         chamber_infifos(I).rd_en <= chmb_infifos_rd_en(I);
@@ -732,6 +734,7 @@ begin
         -- event chamber info; TODO: convert these to signals (but would require additional state)
         variable e_chmb_l1a_id              : std_logic_vector(23 downto 0) := (others => '0');
         variable e_chmb_bx_id               : std_logic_vector(11 downto 0) := (others => '0');
+        variable e_chmb_oh_ec_bc            : std_logic_vector(31 downto 0) := (others => '0');
         variable e_chmb_payload_size        : unsigned(19 downto 0) := (others => '0');
         variable e_chmb_evtfifo_afull       : std_logic := '0';
         variable e_chmb_evtfifo_full        : std_logic := '0';
@@ -922,6 +925,7 @@ begin
                         -- wait for the valid flag and then fetch the chamber event data
                         if (chamber_evtfifos(e_input_idx).valid = '1') then
                         
+                            e_chmb_oh_ec_bc                     := chamber_evtfifos(e_input_idx).dout(91 downto 60);
                             e_chmb_l1a_id                       := chamber_evtfifos(e_input_idx).dout(59 downto 36);
                             e_chmb_bx_id                        := chamber_evtfifos(e_input_idx).dout(35 downto 24);
                             e_chmb_payload_size(11 downto 0)    := unsigned(chamber_evtfifos(e_input_idx).dout(23 downto 12));
@@ -1043,7 +1047,8 @@ begin
                                               err_evtfifo_underflow &
                                               "0" &  -- stuck data
                                               chmb_infifo_underflow & -- this input had an infifo underflow
-                                              "0" & x"00000000";
+                                              "0" & 
+                                              e_chmb_oh_ec_bc;
                             daq_event_header <= '0';
                             daq_event_trailer <= '0';
                             daq_event_write_en <= '1';
@@ -1398,6 +1403,7 @@ begin
     regs_read_arr(4)(REG_DAQ_EXT_STATUS_L1AID_MSB downto REG_DAQ_EXT_STATUS_L1AID_LSB) <= ttc_daq_cntrs_i.l1id;
     regs_read_arr(5)(REG_DAQ_EXT_STATUS_EVT_SENT_MSB downto REG_DAQ_EXT_STATUS_EVT_SENT_LSB) <= std_logic_vector(cnt_sent_events);
     regs_read_arr(6)(REG_DAQ_CONTROL_DAV_TIMEOUT_MSB downto REG_DAQ_CONTROL_DAV_TIMEOUT_LSB) <= dav_timeout;
+    regs_read_arr(6)(REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_BIT) <= eoe_use_oh_ec_bc;
     regs_read_arr(7)(REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_MSB downto REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_LSB) <= std_logic_vector(max_dav_timer);
     regs_read_arr(8)(REG_DAQ_EXT_STATUS_LAST_DAV_TIMER_MSB downto REG_DAQ_EXT_STATUS_LAST_DAV_TIMER_LSB) <= std_logic_vector(last_dav_timer);
     regs_read_arr(9)(REG_DAQ_EXT_STATUS_L1A_FIFO_DATA_CNT_MSB downto REG_DAQ_EXT_STATUS_L1A_FIFO_DATA_CNT_LSB) <= l1afifo_data_cnt;
@@ -1874,6 +1880,7 @@ begin
     tts_override <= regs_write_arr(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB);
     input_mask <= regs_write_arr(0)(REG_DAQ_CONTROL_INPUT_ENABLE_MASK_MSB downto REG_DAQ_CONTROL_INPUT_ENABLE_MASK_LSB);
     dav_timeout <= regs_write_arr(6)(REG_DAQ_CONTROL_DAV_TIMEOUT_MSB downto REG_DAQ_CONTROL_DAV_TIMEOUT_LSB);
+    eoe_use_oh_ec_bc <= regs_write_arr(6)(REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_BIT);
     run_params <= regs_write_arr(13)(REG_DAQ_EXT_CONTROL_RUN_PARAMS_MSB downto REG_DAQ_EXT_CONTROL_RUN_PARAMS_LSB);
     run_type <= regs_write_arr(13)(REG_DAQ_EXT_CONTROL_RUN_TYPE_MSB downto REG_DAQ_EXT_CONTROL_RUN_TYPE_LSB);
     input_control_arr(0).eb_timeout_delay <= regs_write_arr(17)(REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_MSB downto REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_LSB);
@@ -1905,6 +1912,7 @@ begin
     regs_defaults(0)(REG_DAQ_CONTROL_TTS_OVERRIDE_MSB downto REG_DAQ_CONTROL_TTS_OVERRIDE_LSB) <= REG_DAQ_CONTROL_TTS_OVERRIDE_DEFAULT;
     regs_defaults(0)(REG_DAQ_CONTROL_INPUT_ENABLE_MASK_MSB downto REG_DAQ_CONTROL_INPUT_ENABLE_MASK_LSB) <= REG_DAQ_CONTROL_INPUT_ENABLE_MASK_DEFAULT;
     regs_defaults(6)(REG_DAQ_CONTROL_DAV_TIMEOUT_MSB downto REG_DAQ_CONTROL_DAV_TIMEOUT_LSB) <= REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT;
+    regs_defaults(6)(REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_BIT) <= REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_DEFAULT;
     regs_defaults(13)(REG_DAQ_EXT_CONTROL_RUN_PARAMS_MSB downto REG_DAQ_EXT_CONTROL_RUN_PARAMS_LSB) <= REG_DAQ_EXT_CONTROL_RUN_PARAMS_DEFAULT;
     regs_defaults(13)(REG_DAQ_EXT_CONTROL_RUN_TYPE_MSB downto REG_DAQ_EXT_CONTROL_RUN_TYPE_LSB) <= REG_DAQ_EXT_CONTROL_RUN_TYPE_DEFAULT;
     regs_defaults(17)(REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_MSB downto REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_LSB) <= REG_DAQ_OH0_CONTROL_EOE_TIMEOUT_DEFAULT;

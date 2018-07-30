@@ -3224,6 +3224,10 @@ package registers is
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_LSB     : integer := 0;
     constant REG_DAQ_CONTROL_DAV_TIMEOUT_DEFAULT : std_logic_vector(23 downto 0) := x"000500";
 
+    constant REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_ADDR    : std_logic_vector(8 downto 0) := '0' & x"06";
+    constant REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_BIT    : integer := 24;
+    constant REG_DAQ_CONTROL_EOE_USE_OH_EC_BC_DEFAULT : std_logic := '1';
+
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_ADDR    : std_logic_vector(8 downto 0) := '0' & x"07";
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_MSB    : integer := 23;
     constant REG_DAQ_EXT_STATUS_MAX_DAV_TIMER_LSB     : integer := 0;

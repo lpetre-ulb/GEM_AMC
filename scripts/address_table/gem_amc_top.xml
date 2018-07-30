@@ -99,13 +99,13 @@
 
         <node id="BUF_DEPTH_AFTER_RESET" address="0xd" mask="0x0000000f" permission="rw"
               description="Sets the desired buffer depth on the TTC buffer after a buffer reset (which happens after a TTC module reset or a TTC resync command)."
-              fw_signal="buf_depth_after_reset" fw_default="0x08"/>
+              fw_signal="buf_depth_after_reset" fw_default="0x02"/>
         <node id="BUF_OOS_MIN_DEPTH" address="0xd" mask="0x000000f0" permission="rw"
               description="Minimum buffer depth setting. TTS out of sync state will be triggered if the buffer depth falls below this value."
-              fw_signal="buf_oos_min_depth" fw_default="0x07"/>
+              fw_signal="buf_oos_min_depth" fw_default="0x03"/>
         <node id="BUF_OOS_MAX_DEPTH" address="0xd" mask="0x00000f00" permission="rw"
               description="Maximum buffer depth setting. TTS out of sync state will be triggered if the buffer depth exceeds this value."
-              fw_signal="buf_oos_max_depth" fw_default="0x09"/>
+              fw_signal="buf_oos_max_depth" fw_default="0x03"/>
 
       </node>
 
@@ -759,6 +759,11 @@
                            payload will be present). Units = clock cycles @ 25MHz
                            (current DAQLink clk frequency)"
               fw_signal="dav_timeout" fw_default="0x00500"/>
+        <node id="EOE_USE_OH_EC_BC"        address="0x6"  mask="0x01000000" permission="rw"
+              description="When this is 1, the chamber event builder will determine the
+                           end of event based on the OH EC and BC number. If this is 0
+                           then it will use the VFAT BC for that."
+              fw_signal="eoe_use_oh_ec_bc" fw_default="0b1"/>
       </node>
 
       <node id="STATUS"  address="0x1"
