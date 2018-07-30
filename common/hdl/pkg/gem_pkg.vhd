@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180728";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180730";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 13;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 4;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -68,6 +68,7 @@ package gem_pkg is
     -- 1.13.1  Wait until the TTC command FIFO has reset before enabling the writing
     -- 1.13.2  Switched to distributed RAM FIFO for TTC command buffer
     -- 1.13.3  Delay the check of OOS by 1 clock by starting to read 1 clock before asserting reset_done in the ttc command buffer logic
+    -- 1.13.4  Fixed a few bugs in DAQ: zero suppression was causing event size overflow; the chamber TTS state was not being propagated to top TTS (except for the last chamber); the TTS countdown period after reset was not working (not a problem really)
     
     --======================--
     --==      General     ==--

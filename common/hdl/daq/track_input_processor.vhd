@@ -558,13 +558,13 @@ begin
                     end if;
                     
                     -- increment the word counter if the counter is not full yet and we didn't zero suppress this data
-                    if (eb_vfat_words_64 < x"fff") and (ep_last_rx_data_suppress = '0') then
-                        eb_vfat_words_64 <= eb_vfat_words_64 + 3;
-                    else
+                    if (eb_vfat_words_64 = x"fff") then
                         eb_event_too_big <= '1';
                         err_event_too_big <= '1';
+                    elsif (ep_last_rx_data_suppress = '0') then
+                        eb_vfat_words_64 <= eb_vfat_words_64 + 3;
                     end if;
-                    
+                                        
                     -- do we have more than 24 VFAT blocks?
                     if (eb_vfat_words_64 > x"45") then
                         eb_event_bigger_than_24 <= '1';

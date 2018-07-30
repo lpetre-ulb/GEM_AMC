@@ -156,9 +156,12 @@ architecture Behavioral of daq is
     signal tts_busy             : std_logic := '0'; -- I'm busy - NO TRIGGERS FOR NOW, PLEASE
     signal tts_override         : std_logic_vector(3 downto 0) := x"0"; -- this can be set via IPbus and will override the TTS state if it's not x"0" (regardless of reset_daq and daq_enable)
     
+    signal tts_chmb_critical_arr: std_logic_vector(g_NUM_OF_OHs - 1 downto 0) := (others => '0'); -- input critical error detected - RESYNC/RESET NEEDED
+    signal tts_chmb_warning_arr : std_logic_vector(g_NUM_OF_OHs - 1 downto 0) := (others => '0'); -- input overflow warning - STOP TRIGGERS
+    signal tts_chmb_oos_arr     : std_logic_vector(g_NUM_OF_OHs - 1 downto 0) := (others => '0'); -- input out-of-sync - RESYNC NEEDED
     signal tts_chmb_critical    : std_logic := '0'; -- input critical error detected - RESYNC/RESET NEEDED
     signal tts_chmb_warning     : std_logic := '0'; -- input overflow warning - STOP TRIGGERS
-    signal tts_chmb_out_of_sync : std_logic := '0'; -- input out-of-sync - RESYNC NEEDED
+    signal tts_chmb_oos         : std_logic := '0'; -- input out-of-sync - RESYNC NEEDED
 
     signal tts_start_cntdwn_chmb: unsigned(7 downto 0) := x"ff";
     signal tts_start_cntdwn     : unsigned(7 downto 0) := x"ff";
@@ -609,16 +612,37 @@ begin
         if (rising_edge(tk_data_links_i(0).clk)) then
             if (reset_daq = '1') then
                 tts_chmb_critical <= '0';
-                tts_chmb_out_of_sync <= '0';
+                tts_chmb_oos <= '0';
                 tts_chmb_warning <= '0';
-                tts_start_cntdwn_chmb <= x"ff";
+                tts_chmb_critical_arr <= (others => '0');
+                tts_chmb_oos_arr <= (others => '0');
+                tts_chmb_warning_arr <= (others => '0');
+                tts_start_cntdwn_chmb <= x"32";
             else
-                if (tts_start_cntdwn_chmb /= x"00") then
-                    for I in 0 to (g_NUM_OF_OHs - 1) loop
-                        tts_chmb_critical <= tts_chmb_critical or (chmb_tts_states(I)(2) and input_mask(I));
-                        tts_chmb_out_of_sync <= tts_chmb_out_of_sync or (chmb_tts_states(I)(1) and input_mask(I));
-                        tts_chmb_warning <= tts_chmb_warning or (chmb_tts_states(I)(0) and input_mask(I));
+                if (tts_start_cntdwn_chmb = x"00") then
+                    for i in 0 to (g_NUM_OF_OHs - 1) loop
+                        tts_chmb_critical_arr(i) <= chmb_tts_states(i)(2) and input_mask(i);
+                        tts_chmb_oos_arr(i) <= chmb_tts_states(i)(1) and input_mask(i);
+                        tts_chmb_warning_arr(i) <= chmb_tts_states(i)(0) and input_mask(i);
                     end loop;                
+                    
+                    if (tts_chmb_critical = '1' or or_reduce(tts_chmb_critical_arr) = '1') then
+                        tts_chmb_critical <= '1';
+                    else
+                        tts_chmb_critical <= '0';
+                    end if;
+                    
+                    if (tts_chmb_oos = '1' or or_reduce(tts_chmb_oos_arr) = '1') then
+                        tts_chmb_oos <= '1';
+                    else
+                        tts_chmb_oos <= '0';
+                    end if;
+                    
+                    if (or_reduce(tts_chmb_warning_arr) = '1') then
+                        tts_chmb_warning <= '1';
+                    else
+                        tts_chmb_warning <= '0';
+                    end if;
                 else
                     tts_start_cntdwn_chmb <= tts_start_cntdwn_chmb - 1;
                 end if;
@@ -628,7 +652,7 @@ begin
 
     i_tts_sync_chmb_error   : entity work.synchronizer generic map(N_STAGES => 2) port map(async_i => tts_chmb_critical,    clk_i => ttc_clks_i.clk_40, sync_o  => tts_chmb_critical_tts_clk);
     i_tts_sync_chmb_warn    : entity work.synchronizer generic map(N_STAGES => 2) port map(async_i => tts_chmb_warning,     clk_i => ttc_clks_i.clk_40, sync_o  => tts_chmb_warning_tts_clk);
-    i_tts_sync_chmb_oos     : entity work.synchronizer generic map(N_STAGES => 2) port map(async_i => tts_chmb_out_of_sync, clk_i => ttc_clks_i.clk_40, sync_o  => tts_chmb_out_of_sync_tts_clk);
+    i_tts_sync_chmb_oos     : entity work.synchronizer generic map(N_STAGES => 2) port map(async_i => tts_chmb_oos,         clk_i => ttc_clks_i.clk_40, sync_o  => tts_chmb_out_of_sync_tts_clk);
     i_tts_sync_daqfifo_full : entity work.synchronizer generic map(N_STAGES => 2) port map(async_i => err_daqfifo_full,     clk_i => ttc_clks_i.clk_40, sync_o  => err_daqfifo_full_tts_clk);
 
     process (ttc_clks_i.clk_40)
@@ -639,9 +663,9 @@ begin
                 tts_out_of_sync <= '0';
                 tts_warning <= '0';
                 tts_busy <= '1';
-                tts_start_cntdwn <= x"ff";
+                tts_start_cntdwn <= x"32";
             else
-                if (tts_start_cntdwn /= x"00") then
+                if (tts_start_cntdwn = x"00") then
                     tts_busy <= '0';
                     tts_critical_error <= err_l1afifo_full or tts_chmb_critical_tts_clk or err_daqfifo_full_tts_clk;
                     tts_out_of_sync <= tts_chmb_out_of_sync_tts_clk;
