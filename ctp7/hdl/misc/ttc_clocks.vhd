@@ -1008,8 +1008,8 @@ begin
         )
         port map(
             reset_i             => (not sync_good and not ctrl_i.force_sync_done) or ctrl_i.reset_cnt,
-            clk1_i              => clk_40_ttc_bufg,
-            clk2_i              => ttc_clocks_bufg.clk_40,
+            clk1_i              => ttc_clocks_bufg.clk_40,
+            clk2_i              => clk_40_ttc_bufg,
             phase_o             => ttc_phase,
             phase_mean_o        => ttc_phase_mean,
             phase_min_o         => ttc_phase_min,

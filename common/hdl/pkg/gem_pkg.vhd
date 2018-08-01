@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180731";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180801";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 14;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -70,6 +70,7 @@ package gem_pkg is
     -- 1.13.3  Delay the check of OOS by 1 clock by starting to read 1 clock before asserting reset_done in the ttc command buffer logic
     -- 1.13.4  Fixed a few bugs in DAQ: zero suppression was causing event size overflow; the chamber TTS state was not being propagated to top TTS (except for the last chamber); the TTS countdown period after reset was not working (not a problem really)
     -- 1.14.0  Switched from end-of-event based on VFAT BC to OH EC and BC counters (default is using OH EC BC, but it can be switched back to VFAT BC with a registers). Also added OH EC BC counters to the readout in an unused spot of chamber trailer bits [31:0]
+    -- 1.14.1  In PA phase monitor, the sampling clock source was switched from the backplane clock to the jitter cleaned MMCM clock. This is to check if the spread on the phase measurement would improve. 
     
     --======================--
     --==      General     ==--
