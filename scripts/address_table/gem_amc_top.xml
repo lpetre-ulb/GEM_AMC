@@ -102,10 +102,10 @@
               fw_signal="buf_depth_after_reset" fw_default="0x02"/>
         <node id="BUF_OOS_MIN_DEPTH" address="0xd" mask="0x000000f0" permission="rw"
               description="Minimum buffer depth setting. TTS out of sync state will be triggered if the buffer depth falls below this value."
-              fw_signal="buf_oos_min_depth" fw_default="0x03"/>
+              fw_signal="buf_oos_min_depth" fw_default="0x02"/>
         <node id="BUF_OOS_MAX_DEPTH" address="0xd" mask="0x00000f00" permission="rw"
               description="Maximum buffer depth setting. TTS out of sync state will be triggered if the buffer depth exceeds this value."
-              fw_signal="buf_oos_max_depth" fw_default="0x03"/>
+              fw_signal="buf_oos_max_depth" fw_default="0x04"/>
 
       </node>
 
@@ -751,7 +751,7 @@
               description="This is a bitmask telling AMC to enable certain inputs (least
                            significant bit is input 0). Only first is enabled by default"
               fw_signal="input_mask" fw_default="0x1"/>
-        <node id="DAV_TIMEOUT"        address="0x6"  mask="0x00ffffff" permission="rw"
+        <node id="DAV_TIMEOUT"        address="0x1"  mask="0x00ffffff" permission="rw"
               description="This setting controls how long DAQ will wait for individual
                            inputs to report data before calling it timed-out  (if timeout
                            occurs a header and trailer for that chamber will still be
@@ -759,14 +759,30 @@
                            payload will be present). Units = clock cycles @ 25MHz
                            (current DAQLink clk frequency)"
               fw_signal="dav_timeout" fw_default="0x00500"/>
-        <node id="EOE_USE_OH_EC_BC"        address="0x6"  mask="0x01000000" permission="rw"
+        <node id="EOE_USE_OH_EC_BC"        address="0x1"  mask="0x01000000" permission="rw"
               description="When this is 1, the chamber event builder will determine the
                            end of event based on the OH EC and BC number. If this is 0
                            then it will use the VFAT BC for that."
               fw_signal="eoe_use_oh_ec_bc" fw_default="0b1"/>
+        <node id="ENABLE_INPUT_AUTOKILL"        address="0x1"  mask="0x02000000" permission="rw"
+              description="When this is enabled, inputs will get autokilled if they timeout a certain number of times in a row (controlled by INPUT_AUTOKILL_THRESH)"
+              fw_signal="enable_input_autokill" fw_default="0b1"/>
+        <node id="INPUT_AUTOKILL_THRESH"        address="0x2"  mask="0x0000ffff" permission="rw"
+              description="Number of input timeouts in a row that would trigger autokilling of that input (see ENABLE_INPUT_AUTOKILL)"
+              fw_signal="input_autokill_thresh" fw_default="0x0064"/>
       </node>
 
-      <node id="STATUS"  address="0x1"
+      <node id="EXT_CONTROL"  address="0x10"
+            description="DAQ global extended configuration registers">
+        <node id="RUN_TYPE"       address="0x0"  mask="0x0f000000" permission="rw"
+              description="User settable run type that gets embedded into the AMC header"
+              fw_signal="run_type" fw_default="0x0"/>
+        <node id="RUN_PARAMS"     address="0x0"  mask="0x00ffffff" permission="rw"
+              description="User settable run params that gets embedded into the AMC header"
+              fw_signal="run_params" fw_default="0x000000"/>
+      </node>
+
+      <node id="STATUS"  address="0x20"
             description="DAQ global status registers">
         <node id="DAQ_LINK_RDY"    address="0x0"  mask="0x00000001" permission="r"
               description="When this is 1, it means that AMC is in good communication
@@ -815,9 +831,12 @@
         <node id="TTS_STATE"       address="0x0"  mask="0xf0000000" permission="r"
               description="Current TTS state (READY, BUSY, ERROR, WARN, OUT-OF-SYNC)"
               fw_signal="tts_state"/>
+        <node id="INPUT_AUTOKILL_MASK"       address="0x1"  mask="0x00ffffff" permission="r"
+              description="This bitmask shows which inputs have been autokilled due to having too many timeouts in a row (see ENABLE_INPUT_AUTOKILL)"
+              fw_signal="input_autokill_mask"/>
       </node>
 
-      <node id="EXT_STATUS"  address="0x2"
+      <node id="EXT_STATUS"  address="0x30"
             description="DAQ global extended status registers">
         <node id="NOTINTABLE_ERR"  address="0x0"  mask="0x0000ffff" permission="r"
               description="This counter is counting DAQLink GTX/GTH not-in-table errors"
@@ -870,19 +889,9 @@
               sw_monitor_warn_min_threshold="40000"/> <!-- currently running DAQ at 50MHz, which is 3.2Gbs, so warning at 2.5Gbs (could increase to 80MHz to get 5Gbs) -->
       </node>
 
-      <node id="EXT_CONTROL"  address="0xe"
-            description="DAQ global extended configuration registers">
-        <node id="RUN_TYPE"       address="0x1"  mask="0x0f000000" permission="rw"
-              description="User settable run type that gets embedded into the AMC header"
-              fw_signal="run_type" fw_default="0x0"/>
-        <node id="RUN_PARAMS"     address="0x1"  mask="0x00ffffff" permission="rw"
-              description="User settable run params that gets embedded into the AMC header"
-              fw_signal="run_params" fw_default="0x000000"/>
-      </node>
-
-      <node id="OH${OH_IDX}"  address="0x10"
+      <node id="OH${OH_IDX}"  address="0x50"
             description="Link specific registers for OH${OH_IDX}"
-            generate="true" generate_size="12" generate_address_step="0x10" generate_idx_var="OH_IDX">
+            generate="true" generate_size="12" generate_address_step="0x20" generate_idx_var="OH_IDX">
 
         <node id="CONTROL"  address="0x0">
           <node id="EOE_TIMEOUT" address="0x3"  mask="0x00ffffff" permission="rw"
@@ -1038,9 +1047,29 @@
                              the last event. Note: this is mostly for debugging, but could
                              be used to tune the 'end of event timeout'"
                 fw_signal="input_status_arr(${OH_IDX}).eb_last_timer"/>
+          <node id="LIVE_VFAT_WORDS_64_LAST"  address="0x9"  mask="0x00000fff" permission="r"
+                description="Number of 64bit VFAT words received in the last event (this includes both the zero-suppressed data
+                             and non-zero-suppressed data). Once VFAT packet consists of 3 such words, so this number is always
+                             divisible by 3, and should be equal to 24 * 3 when all 24 VFATs are sending data on each L1A (even
+                             though some of them will be zero suppressed at the CTP7)."
+                fw_signal="input_status_arr(${OH_IDX}).eb_vfat_live_words_64"/>
+          <node id="LIVE_VFAT_WORDS_64_MIN"  address="0x9"  mask="0x00fff000" permission="r"
+                description="Minimum value of LIVE_VFAT_WORDS_64_LAST since last resync (see documentation of LIVE_VFAT_WORDS_64_LAST for more details).
+                             If this number is less than 24 * 3, it means that at least one VFAT didn't send data after receiving an L1A (this is an abnormal case)"
+                fw_signal="input_status_arr(${OH_IDX}).eb_vfat_live_words_64_min"/>
+          <node id="LIVE_VFAT_WORDS_64_MAX"  address="0xa"  mask="0x00000fff" permission="r"
+                description="Maximum value of LIVE_VFAT_WORDS_64_LAST since last resync (see documentation of LIVE_VFAT_WORDS_64_LAST for more details).
+                             If this number is more than 24 * 3, it's most likely that two consecutive events were not separated correctly."
+                fw_signal="input_status_arr(${OH_IDX}).eb_vfat_live_words_64_max"/>
+          <node id="DAV_TIMEOUT_CONSEC_CNT"  address="0xb"  mask="0x0000ffff" permission="r"
+                description="Number of times that this input has timed out in a row."
+                fw_signal="dav_timeout_consec_cnts(${OH_IDX})"/>
+          <node id="DAV_TIMEOUT_CNT"  address="0xb"  mask="0xffff0000" permission="r"
+                description="Total number of times that this input has timed out since last resync."
+                fw_signal="dav_timeout_cnts(${OH_IDX})"/>
         </node>
 
-        <node id="LASTBLOCK${BLOCK_IDX}"  address="0x9" permission="r"
+        <node id="LASTBLOCK${BLOCK_IDX}"  address="0x10" permission="r"
               description="contains the last 192+32 bits received from the VFAT and OH"
               generate="true" generate_size="7" generate_address_step="0x1" generate_idx_var="BLOCK_IDX"
               fw_signal="input_status_arr(${OH_IDX}).ep_vfat_block_data(${BLOCK_IDX})">

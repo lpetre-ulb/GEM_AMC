@@ -34,7 +34,7 @@ port(
     infifo_valid_o              : out std_logic;
     infifo_underflow_o          : out std_logic;
     infifo_data_cnt_o           : out std_logic_vector(11 downto 0);
-    evtfifo_dout_o              : out std_logic_vector(91 downto 0);
+    evtfifo_dout_o              : out std_logic_vector(103 downto 0);
     evtfifo_rd_en_i             : in std_logic;
     evtfifo_empty_o             : out std_logic;
     evtfifo_valid_o             : out std_logic;
@@ -80,10 +80,10 @@ architecture Behavioral of track_input_processor is
             rst           : in  std_logic;
             wr_clk        : in  std_logic;
             rd_clk        : in  std_logic;
-            din           : in  std_logic_vector(91 downto 0);
+            din           : in  std_logic_vector(103 downto 0);
             wr_en         : in  std_logic;
             rd_en         : in  std_logic;
-            dout          : out std_logic_vector(91 downto 0);
+            dout          : out std_logic_vector(103 downto 0);
             full          : out std_logic;
             almost_full   : out std_logic;
             empty         : out std_logic;
@@ -134,7 +134,7 @@ architecture Behavioral of track_input_processor is
     signal infifo_underflow         : std_logic := '0';
 
     -- Event FIFO
-    signal evtfifo_din              : std_logic_vector(91 downto 0) := (others => '0');
+    signal evtfifo_din              : std_logic_vector(103 downto 0) := (others => '0');
     signal evtfifo_wr_en            : std_logic := '0';
     signal evtfifo_full             : std_logic := '0';
     signal evtfifo_almost_full      : std_logic := '0';
@@ -157,13 +157,17 @@ architecture Behavioral of track_input_processor is
     signal ep_invalid_vfat_block    : std_logic := '0';
     
     -- Event builder
-    signal eb_vfat_words_64         : unsigned(11 downto 0) := (others => '0');
+    signal eb_vfat_words_64         : unsigned(11 downto 0) := (others => '0'); -- number of non-zero-suppressed VFAT 64bit words in the current event
+    signal eb_vfat_zs_words_64      : unsigned(11 downto 0) := (others => '0'); -- number of zero-suppressed VFAT 64bit words in the current event
     signal eb_vfat_bc               : std_logic_vector(11 downto 0) := (others => '0');
     signal eb_oh_ec_bc              : std_logic_vector(31 downto 0) := (others => '0');
     signal eb_vfat_ec               : std_logic_vector(7 downto 0) := (others => '0');
     signal eb_counters_valid        : std_logic := '0';
     signal eb_event_num             : unsigned(23 downto 0) := x"000001";
     signal eb_event_num_short       : unsigned(7 downto 0) := x"00"; -- used to double check with VFAT EC
+    signal eb_vfat_live_words_64    : unsigned(11 downto 0) := (others => '0'); -- number of non-zero-suppressed plus zero-suppressed VFAT 64bit words in the last event (for monitoring)
+    signal eb_vfat_live_words_64_min: unsigned(11 downto 0) := (others => '1'); -- minimum number of non-zero-suppressed plus zero-suppressed VFAT 64bit words since last resync (for monitoring)
+    signal eb_vfat_live_words_64_max: unsigned(11 downto 0) := (others => '0'); -- maximum number of non-zero-suppressed plus zero-suppressed VFAT 64bit words since last resync (for monitoring)
     
     signal eb_invalid_vfat_block    : std_logic := '0';
     signal eb_event_too_big         : std_logic := '0';
@@ -514,6 +518,7 @@ begin
                 evtfifo_wr_en <= '0';
                 eb_invalid_vfat_block <= '0';
                 eb_vfat_words_64 <= (others => '0');
+                eb_vfat_zs_words_64 <= (others => '0');
                 eb_vfat_bc <= (others => '0');
                 eb_oh_ec_bc <= (others => '0');
                 eb_vfat_ec <= (others => '0');
@@ -533,6 +538,9 @@ begin
                 err_evtfifo_full <= '0';
                 eb_timer <= (others => '0');
                 eb_timeout_flag <= '0';
+                eb_vfat_live_words_64 <= (others => '0');
+                eb_vfat_live_words_64_min <= (others => '1');
+                eb_vfat_live_words_64_max <= (others => '0');
             else
                 
                 if (eb_timer >= eb_timeout_delay) then
@@ -569,10 +577,12 @@ begin
                         err_event_too_big <= '1';
                     elsif (ep_last_rx_data_suppress = '0') then
                         eb_vfat_words_64 <= eb_vfat_words_64 + 3;
+                    else
+                        eb_vfat_zs_words_64 <= eb_vfat_zs_words_64 + 3;
                     end if;
                                         
                     -- do we have more than 24 VFAT blocks?
-                    if (eb_vfat_words_64 > x"45") then
+                    if ((eb_vfat_words_64 > x"45") and (ep_last_rx_data_suppress = '0')) then
                         eb_event_bigger_than_24 <= '1';
                         err_event_bigger_than_24 <= '1';
                     end if;
@@ -611,7 +621,8 @@ begin
                     -- Push to event FIFO
                     if (evtfifo_full = '0') then
                         evtfifo_wr_en <= '1';
-                        evtfifo_din <= eb_oh_ec_bc & 
+                        evtfifo_din <= std_logic_vector(eb_vfat_zs_words_64) &
+                                       eb_oh_ec_bc & 
                                        std_logic_vector(eb_event_num) & 
                                        eb_vfat_bc & 
                                        std_logic_vector(eb_vfat_words_64) & 
@@ -638,12 +649,15 @@ begin
                         eb_counters_valid <= '1';
                         if (ep_last_rx_data_suppress = '0') then
                             eb_vfat_words_64 <= x"003"; -- we already have one VFAT block in the next event (that's the one that marked the end of the previous event)
+                            eb_vfat_zs_words_64 <= (others => '0');
                         else
                             eb_vfat_words_64 <= x"000"; -- the current VFAT block which belongs to the next event is zero suppressed
+                            eb_vfat_zs_words_64 <= x"003";
                         end if;
                     else
                         eb_counters_valid <= '0';
                         eb_vfat_words_64 <= x"000"; -- no data yet after timeout
+                        eb_vfat_zs_words_64 <= (others => '0');
                     end if;
                     
                     -- Increment the event number, set bx
@@ -661,6 +675,16 @@ begin
                     -- reset the timeout
                     eb_timeout_flag <= '0';
                     eb_timer <= (others => '0');
+                    
+                    -- monitor the number of words
+                    eb_vfat_live_words_64 <= eb_vfat_zs_words_64 + eb_vfat_words_64;
+                    if (eb_vfat_zs_words_64 + eb_vfat_words_64 < eb_vfat_live_words_64_min) then
+                        eb_vfat_live_words_64_min <= eb_vfat_zs_words_64 + eb_vfat_words_64;
+                    end if;
+                    
+                    if (eb_vfat_zs_words_64 + eb_vfat_words_64 > eb_vfat_live_words_64_max) then
+                        eb_vfat_live_words_64_max <= eb_vfat_zs_words_64 + eb_vfat_words_64;
+                    end if;
 
                 else
                 
@@ -702,6 +726,10 @@ begin
     status_o.eb_event_num               <= std_logic_vector(eb_event_num);
     status_o.eb_max_timer               <= std_logic_vector(eb_max_timer);
     status_o.eb_last_timer              <= std_logic_vector(eb_last_timer);
+
+    status_o.eb_vfat_live_words_64      <= std_logic_vector(eb_vfat_live_words_64);
+    status_o.eb_vfat_live_words_64_min  <= std_logic_vector(eb_vfat_live_words_64_min);
+    status_o.eb_vfat_live_words_64_max  <= std_logic_vector(eb_vfat_live_words_64_max);
 
     status_o.ep_vfat_block_data(0)      <= ep_vfat_block_data(31 downto 0);
     status_o.ep_vfat_block_data(1)      <= ep_vfat_block_data(63 downto 32);

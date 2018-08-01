@@ -12,8 +12,8 @@ package gem_pkg is
 
     constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180801";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 14;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 15;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -70,7 +70,12 @@ package gem_pkg is
     -- 1.13.3  Delay the check of OOS by 1 clock by starting to read 1 clock before asserting reset_done in the ttc command buffer logic
     -- 1.13.4  Fixed a few bugs in DAQ: zero suppression was causing event size overflow; the chamber TTS state was not being propagated to top TTS (except for the last chamber); the TTS countdown period after reset was not working (not a problem really)
     -- 1.14.0  Switched from end-of-event based on VFAT BC to OH EC and BC counters (default is using OH EC BC, but it can be switched back to VFAT BC with a registers). Also added OH EC BC counters to the readout in an unused spot of chamber trailer bits [31:0]
-    -- 1.14.1  In PA phase monitor, the sampling clock source was switched from the backplane clock to the jitter cleaned MMCM clock. This is to check if the spread on the phase measurement would improve. 
+    -- 1.14.1  In PA phase monitor, the sampling clock source was switched from the backplane clock to the jitter cleaned MMCM clock. This is to check if the spread on the phase measurement would improve.
+    -- 1.15.0  DAQ input processor is now also counting the number of zero suppressed VFAT words and putting that into the datastream, using a spot previously dedicated to per chamber zero suppression flags (bits [51:40] in chamber header). DAQ format version has been changed from 0 to 1 to reflect that.
+    --         Also registers are available to read the current, min, and max "VFAT live word count", which is the number of non-zero-suppressed + zero-suppressed 64bit words (total should be equal to 24 * 3 in normal conditions regardless of zero suppression setting)
+    --         Also this version introduces autokilling of bad links (is enabled by default, but can be disabled). When a given link times out more than a certain number of times in a row (this parameter is configurable, and is set to 100 by default), then this input will be autokilled.
+    --         The autokill mask is reset during each resync. The autokill mask, and the individual link timeout counters (both consecutive and total) can be read with registers.
+    --         Default values of the TTC command buffer min and max for OOS have been set to 2 and 4 respectively (previously these were set at 3 and 3). 
     
     --======================--
     --==      General     ==--
@@ -86,7 +91,7 @@ package gem_pkg is
     --======================-- 
     
     -- DAQ
-    constant C_DAQ_FORMAT_VERSION     : std_logic_vector(3 downto 0)  := x"0";
+    constant C_DAQ_FORMAT_VERSION     : std_logic_vector(3 downto 0)  := x"1";
 
     --============--
     --== Common ==--
@@ -222,35 +227,38 @@ package gem_pkg is
     --=====================================--
     
     type t_daq_input_status is record
-        evtfifo_empty           : std_logic;
-        evtfifo_near_full       : std_logic;
-        evtfifo_full            : std_logic;
-        evtfifo_underflow       : std_logic;
-        evtfifo_near_full_cnt   : std_logic_vector(15 downto 0);
-        evtfifo_wr_rate         : std_logic_vector(16 downto 0);
-        infifo_empty            : std_logic;
-        infifo_near_full        : std_logic;
-        infifo_full             : std_logic;
-        infifo_underflow        : std_logic;
-        infifo_near_full_cnt    : std_logic_vector(15 downto 0);
-        infifo_wr_rate          : std_logic_vector(14 downto 0);
-        tts_state               : std_logic_vector(3 downto 0);
-        err_event_too_big       : std_logic;
-        err_evtfifo_full        : std_logic;
-        err_infifo_underflow    : std_logic;
-        err_infifo_full         : std_logic;
-        err_corrupted_vfat_data : std_logic;
-        err_vfat_block_too_big  : std_logic;
-        err_vfat_block_too_small: std_logic;
-        err_event_bigger_than_24: std_logic;
-        err_mixed_oh_bc         : std_logic;
-        err_mixed_vfat_bc       : std_logic;
-        err_mixed_vfat_ec       : std_logic;
-        cnt_corrupted_vfat      : std_logic_vector(31 downto 0);
-        eb_event_num            : std_logic_vector(23 downto 0);
-        eb_max_timer            : std_logic_vector(23 downto 0);
-        eb_last_timer           : std_logic_vector(23 downto 0);
-        ep_vfat_block_data      : t_std32_array(6 downto 0);
+        evtfifo_empty               : std_logic;
+        evtfifo_near_full           : std_logic;
+        evtfifo_full                : std_logic;
+        evtfifo_underflow           : std_logic;
+        evtfifo_near_full_cnt       : std_logic_vector(15 downto 0);
+        evtfifo_wr_rate             : std_logic_vector(16 downto 0);
+        infifo_empty                : std_logic;
+        infifo_near_full            : std_logic;
+        infifo_full                 : std_logic;
+        infifo_underflow            : std_logic;
+        infifo_near_full_cnt        : std_logic_vector(15 downto 0);
+        infifo_wr_rate              : std_logic_vector(14 downto 0);
+        tts_state                   : std_logic_vector(3 downto 0);
+        err_event_too_big           : std_logic;
+        err_evtfifo_full            : std_logic;
+        err_infifo_underflow        : std_logic;
+        err_infifo_full             : std_logic;
+        err_corrupted_vfat_data     : std_logic;
+        err_vfat_block_too_big      : std_logic;
+        err_vfat_block_too_small    : std_logic;
+        err_event_bigger_than_24    : std_logic;
+        err_mixed_oh_bc             : std_logic;
+        err_mixed_vfat_bc           : std_logic;
+        err_mixed_vfat_ec           : std_logic;
+        cnt_corrupted_vfat          : std_logic_vector(31 downto 0);
+        eb_event_num                : std_logic_vector(23 downto 0);
+        eb_max_timer                : std_logic_vector(23 downto 0);
+        eb_last_timer               : std_logic_vector(23 downto 0);
+        ep_vfat_block_data          : t_std32_array(6 downto 0);
+        eb_vfat_live_words_64       : std_logic_vector(11 downto 0);
+        eb_vfat_live_words_64_min   : std_logic_vector(11 downto 0);
+        eb_vfat_live_words_64_max   : std_logic_vector(11 downto 0);
     end record;
 
     type t_daq_input_status_arr is array(integer range <>) of t_daq_input_status;
@@ -279,7 +287,7 @@ package gem_pkg is
     type t_chamber_infifo_rd_array is array(integer range <>) of t_chamber_infifo_rd;
 
     type t_chamber_evtfifo_rd is record
-        dout          : std_logic_vector(91 downto 0);
+        dout          : std_logic_vector(103 downto 0);
         rd_en         : std_logic;
         empty         : std_logic;
         valid         : std_logic;
