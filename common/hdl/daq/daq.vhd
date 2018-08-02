@@ -628,9 +628,9 @@ begin
             else
                 if (tts_start_cntdwn_chmb = x"00") then
                     for i in 0 to (g_NUM_OF_OHs - 1) loop
-                        tts_chmb_critical_arr(i) <= chmb_tts_states(i)(2) and input_mask(i);
-                        tts_chmb_oos_arr(i) <= chmb_tts_states(i)(1) and input_mask(i);
-                        tts_chmb_warning_arr(i) <= chmb_tts_states(i)(0) and input_mask(i);
+                        tts_chmb_critical_arr(i) <= chmb_tts_states(i)(2) and input_mask(i) and (not input_autokill_mask(i));
+                        tts_chmb_oos_arr(i) <= chmb_tts_states(i)(1) and input_mask(i) and (not input_autokill_mask(i));
+                        tts_chmb_warning_arr(i) <= chmb_tts_states(i)(0) and input_mask(i) and (not input_autokill_mask(i));
                     end loop;                
                     
                     if (tts_chmb_critical = '1' or or_reduce(tts_chmb_critical_arr) = '1') then
@@ -904,7 +904,9 @@ begin
                             end if;
                                                     
                         else
-
+                            
+                            dav_timeout_consec_cnts(e_input_idx) <= (others => '0');
+                            
                             -- send the data
                             daq_event_data <= e_dav_mask & -- DAV mask
                                               -- buffer status (set if we've ever had a buffer overflow)
