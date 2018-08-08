@@ -129,11 +129,17 @@ package ttc_pkg is
     end record;
 
     type t_ttc_buffer_status is record
-        depth       : std_logic_vector(3 downto 0);
-        min_depth   : std_logic_vector(3 downto 0);
-        max_depth   : std_logic_vector(3 downto 0);
-        out_of_sync : std_logic;
-        busy        : std_logic;
+        depth           : std_logic_vector(3 downto 0); -- current buffer depth
+        min_depth       : std_logic_vector(3 downto 0); -- min buffer depth
+        max_depth       : std_logic_vector(3 downto 0); -- max buffer depth
+        out_of_sync     : std_logic; -- buffer is out of sync (the depth limits have been hit)
+        busy            : std_logic; -- asserted high after reset until the buffer has been initialized
+        oos_cnt         : std_logic_vector(15 downto 0); -- number of times the buffer has gone into OOS state 
+        unf_cnt         : std_logic_vector(15 downto 0); -- number of times the buffer had an underflow and went to OOS due to that
+        ovf_cnt         : std_logic_vector(15 downto 0); -- number of times the buffer had an overflow and went to OOS due to that
+        oos_time_last   : std_logic_vector(15 downto 0); -- number of seconds since last time the buffer went into OOS
+        oos_dur_last    : std_logic_vector(31 downto 0); -- number of clock cycles that the last OOS state lasted before being reset
+        oos_dur_max     : std_logic_vector(31 downto 0); -- maximum number of clock cycles that the OOS state lasted before being reset        
     end record;
 
     type t_ttc_status is record

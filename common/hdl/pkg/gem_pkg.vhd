@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180802";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180808";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 15;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 2;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -76,7 +76,8 @@ package gem_pkg is
     --         Also this version introduces autokilling of bad links (is enabled by default, but can be disabled). When a given link times out more than a certain number of times in a row (this parameter is configurable, and is set to 100 by default), then this input will be autokilled.
     --         The autokill mask is reset during each resync. The autokill mask, and the individual link timeout counters (both consecutive and total) can be read with registers.
     --         Default values of the TTC command buffer min and max for OOS have been set to 2 and 4 respectively (previously these were set at 3 and 3).
-    -- 1.15.1  Minor fixes related to input autokill: when an input is autokilled, also mask its TTS state, and also the consecutive timeout count for the first input had a bug related to resetting which was fixed 
+    -- 1.15.1  Minor fixes related to input autokill: when an input is autokilled, also mask its TTS state, and also the consecutive timeout count for the first input had a bug related to resetting which was fixed
+    -- 1.15.2  TTC buffer monitoring counters added: number of OOS instances, number of underflow and overflow instances, number of seconds since last OOS, last and max duration of the OOS state in clock cycles 
     
     --======================--
     --==      General     ==--

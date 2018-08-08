@@ -15,7 +15,7 @@ package registers is
     -- data status, bc0 status, command counters and a small spy buffer)
     --============================================================================
 
-    constant REG_TTC_NUM_REGS : integer := 46;
+    constant REG_TTC_NUM_REGS : integer := 50;
     constant REG_TTC_ADDRESS_MSB : integer := 7;
     constant REG_TTC_ADDRESS_LSB : integer := 0;
     constant REG_TTC_CTRL_MODULE_RESET_ADDR    : std_logic_vector(7 downto 0) := x"00";
@@ -329,6 +329,30 @@ package registers is
 
     constant REG_TTC_STATUS_BUFFER_BUSY_ADDR    : std_logic_vector(7 downto 0) := x"35";
     constant REG_TTC_STATUS_BUFFER_BUSY_BIT    : integer := 13;
+
+    constant REG_TTC_STATUS_BUFFER_OOS_CNT_ADDR    : std_logic_vector(7 downto 0) := x"35";
+    constant REG_TTC_STATUS_BUFFER_OOS_CNT_MSB    : integer := 31;
+    constant REG_TTC_STATUS_BUFFER_OOS_CNT_LSB     : integer := 16;
+
+    constant REG_TTC_STATUS_BUFFER_UNF_CNT_ADDR    : std_logic_vector(7 downto 0) := x"36";
+    constant REG_TTC_STATUS_BUFFER_UNF_CNT_MSB    : integer := 15;
+    constant REG_TTC_STATUS_BUFFER_UNF_CNT_LSB     : integer := 0;
+
+    constant REG_TTC_STATUS_BUFFER_OVF_CNT_ADDR    : std_logic_vector(7 downto 0) := x"36";
+    constant REG_TTC_STATUS_BUFFER_OVF_CNT_MSB    : integer := 31;
+    constant REG_TTC_STATUS_BUFFER_OVF_CNT_LSB     : integer := 16;
+
+    constant REG_TTC_STATUS_BUFFER_LAST_OOS_TIME_SECONDS_ADDR    : std_logic_vector(7 downto 0) := x"37";
+    constant REG_TTC_STATUS_BUFFER_LAST_OOS_TIME_SECONDS_MSB    : integer := 15;
+    constant REG_TTC_STATUS_BUFFER_LAST_OOS_TIME_SECONDS_LSB     : integer := 0;
+
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_LAST_ADDR    : std_logic_vector(7 downto 0) := x"38";
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_LAST_MSB    : integer := 31;
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_LAST_LSB     : integer := 0;
+
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_MAX_ADDR    : std_logic_vector(7 downto 0) := x"39";
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_MAX_MSB    : integer := 31;
+    constant REG_TTC_STATUS_BUFFER_OOS_DURATION_MAX_LSB     : integer := 0;
 
     constant REG_TTC_CMD_COUNTERS_L1A_ADDR    : std_logic_vector(7 downto 0) := x"40";
     constant REG_TTC_CMD_COUNTERS_L1A_MSB    : integer := 31;

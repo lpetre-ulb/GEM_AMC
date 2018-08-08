@@ -169,6 +169,7 @@ begin
     i_ttc_cmd : entity work.ttc_cmd
         port map(
             reset_i                 => reset or resync_cmd,
+            reset_oos_cnt_i         => ttc_ctrl.cnt_reset or reset,
             clk_40_backplane_i      => ttc_clks_i.clk_40_backplane,
             clk_40_fabric_i         => ttc_clks_i.clk_40,
             ttc_data_p_i            => ttc_data_p_i,
@@ -181,11 +182,7 @@ begin
             buf_depth_after_reset_i => buf_depth_after_reset,
             buf_oos_min_depth_i     => buf_oos_min_depth,
             buf_oos_max_depth_i     => buf_oos_max_depth,
-            buf_depth_o             => ttc_status.buffer_status.depth,
-            buf_depth_min_o         => ttc_status.buffer_status.min_depth,
-            buf_depth_max_o         => ttc_status.buffer_status.max_depth,
-            buf_oos_o               => ttc_status.buffer_status.out_of_sync,
-            buf_busy_o              => ttc_status.buffer_status.busy
+            buf_status_o            => ttc_status.buffer_status
         );
 
     p_cmd:
@@ -478,18 +475,22 @@ begin
     regs_addresses(31)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"32";
     regs_addresses(32)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"33";
     regs_addresses(33)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"35";
-    regs_addresses(34)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"40";
-    regs_addresses(35)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"41";
-    regs_addresses(36)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"42";
-    regs_addresses(37)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"43";
-    regs_addresses(38)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"44";
-    regs_addresses(39)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"45";
-    regs_addresses(40)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"46";
-    regs_addresses(41)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"47";
-    regs_addresses(42)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"48";
-    regs_addresses(43)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"49";
-    regs_addresses(44)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"50";
-    regs_addresses(45)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"51";
+    regs_addresses(34)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"36";
+    regs_addresses(35)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"37";
+    regs_addresses(36)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"38";
+    regs_addresses(37)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"39";
+    regs_addresses(38)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"40";
+    regs_addresses(39)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"41";
+    regs_addresses(40)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"42";
+    regs_addresses(41)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"43";
+    regs_addresses(42)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"44";
+    regs_addresses(43)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"45";
+    regs_addresses(44)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"46";
+    regs_addresses(45)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"47";
+    regs_addresses(46)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"48";
+    regs_addresses(47)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"49";
+    regs_addresses(48)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"50";
+    regs_addresses(49)(REG_TTC_ADDRESS_MSB downto REG_TTC_ADDRESS_LSB) <= x"51";
 
     -- Connect read signals
     regs_read_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= ttc_ctrl.l1a_enable;
@@ -561,18 +562,24 @@ begin
     regs_read_arr(33)(REG_TTC_STATUS_BUFFER_MAX_DEPTH_MSB downto REG_TTC_STATUS_BUFFER_MAX_DEPTH_LSB) <= ttc_status.buffer_status.max_depth;
     regs_read_arr(33)(REG_TTC_STATUS_BUFFER_OOS_BIT) <= ttc_status.buffer_status.out_of_sync;
     regs_read_arr(33)(REG_TTC_STATUS_BUFFER_BUSY_BIT) <= ttc_status.buffer_status.busy;
-    regs_read_arr(34)(REG_TTC_CMD_COUNTERS_L1A_MSB downto REG_TTC_CMD_COUNTERS_L1A_LSB) <= ttc_cmds_cnt_arr(0);
-    regs_read_arr(35)(REG_TTC_CMD_COUNTERS_BC0_MSB downto REG_TTC_CMD_COUNTERS_BC0_LSB) <= ttc_cmds_cnt_arr(1);
-    regs_read_arr(36)(REG_TTC_CMD_COUNTERS_EC0_MSB downto REG_TTC_CMD_COUNTERS_EC0_LSB) <= ttc_cmds_cnt_arr(2);
-    regs_read_arr(37)(REG_TTC_CMD_COUNTERS_RESYNC_MSB downto REG_TTC_CMD_COUNTERS_RESYNC_LSB) <= ttc_cmds_cnt_arr(3);
-    regs_read_arr(38)(REG_TTC_CMD_COUNTERS_OC0_MSB downto REG_TTC_CMD_COUNTERS_OC0_LSB) <= ttc_cmds_cnt_arr(4);
-    regs_read_arr(39)(REG_TTC_CMD_COUNTERS_HARD_RESET_MSB downto REG_TTC_CMD_COUNTERS_HARD_RESET_LSB) <= ttc_cmds_cnt_arr(5);
-    regs_read_arr(40)(REG_TTC_CMD_COUNTERS_CALPULSE_MSB downto REG_TTC_CMD_COUNTERS_CALPULSE_LSB) <= ttc_cmds_cnt_arr(6);
-    regs_read_arr(41)(REG_TTC_CMD_COUNTERS_START_MSB downto REG_TTC_CMD_COUNTERS_START_LSB) <= ttc_cmds_cnt_arr(7);
-    regs_read_arr(42)(REG_TTC_CMD_COUNTERS_STOP_MSB downto REG_TTC_CMD_COUNTERS_STOP_LSB) <= ttc_cmds_cnt_arr(8);
-    regs_read_arr(43)(REG_TTC_CMD_COUNTERS_TEST_SYNC_MSB downto REG_TTC_CMD_COUNTERS_TEST_SYNC_LSB) <= ttc_cmds_cnt_arr(9);
-    regs_read_arr(44)(REG_TTC_L1A_ID_MSB downto REG_TTC_L1A_ID_LSB) <= l1id_cnt;
-    regs_read_arr(45)(REG_TTC_L1A_RATE_MSB downto REG_TTC_L1A_RATE_LSB) <= l1a_rate;
+    regs_read_arr(33)(REG_TTC_STATUS_BUFFER_OOS_CNT_MSB downto REG_TTC_STATUS_BUFFER_OOS_CNT_LSB) <= ttc_status.buffer_status.oos_cnt;
+    regs_read_arr(34)(REG_TTC_STATUS_BUFFER_UNF_CNT_MSB downto REG_TTC_STATUS_BUFFER_UNF_CNT_LSB) <= ttc_status.buffer_status.unf_cnt;
+    regs_read_arr(34)(REG_TTC_STATUS_BUFFER_OVF_CNT_MSB downto REG_TTC_STATUS_BUFFER_OVF_CNT_LSB) <= ttc_status.buffer_status.ovf_cnt;
+    regs_read_arr(35)(REG_TTC_STATUS_BUFFER_LAST_OOS_TIME_SECONDS_MSB downto REG_TTC_STATUS_BUFFER_LAST_OOS_TIME_SECONDS_LSB) <= ttc_status.buffer_status.oos_time_last;
+    regs_read_arr(36)(REG_TTC_STATUS_BUFFER_OOS_DURATION_LAST_MSB downto REG_TTC_STATUS_BUFFER_OOS_DURATION_LAST_LSB) <= ttc_status.buffer_status.oos_dur_last;
+    regs_read_arr(37)(REG_TTC_STATUS_BUFFER_OOS_DURATION_MAX_MSB downto REG_TTC_STATUS_BUFFER_OOS_DURATION_MAX_LSB) <= ttc_status.buffer_status.oos_dur_max;
+    regs_read_arr(38)(REG_TTC_CMD_COUNTERS_L1A_MSB downto REG_TTC_CMD_COUNTERS_L1A_LSB) <= ttc_cmds_cnt_arr(0);
+    regs_read_arr(39)(REG_TTC_CMD_COUNTERS_BC0_MSB downto REG_TTC_CMD_COUNTERS_BC0_LSB) <= ttc_cmds_cnt_arr(1);
+    regs_read_arr(40)(REG_TTC_CMD_COUNTERS_EC0_MSB downto REG_TTC_CMD_COUNTERS_EC0_LSB) <= ttc_cmds_cnt_arr(2);
+    regs_read_arr(41)(REG_TTC_CMD_COUNTERS_RESYNC_MSB downto REG_TTC_CMD_COUNTERS_RESYNC_LSB) <= ttc_cmds_cnt_arr(3);
+    regs_read_arr(42)(REG_TTC_CMD_COUNTERS_OC0_MSB downto REG_TTC_CMD_COUNTERS_OC0_LSB) <= ttc_cmds_cnt_arr(4);
+    regs_read_arr(43)(REG_TTC_CMD_COUNTERS_HARD_RESET_MSB downto REG_TTC_CMD_COUNTERS_HARD_RESET_LSB) <= ttc_cmds_cnt_arr(5);
+    regs_read_arr(44)(REG_TTC_CMD_COUNTERS_CALPULSE_MSB downto REG_TTC_CMD_COUNTERS_CALPULSE_LSB) <= ttc_cmds_cnt_arr(6);
+    regs_read_arr(45)(REG_TTC_CMD_COUNTERS_START_MSB downto REG_TTC_CMD_COUNTERS_START_LSB) <= ttc_cmds_cnt_arr(7);
+    regs_read_arr(46)(REG_TTC_CMD_COUNTERS_STOP_MSB downto REG_TTC_CMD_COUNTERS_STOP_LSB) <= ttc_cmds_cnt_arr(8);
+    regs_read_arr(47)(REG_TTC_CMD_COUNTERS_TEST_SYNC_MSB downto REG_TTC_CMD_COUNTERS_TEST_SYNC_LSB) <= ttc_cmds_cnt_arr(9);
+    regs_read_arr(48)(REG_TTC_L1A_ID_MSB downto REG_TTC_L1A_ID_LSB) <= l1id_cnt;
+    regs_read_arr(49)(REG_TTC_L1A_RATE_MSB downto REG_TTC_L1A_RATE_LSB) <= l1a_rate;
 
     -- Connect write signals
     ttc_ctrl.l1a_enable <= regs_write_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT);
