@@ -314,6 +314,24 @@
           <node id="BUSY" address="0x0" mask="0x00002000" permission="r"
                 description="When this bit is set, it means that we are currently holding TTS busy state because we're waiting for the TTC buffer to reach it's initial depth value defined by BUF_DEPTH_AFTER_RESET control register (note that this condition should only last for BUF_DEPTH_AFTER_RESET clock cycles)"
                 fw_signal="ttc_status.buffer_status.busy"/>
+          <node id="OOS_CNT" address="0x0" mask="0xffff0000" permission="r"
+                description="Number of times the buffer has gone into OOS state"
+                fw_signal="ttc_status.buffer_status.oos_cnt"/>
+          <node id="UNF_CNT" address="0x1" mask="0x0000ffff" permission="r"
+                description="Number of times the buffer had an underflow and went to OOS due to that"
+                fw_signal="ttc_status.buffer_status.unf_cnt"/>
+          <node id="OVF_CNT" address="0x1" mask="0xffff0000" permission="r"
+                description="Number of times the buffer had an overflow and went to OOS due to that"
+                fw_signal="ttc_status.buffer_status.ovf_cnt"/>
+          <node id="LAST_OOS_TIME_SECONDS" address="0x2" mask="0x0000ffff" permission="r"
+                description="Number of seconds since last time the buffer went into OOS"
+                fw_signal="ttc_status.buffer_status.oos_time_last"/>
+          <node id="OOS_DURATION_LAST" address="0x3" mask="0xffffffff" permission="r"
+                description="Number of clock cycles that the last OOS state lasted before being reset"
+                fw_signal="ttc_status.buffer_status.oos_dur_last"/>
+          <node id="OOS_DURATION_MAX" address="0x4" mask="0xffffffff" permission="r"
+                description="Maximum number of clock cycles that the OOS state lasted before being reset"
+                fw_signal="ttc_status.buffer_status.oos_dur_max"/>
         </node>
       </node>
 

@@ -17,12 +17,15 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.VComponents.all;
 
+use work.ttc_pkg.all;
+
 --============================================================================
 --                                                          Entity declaration
 --============================================================================
 entity ttc_cmd is
     port(
-        reset_i                 : in  std_logic; -- resets the TTC command fifo, note that TTC commands are dead for 8 clock cycles after this reset
+        reset_i                 : in  std_logic; -- resets the TTC command fifo, note that TTC commands are dead for 8 clock cycles after this reset (note that this reset does not reset the OOS counters!)
+        reset_oos_cnt_i         : in  std_logic; -- this reset only resets the OOS counters
         
         clk_40_backplane_i      : in  std_logic; -- TTC 40MHz clock from the backplane
         clk_40_fabric_i         : in  std_logic; -- TTC 40MHz fabric clock
@@ -39,11 +42,8 @@ entity ttc_cmd is
         buf_depth_after_reset_i : in  std_logic_vector(3 downto 0); -- desired depth of the buffer after reset 
         buf_oos_min_depth_i     : in  std_logic_vector(3 downto 0); -- lower range of the buffer depth when oos should be asserted
         buf_oos_max_depth_i     : in  std_logic_vector(3 downto 0); -- upper range of the buffer depth when oos should be asserted
-        buf_depth_o             : out std_logic_vector(3 downto 0); -- current buffer depth
-        buf_depth_min_o         : out std_logic_vector(3 downto 0); -- min buffer depth
-        buf_depth_max_o         : out std_logic_vector(3 downto 0); -- max buffer depth
-        buf_oos_o               : out std_logic; -- buffer is out of sync (the depth limits have been hit)
-        buf_busy_o              : out std_logic  -- asserted high after reset until the buffer has been initialized
+        
+        buf_status_o            : out t_ttc_buffer_status
         
     );
 end ttc_cmd;
@@ -113,7 +113,9 @@ architecture ttc_cmd_arch of ttc_cmd is
     signal s_buf_wr_en          : std_logic;
     signal s_buf_rd_en          : std_logic;
     signal s_buf_ovf            : std_logic;
+    signal s_buf_ovf_prev       : std_logic;
     signal s_buf_unf            : std_logic;
+    signal s_buf_unf_prev       : std_logic;
     signal s_buf_full           : std_logic;
     signal s_buf_empty          : std_logic;
     signal s_buf_valid          : std_logic;
@@ -122,8 +124,17 @@ architecture ttc_cmd_arch of ttc_cmd is
     signal s_buf_data_cnt_min   : std_logic_vector(3 downto 0) := x"f";
     signal s_buf_data_cnt_max   : std_logic_vector(3 downto 0) := x"0";
     signal s_buf_oos            : std_logic := '0';
+    signal s_buf_oos_prev       : std_logic := '0';
     signal s_buf_busy           : std_logic := '1';
     signal s_buf_reset_done     : std_logic := '0';
+    
+    signal s_buf_oos_start      : std_logic; -- this goes up for 1 clock when OOS transitions from 0 to 1
+    signal s_buf_oos_cnt        : unsigned(15 downto 0) := (others => '0');
+    signal s_buf_unf_cnt        : unsigned(15 downto 0) := (others => '0');
+    signal s_buf_ovf_cnt        : unsigned(15 downto 0) := (others => '0');
+    signal s_buf_oos_time_last  : std_logic_vector(15 downto 0) := (others => '0');
+    signal s_buf_oos_dur_last   : std_logic_vector(31 downto 0) := (others => '0');
+    signal s_buf_oos_dur_max    : unsigned(31 downto 0) := (others => '0');
 
 --============================================================================
 --                                                          Architecture begin
@@ -251,11 +262,80 @@ begin
         end if;
     end process;
 
-    buf_depth_o     <= s_buf_data_cnt;
-    buf_depth_min_o <= s_buf_data_cnt_min;
-    buf_depth_max_o <= s_buf_data_cnt_max;
-    buf_oos_o       <= s_buf_oos;
-    buf_busy_o      <= s_buf_busy;
+    buf_status_o.depth          <= s_buf_data_cnt;
+    buf_status_o.min_depth      <= s_buf_data_cnt_min;
+    buf_status_o.max_depth      <= s_buf_data_cnt_max;
+    buf_status_o.out_of_sync    <= s_buf_oos;
+    buf_status_o.busy           <= s_buf_busy;
+    
+    buf_status_o.oos_cnt        <= std_logic_vector(s_buf_oos_cnt);
+    buf_status_o.unf_cnt        <= std_logic_vector(s_buf_unf_cnt);
+    buf_status_o.ovf_cnt        <= std_logic_vector(s_buf_ovf_cnt);
+    buf_status_o.oos_time_last  <= s_buf_oos_time_last;
+    buf_status_o.oos_dur_last   <= s_buf_oos_dur_last;
+    buf_status_o.oos_dur_max    <= std_logic_vector(s_buf_oos_dur_max);
+
+    p_oos_cnt : process(clk_40_fabric_i)
+    begin
+        if (rising_edge(clk_40_fabric_i)) then
+            
+            s_buf_oos_prev <= s_buf_oos;
+            s_buf_ovf_prev <= s_buf_ovf;
+            s_buf_unf_prev <= s_buf_unf;
+            
+            if (reset_oos_cnt_i = '1') then
+                s_buf_oos_cnt <= (others => '0');
+                s_buf_unf_cnt <= (others => '0');
+                s_buf_ovf_cnt <= (others => '0');
+                s_buf_oos_dur_max <= (others => '0');
+                s_buf_oos_start <= '0';
+            else
+                if ((s_buf_oos_prev = '0') and (s_buf_oos = '1')) then
+                    s_buf_oos_cnt <= s_buf_oos_cnt + 1;
+                    s_buf_oos_start <= '1';
+                    if (s_buf_ovf_prev = '1') then
+                        s_buf_ovf_cnt <= s_buf_ovf_cnt + 1;
+                    end if;
+                    if (s_buf_unf_prev = '1') then
+                        s_buf_unf_cnt <= s_buf_unf_cnt + 1;
+                    end if;
+                else
+                    s_buf_oos_start <= '0';
+                end if;
+                
+                if (s_buf_oos_dur_max < unsigned(s_buf_oos_dur_last)) then
+                    s_buf_oos_dur_max <= unsigned(s_buf_oos_dur_last);
+                else
+                    s_buf_oos_dur_max <= s_buf_oos_dur_max;
+                end if;
+                
+            end if;
+        end if;
+    end process;
+
+    cnt_oos_dur_last : entity work.counter
+        generic map(
+            g_COUNTER_WIDTH  => 32,
+            g_ALLOW_ROLLOVER => false
+        )
+        port map(
+            ref_clk_i => clk_40_fabric_i,
+            reset_i   => s_buf_oos_start or reset_oos_cnt_i,
+            en_i      => s_buf_oos,
+            count_o   => s_buf_oos_dur_last
+        );
+
+    cnt_oos_time_last : entity work.seconds_counter
+        generic map(
+            g_CLK_FREQUENCY  => C_TTC_CLK_FREQUENCY_SLV,
+            g_ALLOW_ROLLOVER => false,
+            g_COUNTER_WIDTH  => 16
+        )
+        port map(
+            clk_i     => clk_40_fabric_i,
+            reset_i   => s_buf_oos_start or reset_oos_cnt_i,
+            seconds_o => s_buf_oos_time_last
+        );
 
 --    i_buf_ila : component ila_ttc_cmd_buffer
 --        port map(
