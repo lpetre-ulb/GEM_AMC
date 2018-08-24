@@ -857,7 +857,7 @@
       </spirit:componentInstance>
       <spirit:componentInstance>
         <spirit:instanceName>axi_chip2chip_0</spirit:instanceName>
-        <spirit:componentRef spirit:library="ip" spirit:name="axi_chip2chip" spirit:vendor="xilinx.com" spirit:version="4.2"/>
+        <spirit:componentRef spirit:library="ip" spirit:name="axi_chip2chip" spirit:vendor="xilinx.com" spirit:version="4.3"/>
         <spirit:configurableElementValues>
           <spirit:configurableElementValue spirit:referenceId="bd:xciName">v7_bd_axi_chip2chip_0_0</spirit:configurableElementValue>
           <spirit:configurableElementValue spirit:referenceId="C_AXI_WUSER_WIDTH">1</spirit:configurableElementValue>
@@ -889,7 +889,7 @@
       </spirit:componentInstance>
       <spirit:componentInstance>
         <spirit:instanceName>clk_wiz_0</spirit:instanceName>
-        <spirit:componentRef spirit:library="ip" spirit:name="clk_wiz" spirit:vendor="xilinx.com" spirit:version="5.3"/>
+        <spirit:componentRef spirit:library="ip" spirit:name="clk_wiz" spirit:vendor="xilinx.com" spirit:version="5.4"/>
         <spirit:configurableElementValues>
           <spirit:configurableElementValue spirit:referenceId="bd:xciName">v7_bd_clk_wiz_0_0</spirit:configurableElementValue>
           <spirit:configurableElementValue spirit:referenceId="USE_PHASE_ALIGNMENT">false</spirit:configurableElementValue>
@@ -5803,7 +5803,7 @@
     <spirit:vendor>xilinx.com</spirit:vendor>
     <spirit:library>Addressing/axi_chip2chip_0</spirit:library>
     <spirit:name>axi_chip2chip</spirit:name>
-    <spirit:version>4.2</spirit:version>
+    <spirit:version>4.3</spirit:version>
     <spirit:addressSpaces>
       <spirit:addressSpace>
         <spirit:name>MAXI-Lite</spirit:name>
