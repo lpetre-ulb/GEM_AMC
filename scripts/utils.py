@@ -25,6 +25,12 @@ def printCyan(string):
 def printRed(string):
     print Colors.RED + string + Colors.ENDC
 
+def printGreenRed(string, controlValue, expectedValue):
+    col = Colors.GREEN
+    if controlValue != expectedValue:
+        col = Colors.RED
+    print col + string + Colors.ENDC
+
 def hex(number):
     if number is None:
         return 'None'
@@ -41,7 +47,7 @@ def hexPadded(number, numBytes):
     if number is None:
         return 'None'
     else:
-        return "{0:#0{1}x}".format(number, numBytes * 2 + 2)
+        return "{0:#0{1}x}".format(number, int(numBytes * 2) + 2)
 
 def binary(number, length):
     if number is None:
