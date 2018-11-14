@@ -23,12 +23,16 @@ use work.ttc_pkg.all;
 --                                                          Entity declaration
 --============================================================================
 entity ttc_cmd is
+    generic(
+        g_DEBUG         : boolean := false -- if this is set to true, some chipscope cores will be inserted
+    );    
     port(
         reset_i                 : in  std_logic; -- resets the TTC command fifo, note that TTC commands are dead for 8 clock cycles after this reset (note that this reset does not reset the OOS counters!)
         reset_oos_cnt_i         : in  std_logic; -- this reset only resets the OOS counters
         
         clk_40_backplane_i      : in  std_logic; -- TTC 40MHz clock from the backplane
         clk_40_fabric_i         : in  std_logic; -- TTC 40MHz fabric clock
+        ttc_clks_i              : in  t_ttc_clks; -- other TTC clocks (only used for ILA)
 
         ttc_data_p_i            : in  std_logic; -- TTC datastream from AMC13
         ttc_data_n_i            : in  std_logic;
@@ -90,6 +94,22 @@ architecture ttc_cmd_arch of ttc_cmd is
             probe13 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
             probe14 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             probe15 : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+        );
+    END COMPONENT;
+
+    COMPONENT ila_ttc_cmd_buf_2
+        PORT(
+            clk    : IN STD_LOGIC;
+            probe0 : IN STD_LOGIC;
+            probe1 : IN STD_LOGIC;
+            probe2 : IN STD_LOGIC;
+            probe3 : IN STD_LOGIC;
+            probe4 : IN STD_LOGIC;
+            probe5 : IN STD_LOGIC;
+            probe6 : IN STD_LOGIC;
+            probe7 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            probe8 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+            probe9 : IN STD_LOGIC
         );
     END COMPONENT;
 
@@ -337,27 +357,43 @@ begin
             seconds_o => s_buf_oos_time_last
         );
 
---    i_buf_ila : component ila_ttc_cmd_buffer
---        port map(
---            clk     => clk_40_fabric_i,
---            probe0  => s_buf_reset,
---            probe1  => s_ttc_data_backplane,
---            probe2  => s_buf_rd_en,
---            probe3  => s_buf_dout,
---            probe4  => s_buf_full,
---            probe5  => s_buf_ovf,
---            probe6  => s_buf_empty,
---            probe7  => s_buf_valid,
---            probe8  => s_buf_unf,
---            probe9  => s_buf_data_cnt,
---            probe10 => s_buf_oos,
---            probe11 => s_buf_busy,
---            probe12 => s_buf_reset_done,
---            probe13 => s_ttc_data_fabric,
---            probe14 => s_buf_data_cnt_min,
---            probe15 => s_buf_data_cnt_max
---        );
+    if g_DEBUG generate
+        i_buf_ila_2 : component ila_ttc_cmd_buf_2
+            port map(
+                clk    => ttc_clks_i.clk_160,
+                probe0 => clk_40_fabric_i,
+                probe1 => clk_40_backplane_i,
+                probe2 => s_buf_wr_en,
+                probe3 => s_buf_rd_en,
+                probe4 => s_buf_ovf,
+                probe5 => s_buf_unf,
+                probe6 => s_buf_reset,
+                probe7 => s_buf_data_cnt,
+                probe8 => s_ttc_data_backplane,
+                probe9 => s_buf_oos
+            );
 
+--        i_buf_ila : component ila_ttc_cmd_buffer
+--            port map(
+--                clk     => clk_40_fabric_i,
+--                probe0  => s_buf_reset,
+--                probe1  => s_ttc_data_backplane,
+--                probe2  => s_buf_rd_en,
+--                probe3  => s_buf_dout,
+--                probe4  => s_buf_full,
+--                probe5  => s_buf_ovf,
+--                probe6  => s_buf_empty,
+--                probe7  => s_buf_valid,
+--                probe8  => s_buf_unf,
+--                probe9  => s_buf_data_cnt,
+--                probe10 => s_buf_oos,
+--                probe11 => s_buf_busy,
+--                probe12 => s_buf_reset_done,
+--                probe13 => s_ttc_data_fabric,
+--                probe14 => s_buf_data_cnt_min,
+--                probe15 => s_buf_data_cnt_max
+--            );
+    end generate;
 
     i_ttc_decoder : entity work.ttc_decoder
         port map(

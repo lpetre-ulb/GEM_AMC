@@ -167,11 +167,15 @@ begin
     ------------- TTC commands -------------
     
     i_ttc_cmd : entity work.ttc_cmd
+        generic map(
+            g_DEBUG => false
+        )
         port map(
             reset_i                 => reset or resync_cmd,
             reset_oos_cnt_i         => ttc_ctrl.cnt_reset or reset,
             clk_40_backplane_i      => ttc_clks_i.clk_40_backplane,
             clk_40_fabric_i         => ttc_clks_i.clk_40,
+            ttc_clks_i              => ttc_clks_i,
             ttc_data_p_i            => ttc_data_p_i,
             ttc_data_n_i            => ttc_data_n_i,
             ttc_cmd_o               => ttc_cmd,
