@@ -357,7 +357,7 @@ begin
             seconds_o => s_buf_oos_time_last
         );
 
-    if g_DEBUG generate
+    gen_debug: if g_DEBUG generate
         i_buf_ila_2 : component ila_ttc_cmd_buf_2
             port map(
                 clk    => ttc_clks_i.clk_160,

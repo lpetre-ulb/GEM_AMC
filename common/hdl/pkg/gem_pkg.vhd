@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20180809";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20181114";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 1;
-    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 15;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
+    constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 16;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
     
     ------ Change log ------
     -- 1.8.6  no gbt sync procedure with oh
@@ -78,7 +78,8 @@ package gem_pkg is
     --         Default values of the TTC command buffer min and max for OOS have been set to 2 and 4 respectively (previously these were set at 3 and 3).
     -- 1.15.1  Minor fixes related to input autokill: when an input is autokilled, also mask its TTS state, and also the consecutive timeout count for the first input had a bug related to resetting which was fixed
     -- 1.15.2  TTC buffer monitoring counters added: number of OOS instances, number of underflow and overflow instances, number of seconds since last OOS, last and max duration of the OOS state in clock cycles
-    -- 1.15.3  ILA added to check the clocks and fifo signals in the TTC command buffer 
+    -- 1.15.3  ILA added to check the clocks and fifo signals in the TTC command buffer
+    -- 1.16.0  Updated the Chip2Chip interface to be compatible with the new linux versions that support gemloader 
     
     --======================--
     --==      General     ==--
