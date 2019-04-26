@@ -95,6 +95,10 @@ architecture gth_register_file_arch of gth_register_file is
   signal s_reg_cplllock       : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
   signal s_reg_cpllrefclklost : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
 
+  signal s_rx_not_in_table  : t_slv_arr_2(g_NUM_OF_GTH_GTs-1 downto 0);
+  signal s_rx_disperr       : t_slv_arr_2(g_NUM_OF_GTH_GTs-1 downto 0);
+  signal s_prbs_err         : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
+
   constant C_GTH_STAT_CH0_ADDR              : integer := 0;
   constant C_GTH_RST_CH0_ADDR               : integer := 4;
   constant C_GTH_CTRL_CH0_ADDR              : integer := 8;
@@ -178,10 +182,14 @@ begin
     begin
       if (rising_edge(clk_gth_rx_usrclk_arr_i(i))) then
       
+        s_rx_not_in_table(i) <= gth_rx_status_arr_i(i).rxnotintable(1 downto 0);
+        s_rx_disperr(i) <= gth_rx_status_arr_i(i).rxdisperr(1 downto 0);
+        s_prbs_err(i) <= gth_rx_status_arr_i(i).rxprbserr;
+      
         -- PRBS error counter
         if (s_gth_prbs_cnt_rst_reg(i)(0) = '1') then
           s_gth_prbs_cnt_reg(i) <= (others => '0');
-        elsif (gth_rx_status_arr_i(i).rxprbserr = '1' and s_gth_prbs_cnt_reg(i) /= x"FFFFFFFF") then
+        elsif (s_prbs_err(i) = '1' and s_gth_prbs_cnt_reg(i) /= x"FFFFFFFF") then
           s_gth_prbs_cnt_reg(i) <= std_logic_vector(unsigned(s_gth_prbs_cnt_reg(i)) + 1);
         end if;
 
@@ -190,10 +198,10 @@ begin
           s_gth_rxnotintable_cnt_reg(i) <= (others => '0');
           s_gth_rxdisperr_cnt_reg(i) <= (others => '0');
         else
-          if (((gth_rx_status_arr_i(i).rxnotintable(1)) = '1') and (s_gth_rxnotintable_cnt_reg(i) /= x"ffffffff")) then
+          if ((or_reduce(s_rx_not_in_table(i)) = '1') and (s_gth_rxnotintable_cnt_reg(i) /= x"ffffffff")) then
             s_gth_rxnotintable_cnt_reg(i) <= std_logic_vector(unsigned(s_gth_rxnotintable_cnt_reg(i)) + 1);
           end if;
-          if (((gth_rx_status_arr_i(i).rxdisperr(2)) = '1') and (s_gth_rxdisperr_cnt_reg(i) /= x"ffffffff")) then
+          if ((or_reduce(s_rx_disperr(i)) = '1') and (s_gth_rxdisperr_cnt_reg(i) /= x"ffffffff")) then
             s_gth_rxdisperr_cnt_reg(i) <= std_logic_vector(unsigned(s_gth_rxdisperr_cnt_reg(i)) + 1);
           end if;
         end if;

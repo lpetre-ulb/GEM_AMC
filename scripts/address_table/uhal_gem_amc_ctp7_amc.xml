@@ -493,9 +493,6 @@
         <node id="USE_OH_VFAT3_SLOTS" address="0x1" permission="rw" mask="0x1"/>
         <node id="SC_ONLY_MODE" address="0x1" permission="rw" mask="0x2"/>
         <node id="USE_OH_V3B_MAPPING" address="0x1" permission="rw" mask="0x4"/>
-        <node id="V3B_FPGA_SLOW_RX_BITSHIFT" address="0x1" permission="rw" mask="0x70"/>
-        <node id="V3B_FPGA_TX_0_BITSLIP" address="0x1" permission="rw" mask="0xf00"/>
-        <node id="V3B_FPGA_TX_1_BITSLIP" address="0x1" permission="rw" mask="0xf000"/>
       </node>
       <node id="TESTS" address="0x200" >
         <node id="GBT_LOOPBACK_EN" address="0x0" permission="rw" mask="0x1"/>
@@ -570,6 +567,126 @@
           <node id="ERROR_CNT" address="0x2" permission="r" />
         </node>
         <node id="LINK_11" address="0xc0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_12" address="0xd0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_13" address="0xe0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_14" address="0xf0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_15" address="0x100" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_16" address="0x110" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_17" address="0x120" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_18" address="0x130" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_19" address="0x140" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_20" address="0x150" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_21" address="0x160" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_22" address="0x170" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_23" address="0x180" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_24" address="0x190" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_25" address="0x1a0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_26" address="0x1b0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_27" address="0x1c0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_28" address="0x1d0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_29" address="0x1e0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_30" address="0x1f0" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_31" address="0x200" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_32" address="0x210" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_33" address="0x220" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_34" address="0x230" >
+          <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
+          <node id="ERROR_CNT" address="0x2" permission="r" />
+        </node>
+        <node id="LINK_35" address="0x240" >
           <node id="SYNC_DONE" address="0x0" permission="r" mask="0x1"/>
           <node id="MEGA_WORD_CNT" address="0x1" permission="r" />
           <node id="ERROR_CNT" address="0x2" permission="r" />
@@ -3681,6 +3798,1864 @@
         <node id="OH_FPGA_OH9" address="0x20708" permission="rw" mode="block"size="200"/>
         <node id="OH_FPGA_OH10" address="0x207d0" permission="rw" mode="block"size="200"/>
         <node id="OH_FPGA_OH11" address="0x20898" permission="rw" mode="block"size="200"/>
+      </node>
+    </node>
+    <node id="OPTICAL_LINKS" address="0x1400000" >
+      <node id="MGT_CHANNEL_0" address="0x0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_1" address="0x40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_2" address="0x80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_3" address="0xc0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_4" address="0x100" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_5" address="0x140" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_6" address="0x180" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_7" address="0x1c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_8" address="0x200" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_9" address="0x240" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_10" address="0x280" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_11" address="0x2c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_12" address="0x300" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_13" address="0x340" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_14" address="0x380" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_15" address="0x3c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_16" address="0x400" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_17" address="0x440" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_18" address="0x480" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_19" address="0x4c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_20" address="0x500" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_21" address="0x540" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_22" address="0x580" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_23" address="0x5c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_24" address="0x600" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_25" address="0x640" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_26" address="0x680" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_27" address="0x6c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_28" address="0x700" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_29" address="0x740" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_30" address="0x780" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_31" address="0x7c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_32" address="0x800" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_33" address="0x840" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_34" address="0x880" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_35" address="0x8c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_36" address="0x900" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_37" address="0x940" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_38" address="0x980" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_39" address="0x9c0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_40" address="0xa00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_41" address="0xa40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_42" address="0xa80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_43" address="0xac0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_44" address="0xb00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_45" address="0xb40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_46" address="0xb80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_47" address="0xbc0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_48" address="0xc00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_49" address="0xc40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_50" address="0xc80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_51" address="0xcc0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_52" address="0xd00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_53" address="0xd40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_54" address="0xd80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_55" address="0xdc0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_56" address="0xe00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_57" address="0xe40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_58" address="0xe80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_59" address="0xec0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_60" address="0xf00" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_61" address="0xf40" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_62" address="0xf80" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
+      </node>
+      <node id="MGT_CHANNEL_63" address="0xfc0" >
+        <node id="RESET" address="0x1" permission="rw" mask="0x3">
+          <node id="TX_RESET" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_RESET" address="0x0" permission="rw" mask="0x2"/>
+        </node>
+        <node id="CTRL" address="0x2" permission="rw" mask="0x7f">
+          <node id="TX_POWERDOWN" address="0x0" permission="rw" mask="0x1"/>
+          <node id="RX_POWERDOWN" address="0x0" permission="rw" mask="0x2"/>
+          <node id="TX_POLARITY" address="0x0" permission="rw" mask="0x4"/>
+          <node id="RX_POLARITY" address="0x0" permission="rw" mask="0x8"/>
+          <node id="LOOPBACK" address="0x0" permission="rw" mask="0x10"/>
+          <node id="TX_INHIBIT" address="0x0" permission="rw" mask="0x20"/>
+          <node id="RX_LOW_POWER_MODE" address="0x0" permission="rw" mask="0x40"/>
+          <node id="RX_PRBS_SEL" address="0x1" permission="rw" mask="0x7"/>
+          <node id="TX_PRBS_SEL" address="0x1" permission="rw" mask="0x70"/>
+          <node id="PRBS_CNT_RESET" address="0x2" permission="w" mask="0x1"/>
+          <node id="RX_ERROR_CNT_RESET" address="0x3" permission="w" mask="0x1"/>
+        </node>
+        <node id="STATUS" address="0x0" permission="r" mask="0xf">
+          <node id="TX_RESET_DONE" address="0x0" permission="r" mask="0x1"/>
+          <node id="RX_RESET_DONE" address="0x0" permission="r" mask="0x2"/>
+          <node id="CPLL_LOCKED" address="0x0" permission="r" mask="0x4"/>
+          <node id="CPLL_REF_CLK_LOST" address="0x0" permission="r" mask="0x8"/>
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="PRBS_ERROR_CNT" address="0x4" permission="r" />
+          <node id="RX_NOT_IN_TABLE_CNT" address="0x5" permission="r" />
+          <node id="RX_DISPERR_CNT" address="0x6" permission="r" />
+        </node>
       </node>
     </node>
     <node id="GLIB_SYSTEM" address="0x910000" >

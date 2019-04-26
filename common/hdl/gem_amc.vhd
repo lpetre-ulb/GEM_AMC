@@ -597,7 +597,8 @@ begin
             link_status_arr_o           => gbt_link_status_arr
         );
 
-    i_gbt_link_mux : entity work.gbt_link_mux(gbt_link_mux_ge21)
+--    i_gbt_link_mux : entity work.gbt_link_mux(gbt_link_mux_ge21)
+    i_gbt_link_mux : entity work.gbt_link_mux(gbt_link_mux_ge11)
         generic map(
             g_NUM_OF_OHs  => g_NUM_OF_OHs
         )

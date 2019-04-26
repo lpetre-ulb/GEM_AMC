@@ -30,6 +30,8 @@ printf "------------------------------------------------------------------------
                 gth_ctrl_base_reg=$(($gth_ctrl_base_reg+256))
                 gth_prbs_sel_base_reg=$(($gth_prbs_sel_base_reg+256))
                 gth_prbs_cnt_base_reg=$(($gth_prbs_cnt_base_reg+256))
+		gth_rx_notintable_cnt_base_reg=$(($gth_rx_notintable_cnt_base_reg+256))
+		gth_rx_disperr_cnt_base_reg=$(($gth_rx_disperr_cnt_base_reg+256))
 
         done
 printf "--------------------------------------------------------------------------------------------------\n"

@@ -9415,7 +9415,7 @@ package registers is
     constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_MONITORING_OFF_ADDR    : std_logic_vector(16 downto 0) := '0' & x"2000";
     constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_MONITORING_OFF_MSB    : integer := 31;
     constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_MONITORING_OFF_LSB     : integer := 0;
-    constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_MONITORING_OFF_DEFAULT : std_logic_vector(31 downto 0) := x"00000000";
+    constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_MONITORING_OFF_DEFAULT : std_logic_vector(31 downto 0) := x"ffffffff";
 
     constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_OH0_AVCCN_ADDR    : std_logic_vector(16 downto 0) := '0' & x"2001";
     constant REG_SLOW_CONTROL_SCA_ADC_MONITORING_OH0_AVCCN_MSB    : integer := 11;
