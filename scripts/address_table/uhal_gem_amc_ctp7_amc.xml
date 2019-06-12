@@ -8,6 +8,8 @@
         <node id="CNT_RESET" address="0x2" permission="w" />
         <node id="MMCM_PHASE_SHIFT" address="0x3" permission="w" />
         <node id="L1A_ENABLE" address="0x4" permission="rw" mask="0x1"/>
+        <node id="CALIBRATION_MODE" address="0x4" permission="rw" mask="0x2"/>
+        <node id="CALPULSE_L1A_DELAY" address="0x4" permission="rw" mask="0xfff00000"/>
       </node>
       <node id="CONFIG" address="0x5" >
         <node id="CMD_BC0" address="0x0" permission="rw" mask="0xff"/>

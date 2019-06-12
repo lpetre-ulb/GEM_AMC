@@ -38,6 +38,15 @@ package registers is
     constant REG_TTC_CTRL_L1A_ENABLE_BIT    : integer := 0;
     constant REG_TTC_CTRL_L1A_ENABLE_DEFAULT : std_logic := '1';
 
+    constant REG_TTC_CTRL_CALIBRATION_MODE_ADDR    : std_logic_vector(5 downto 0) := "00" & x"4";
+    constant REG_TTC_CTRL_CALIBRATION_MODE_BIT    : integer := 1;
+    constant REG_TTC_CTRL_CALIBRATION_MODE_DEFAULT : std_logic := '0';
+
+    constant REG_TTC_CTRL_CALPULSE_L1A_DELAY_ADDR    : std_logic_vector(5 downto 0) := "00" & x"4";
+    constant REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB    : integer := 31;
+    constant REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB     : integer := 20;
+    constant REG_TTC_CTRL_CALPULSE_L1A_DELAY_DEFAULT : std_logic_vector(31 downto 20) := x"064";
+
     constant REG_TTC_CONFIG_CMD_BC0_ADDR    : std_logic_vector(5 downto 0) := "00" & x"5";
     constant REG_TTC_CONFIG_CMD_BC0_MSB    : integer := 7;
     constant REG_TTC_CONFIG_CMD_BC0_LSB     : integer := 0;

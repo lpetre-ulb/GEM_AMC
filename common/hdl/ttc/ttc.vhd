@@ -127,6 +127,9 @@ architecture ttc_arch of ttc is
     signal ttc_ctrl                 : t_ttc_ctrl;
     signal ttc_status               : t_ttc_status;
     signal ttc_conf                 : t_ttc_conf; 
+    
+    -- calibration signals
+    signal calib_l1a_countdown      : unsigned(11 downto 0) := (others => '0');
 
     -- stats
     constant C_NUM_OF_DECODED_TTC_CMDS : integer := 10;
@@ -242,6 +245,7 @@ begin
                 hard_reset_cmd_real <= '0';
                 calpulse_cmd_real   <= '0';
                 l1a_cmd_real        <= '0';
+                calib_l1a_countdown <= (others => '0');
             else
                 if (ttc_cmd = ttc_conf.cmd_bc0) then
                     bc0_cmd_real <= '1';
@@ -268,11 +272,6 @@ begin
                 else
                     hard_reset_cmd_real <= '0';
                 end if;
-                if (ttc_cmd = ttc_conf.cmd_calpulse) then
-                    calpulse_cmd_real <= '1';
-                else
-                    calpulse_cmd_real <= '0';
-                end if;
                 if (ttc_cmd = ttc_conf.cmd_start) then
                     start_cmd_real <= '1';
                 else
@@ -289,7 +288,36 @@ begin
                     test_sync_cmd_real <= '0';
                 end if;
 
-                l1a_cmd_real <= ttc_l1a and ttc_ctrl.l1a_enable;
+                if (ttc_ctrl.calib_mode = '0') then
+                    l1a_cmd_real <= ttc_l1a and ttc_ctrl.l1a_enable;
+                    if (ttc_cmd = ttc_conf.cmd_calpulse) then
+                        calpulse_cmd_real <= '1';
+                    else
+                        calpulse_cmd_real <= '0';
+                    end if;
+                    calib_l1a_countdown <= x"000";
+                else
+                    if (calib_l1a_countdown = x"001") then
+                        l1a_cmd_real <= '1';
+                    else
+                        l1a_cmd_real <= '0';
+                    end if;
+                    
+                    if (ttc_l1a = '1' and ttc_ctrl.l1a_enable = '1') then  
+                        calpulse_cmd_real <= '1';
+                        calib_l1a_countdown <= unsigned(ttc_ctrl.calib_l1a_delay);
+                    else
+                        calpulse_cmd_real <= '0';
+                        
+                        if (calib_l1a_countdown /= x"000") then
+                            calib_l1a_countdown <= calib_l1a_countdown - 1;
+                        else
+                            calib_l1a_countdown <= x"000";
+                        end if;
+                        
+                    end if;
+                    
+                end if;
 
             end if;
 
@@ -545,6 +573,8 @@ begin
 
     -- Connect read signals
     regs_read_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= ttc_ctrl.l1a_enable;
+    regs_read_arr(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT) <= ttc_ctrl.calib_mode;
+    regs_read_arr(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB) <= ttc_ctrl.calib_l1a_delay;
     regs_read_arr(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= ttc_conf.cmd_bc0;
     regs_read_arr(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= ttc_conf.cmd_ec0;
     regs_read_arr(5)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB) <= ttc_conf.cmd_resync;
@@ -585,6 +615,8 @@ begin
 
     -- Connect write signals
     ttc_ctrl.l1a_enable <= regs_write_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT);
+    ttc_ctrl.calib_mode <= regs_write_arr(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT);
+    ttc_ctrl.calib_l1a_delay <= regs_write_arr(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB);
     ttc_conf.cmd_bc0 <= regs_write_arr(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB);
     ttc_conf.cmd_ec0 <= regs_write_arr(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB);
     ttc_conf.cmd_resync <= regs_write_arr(5)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB);
@@ -621,6 +653,8 @@ begin
 
     -- Defaults
     regs_defaults(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= REG_TTC_CTRL_L1A_ENABLE_DEFAULT;
+    regs_defaults(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT) <= REG_TTC_CTRL_CALIBRATION_MODE_DEFAULT;
+    regs_defaults(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB) <= REG_TTC_CTRL_CALPULSE_L1A_DELAY_DEFAULT;
     regs_defaults(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= REG_TTC_CONFIG_CMD_BC0_DEFAULT;
     regs_defaults(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= REG_TTC_CONFIG_CMD_EC0_DEFAULT;
     regs_defaults(5)(REG_TTC_CONFIG_CMD_RESYNC_MSB downto REG_TTC_CONFIG_CMD_RESYNC_LSB) <= REG_TTC_CONFIG_CMD_RESYNC_DEFAULT;
