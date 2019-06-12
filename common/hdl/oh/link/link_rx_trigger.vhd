@@ -138,7 +138,7 @@ begin
                 sbit_overflow <= '0';
             else
                 
-                if (reset_cntdown /= x"ff") then
+                if (reset_cntdown /= x"00") then
                     reset_cntdown <= reset_cntdown - 1;
                 end if;
                 
