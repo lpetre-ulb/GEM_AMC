@@ -634,6 +634,9 @@ begin
     --===========================--
 
     i_oh_fpga_loader : entity work.oh_fpga_loader
+            generic map (
+                g_LOADER_CLK_80_MHZ => true
+            )
         port map(
             reset_i           => reset_i,
             gbt_clk_i         => ttc_clocks_i.clk_40,

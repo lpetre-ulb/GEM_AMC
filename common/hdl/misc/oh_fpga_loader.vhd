@@ -16,6 +16,9 @@ use work.ttc_pkg.all;
 use work.gem_pkg.all;
 
 entity oh_fpga_loader is
+    generic(
+        g_LOADER_CLK_80_MHZ : boolean := true -- if this is set to false then 40MHz operation is assumed and loader_clk_i must be supplied with 40MHz clock instead of 80MHz
+    );    
     port (
         reset_i             : in  std_logic;
         
@@ -74,8 +77,8 @@ architecture Behavioral of oh_fpga_loader is
 
     ------------- signals -------------
 
-    constant FIRMWARE_SIZE      : unsigned(31 downto 0) := x"0029b1f9"; -- 16bit words for 80MHz
---    constant FIRMWARE_SIZE      : unsigned(31 downto 0) := x"005363f2"; -- 8bit words for 40MHz
+--    constant FIRMWARE_SIZE      : unsigned(31 downto 0) := x"0029b1f9"; -- 16bit words for 80MHz
+    constant FIRMWARE_SIZE      : unsigned(31 downto 0) := x"005363f2"; -- 8bit words for 40MHz
     --constant FIRMWARE_SIZE      : unsigned(31 downto 0) := x"00756767"; -- TODO: only need 32 bits for testing, in normal operation 24 bits should be fine, for 160T the size = x"536403", for 195T the size = x"756767"
     constant WAIT_DATA_TIMEOUT  : unsigned(31 downto 0) := x"00001f40"; -- TODO: should be around 100us
     constant WAIT_INIT_TIMEOUT  : unsigned(19 downto 0) := x"13880";    -- wait time for FPGA to initialize after PROG_B has been pulled low
@@ -185,7 +188,11 @@ begin
                             byte_cnt <= (others => '0');
                         else
                             elink_data_o <= loader_data(7 downto 0) & loader_data(15 downto 8); -- unswap the bytes that got swapped by the FIFO
-                            byte_cnt <= byte_cnt + 1;
+                            if (g_LOADER_CLK_80_MHZ) then
+                                byte_cnt <= byte_cnt + 2;
+                            else
+                                byte_cnt <= byte_cnt + 1;
+                            end if;
                             loading_started <= '1';
                         end if;
 
@@ -200,7 +207,7 @@ begin
                             state <= IDLE;
                         end if;
                         
-                        if (byte_cnt = FIRMWARE_SIZE) then
+                        if (byte_cnt >= FIRMWARE_SIZE) then
                             state <= IDLE;
                             success_cnt <= success_cnt + 1;
                         end if;
@@ -226,21 +233,29 @@ begin
     end process;
     
     to_gem_loader_o.en  <= loader_en;
-    to_gem_loader_o.clk <= loader_clk_i; 
+    to_gem_loader_o.clk <= loader_clk_i;
 
-    i_fifo_gemloader : fifo_gemloader_gbt
-        port map(
-            rst    => fifo_reset,
-            wr_clk => loader_clk_i,
-            rd_clk => gbt_clk_i,
-            din    => from_gem_loader_i.data,
-            wr_en  => from_gem_loader_i.valid,
-            rd_en  => loader_rden,
-            dout   => loader_data,
-            full   => open,
-            empty  => loader_empty,
-            valid  => loader_valid
-        );
+    g_loader_fifo_80mhz: if g_LOADER_CLK_80_MHZ generate    
+        i_fifo_gemloader : fifo_gemloader_gbt
+            port map(
+                rst    => fifo_reset,
+                wr_clk => loader_clk_i,
+                rd_clk => gbt_clk_i,
+                din    => from_gem_loader_i.data,
+                wr_en  => from_gem_loader_i.valid,
+                rd_en  => loader_rden,
+                dout   => loader_data,
+                full   => open,
+                empty  => loader_empty,
+                valid  => loader_valid
+            );
+    end generate;
+    
+    g_loader_fifo_40mhz: if not g_LOADER_CLK_80_MHZ generate    
+        loader_data <= from_gem_loader_i.data & from_gem_loader_i.data;
+        loader_empty <= '0';
+        loader_valid <= from_gem_loader_i.valid;
+    end generate;
 
     i_ila : ila_gem_loader
         port map(

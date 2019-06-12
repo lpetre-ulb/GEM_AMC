@@ -68,32 +68,4 @@ package sca_pkg is
         (channel => SCA_CHANNEL_JTAG, command => SCA_CMD_JTAG_SET_FREQ, length => x"04", data => SCA_CFG_JTAG_FREQ)         -- set default JTAG clk frequency
     );
     
-    type t_sca_adc_channel_arr is array(integer range <>) of std_logic_vector(4 downto 0);
-    
-    constant SCA_MONITOR_ADC_CHANNELS : t_sca_adc_channel_arr(0 to 19) := (
-        "0" & x"3", -- AVCCN
-        "1" & x"b", -- AVTTN
-        "1" & x"5", -- 1.0 INT
-        "0" & x"1", -- V1P8F
-        "0" & x"c", -- V1P5
-        "0" & x"6", -- 2.5V IO
-        "0" & x"F", -- 3V
-        "0" & x"9", -- 1.8V
-        "1" & x"0", -- VTRX RSSI2
-        "1" & x"1", -- VTRX RSSI1
-        "1" & x"F", -- SCA Temperature
-        "1" & x"2", -- Board Temp 1
-        "1" & x"8", -- Board Temp 2
-        "1" & x"E", -- Board Temp 3
-        "0" & x"2", -- Board Temp 4
-        "0" & x"5", -- Board Temp 5
-        "0" & x"0", -- Board Temp 6
-        "0" & x"4", -- Board Temp 7
-        "0" & x"7", -- Board Temp 8
-        "0" & x"8"  -- Board Temp 9
-    );
-
-    type t_sca_adc_value_arr is array(SCA_MONITOR_ADC_CHANNELS'range) of std_logic_vector(11 downto 0);
-    type t_sca_adc_value_arr_arr is array(integer range <>) of t_sca_adc_value_arr;
-    
 end sca_pkg;

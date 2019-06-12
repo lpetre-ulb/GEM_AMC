@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190508";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190611";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 3;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 8;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 3;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 4;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -103,7 +103,8 @@ package gem_pkg is
     -- 3.8.0  Switched to the new OH FPGA communication protocol from Andrew, which uses 6b8b encoding and only one elink. Also added some GE2/1 support.
     -- 3.8.1  Bugfix in the OH FPGA communication FSM 
     -- 3.8.2  Added BC0 and RESYNC markers to the trigger receivers (backwards compatible with older OH fw versions). For now it's not doing anything with those, but just doesn't count them as errors.
-    -- 3.8.3  Fixed the trigger link missed comma counter so that it starts counting errors after 128 clock cycles after reset (previously it would only start counting after the first occurance of good frame marker, which sometimes made a link look good even if it was completely bad) 
+    -- 3.8.3  Fixed the trigger link missed comma counter so that it starts counting errors after 128 clock cycles after reset (previously it would only start counting after the first occurance of good frame marker, which sometimes made a link look good even if it was completely bad)
+    -- 3.8.4  Added a possibility to switch to 40MHz promless programming mode; added VFAT-VFAT mixed BC and mixed EC flags in the data format; removed ADC monitoring from the SCA controller 
 
     --======================--
     --==      General     ==--

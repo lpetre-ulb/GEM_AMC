@@ -981,10 +981,10 @@ begin
                                           l1afifo_near_full &
                                           e_chmb_evt_bigger_24 &
                                           e_chmb_invalid_vfat_block &
-                                          "0" & -- OOS GLIB-VFAT
-                                          "0" & -- OOS GLIB-OH
-                                          "0" & -- GLIB-VFAT BX mismatch
-                                          "0" & -- GLIB-OH BX mismatch
+                                          "0" & -- OOS AMC-VFAT
+                                          e_chmb_mixed_vfat_ec & -- OOS VFAT-VFAT
+                                          "0" & -- AMC-VFAT BX mismatch
+                                          e_chmb_mixed_vfat_bc & -- VFAT-VFAT BX mismatch
                                           x"00" & "00"; -- Not used
 
                         daq_event_header <= '0';

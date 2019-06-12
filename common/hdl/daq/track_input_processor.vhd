@@ -548,23 +548,17 @@ begin
                         eb_counters_valid <= '1';
                     else -- we do have a valid bc
                         
-                        -- is the current vfat bc different than the previous (in the same event)
-                        if (eb_vfat_bc /= ep_last_rx_data(155 downto 144)) then
-                            eb_mixed_vfat_bc <= '1';
-                            err_mixed_vfat_bc <= '1';
-                        end if;
-                        
-                        -- is the current OH bc different than the previous (in the same event)
---                        if (eb_oh_bc /= ep_last_rx_data(223 downto 192)) then
---                            eb_mixed_oh_bc <= '1';
---                            err_mixed_oh_bc <= '1';
---                        end if;
-                        
-                        -- is the current VFAT ec different than the previous (in the same event)
-                        if (eb_vfat_ec /= ep_last_rx_data(167 downto 160)) then
-                            eb_mixed_vfat_ec <= '1';
-                            err_mixed_vfat_ec <= '1';
-                        end if;
+                    -- is the current vfat bc different than the previous (in the same event)
+                    if (eb_vfat_bc /= ep_last_rx_data(155 downto 144)) then
+                        eb_mixed_vfat_bc <= '1';
+                        err_mixed_vfat_bc <= '1';
+                    end if;
+                    
+                    -- is the current VFAT ec different than the previous (in the same event)
+                    if (eb_vfat_ec /= ep_last_rx_data(167 downto 160)) then
+                        eb_mixed_vfat_ec <= '1';
+                        err_mixed_vfat_ec <= '1';
+                    end if;
                         
                     end if;
                     
