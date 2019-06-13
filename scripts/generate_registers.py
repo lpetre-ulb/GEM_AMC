@@ -634,11 +634,11 @@ def printNodeToUHALFile(node, file, level, baseAddress, baseName, addrOffset, nu
     if node.permission is not None:
         file.write('permission="%s" ' % node.permission)
     if node.mask is not None:
-        file.write('mask="%s"' % hex(node.mask))
+        file.write('mask="%s" ' % hex(node.mask))
     if node.mode is not None:
-        file.write('mode="%s"' % node.mode)
+        file.write('mode="%s" ' % node.mode)
     if node.size is not None:
-        file.write('size="%s"' % node.size)
+        file.write('size="%s" ' % node.size)
 
     if len(node.children) > 0:
         file.write('>\n')

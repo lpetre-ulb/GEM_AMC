@@ -104,7 +104,7 @@ package gem_pkg is
     -- 3.8.1  Bugfix in the OH FPGA communication FSM 
     -- 3.8.2  Added BC0 and RESYNC markers to the trigger receivers (backwards compatible with older OH fw versions). For now it's not doing anything with those, but just doesn't count them as errors.
     -- 3.8.3  Fixed the trigger link missed comma counter so that it starts counting errors after 128 clock cycles after reset (previously it would only start counting after the first occurance of good frame marker, which sometimes made a link look good even if it was completely bad)
-    -- 3.8.4  Added a possibility to switch to 40MHz promless programming mode; added VFAT-VFAT mixed BC and mixed EC flags in the data format; removed ADC monitoring from the SCA controller; SCA TTC_HARD_RESET_EN is now an OH mask instead of just one bit 
+    -- 3.8.4  Added a possibility to switch to 40MHz promless programming mode; added VFAT-VFAT mixed BC and mixed EC flags in the data format; removed ADC monitoring from the SCA controller; SCA TTC_HARD_RESET_EN is now an OH mask instead of just one bit; BC now starts at 1 instead of 0 to match VFAT BC counting
 
     --======================--
     --==      General     ==--

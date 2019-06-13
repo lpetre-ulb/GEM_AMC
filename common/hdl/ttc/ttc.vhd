@@ -396,10 +396,10 @@ begin
     begin
         if (rising_edge(ttc_clks_i.clk_40)) then
             if (reset = '1') then
-                bx_cnt <= (others => '0');
+                bx_cnt <= x"001";
             else
                 if (bc0_cmd = '1') then
-                    bx_cnt <= (others => '0');
+                    bx_cnt <= x"001";
                 else
                     bx_cnt <= std_logic_vector(unsigned(bx_cnt) + 1);
                 end if;
@@ -415,7 +415,7 @@ begin
     begin
         if (rising_edge(ttc_clks_i.clk_40)) then
             if (bc0_cmd = '1' and reset = '0') then
-                if (unsigned(bx_cnt) < unsigned(C_TTC_NUM_BXs) - 1) then
+                if (unsigned(bx_cnt) < unsigned(C_TTC_NUM_BXs)) then
                     ttc_status.bc0_status.err <= '1';
                     ttc_status.bc0_status.locked <= '0';
                     ttc_status.bc0_status.udf_cnt <= std_logic_vector(unsigned(ttc_status.bc0_status.udf_cnt) + 1); 
@@ -425,7 +425,7 @@ begin
                     if (ttc_status.bc0_status.udf_cnt /= x"ffff") then
                         ttc_status.bc0_status.udf_cnt <= std_logic_vector(unsigned(ttc_status.bc0_status.udf_cnt) + 1);
                     end if; 
-                elsif (unsigned(bx_cnt) > unsigned(C_TTC_NUM_BXs) - 1) then
+                elsif (unsigned(bx_cnt) > unsigned(C_TTC_NUM_BXs)) then
                     ttc_status.bc0_status.err <= '1';
                     ttc_status.bc0_status.locked <= '0';
                     if (ttc_status.bc0_status.unlocked_cnt /= x"ffff") then
