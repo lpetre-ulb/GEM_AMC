@@ -993,9 +993,9 @@
           <node id="OH_FPGA_HARD_RESET" address="0x1" permission="w"
                 description="Writing to this register will trigger OH FPGA hard reset"
                 fw_write_pulse_signal="manual_hard_reset"/>
-          <node id="TTC_HARD_RESET_EN" address="0x2" mask="0x00000001" permission="rw"
-                description="When this is set to 1 (default), TTC hard reset commands are forwarded to the SCA to reset the OH FPGA"
-                fw_signal="sca_ttc_hr_enable" fw_default="0b1"/>
+          <node id="TTC_HARD_RESET_EN" address="0x2" permission="rw"
+                description="This is a bitmask (one bit per OH) that determines whether or not TTC hard reset commands are forwarded to the SCA to reset the OH FPGA"
+                fw_signal="sca_ttc_hr_enable" fw_default="0xffffffff"/>
           <node id="SCA_RESET_ENABLE_MASK" address="0x3" mask="0xffffffff" permission="rw"
                 description="This bitmask defines which SCAs will be reset uppon receipt of MODULE_RESET command."
                 fw_signal="sca_reset_mask" fw_default="0xffffffff"/>

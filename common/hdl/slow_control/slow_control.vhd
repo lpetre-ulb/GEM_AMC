@@ -66,7 +66,7 @@ architecture slow_control_arch of slow_control is
     signal sca_reset_mask           : std_logic_vector(31 downto 0);
     signal sca_ready_arr            : std_logic_vector(31 downto 0);
     signal sca_critical_error_arr   : std_logic_vector(31 downto 0);
-    signal sca_ttc_hr_enable        : std_logic;
+    signal sca_ttc_hr_enable        : std_logic_vector(31 downto 0);
     
     -- manual commands
     signal manual_hard_reset            : std_logic;
@@ -151,7 +151,7 @@ begin
                 gbt_rx_sca_elink_i          => gbt_rx_sca_elinks_i(i),
                 gbt_tx_sca_elink_o          => gbt_tx_sca_elinks_o(i),
             
-                hard_reset_i                => manual_hard_reset or (ttc_cmds_i.hard_reset and sca_ttc_hr_enable),
+                hard_reset_i                => manual_hard_reset or (ttc_cmds_i.hard_reset and sca_ttc_hr_enable(i)),
             
                 user_command_i              => sca_user_command,
                 user_command_en_i           => sca_user_command_en and sca_user_command_en_mask(i),
@@ -360,7 +360,7 @@ begin
     regs_addresses(72)(REG_SLOW_CONTROL_ADDRESS_MSB downto REG_SLOW_CONTROL_ADDRESS_LSB) <= '0' & x"4002";
 
     -- Connect read signals
-    regs_read_arr(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_BIT) <= sca_ttc_hr_enable;
+    regs_read_arr(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_MSB downto REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_LSB) <= sca_ttc_hr_enable;
     regs_read_arr(3)(REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_MSB downto REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_LSB) <= sca_reset_mask;
     regs_read_arr(4)(REG_SLOW_CONTROL_SCA_STATUS_READY_MSB downto REG_SLOW_CONTROL_SCA_STATUS_READY_LSB) <= sca_ready_arr;
     regs_read_arr(5)(REG_SLOW_CONTROL_SCA_STATUS_CRITICAL_ERROR_MSB downto REG_SLOW_CONTROL_SCA_STATUS_CRITICAL_ERROR_LSB) <= sca_critical_error_arr;
@@ -460,7 +460,7 @@ begin
     regs_read_arr(72)(REG_SLOW_CONTROL_VFAT3_TRANSACTION_CNT_MSB downto REG_SLOW_CONTROL_VFAT3_TRANSACTION_CNT_LSB) <= vfat3_sc_status_i.transaction_cnt;
 
     -- Connect write signals
-    sca_ttc_hr_enable <= regs_write_arr(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_BIT);
+    sca_ttc_hr_enable <= regs_write_arr(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_MSB downto REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_LSB);
     sca_reset_mask <= regs_write_arr(3)(REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_MSB downto REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_LSB);
     sca_user_command_en_mask <= regs_write_arr(18)(REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_LINK_ENABLE_MASK_MSB downto REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_LINK_ENABLE_MASK_LSB);
     sca_user_command.channel <= regs_write_arr(19)(REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_SCA_CMD_SCA_CMD_CHANNEL_MSB downto REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_SCA_CMD_SCA_CMD_CHANNEL_LSB);
@@ -525,7 +525,7 @@ begin
     regs_read_ready_arr(62) <= jtag_shift_done_arr(11);
 
     -- Defaults
-    regs_defaults(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_BIT) <= REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_DEFAULT;
+    regs_defaults(2)(REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_MSB downto REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_LSB) <= REG_SLOW_CONTROL_SCA_CTRL_TTC_HARD_RESET_EN_DEFAULT;
     regs_defaults(3)(REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_MSB downto REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_LSB) <= REG_SLOW_CONTROL_SCA_CTRL_SCA_RESET_ENABLE_MASK_DEFAULT;
     regs_defaults(18)(REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_LINK_ENABLE_MASK_MSB downto REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_LINK_ENABLE_MASK_LSB) <= REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_LINK_ENABLE_MASK_DEFAULT;
     regs_defaults(19)(REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_SCA_CMD_SCA_CMD_CHANNEL_MSB downto REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_SCA_CMD_SCA_CMD_CHANNEL_LSB) <= REG_SLOW_CONTROL_SCA_MANUAL_CONTROL_SCA_CMD_SCA_CMD_CHANNEL_DEFAULT;

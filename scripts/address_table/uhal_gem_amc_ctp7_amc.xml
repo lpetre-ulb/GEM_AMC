@@ -3338,7 +3338,7 @@
         <node id="CTRL" address="0x0" >
           <node id="MODULE_RESET" address="0x0" permission="w" />
           <node id="OH_FPGA_HARD_RESET" address="0x1" permission="w" />
-          <node id="TTC_HARD_RESET_EN" address="0x2" permission="rw" mask="0x1"/>
+          <node id="TTC_HARD_RESET_EN" address="0x2" permission="rw" />
           <node id="SCA_RESET_ENABLE_MASK" address="0x3" permission="rw" mask="0xffffffff"/>
         </node>
         <node id="STATUS" address="0x100" >
