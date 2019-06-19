@@ -148,6 +148,8 @@ begin
 
             if (reset_i = '1') then
                 frame_data <= (others => '0');
+                send_idle <= '1';
+                send_header <= '0';
             else
                 case state is
                     when IDLE =>
