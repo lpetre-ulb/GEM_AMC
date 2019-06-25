@@ -22,7 +22,7 @@ def main():
                    help='Required: Release version e.g. 3.5.0')
     parser.add_argument('-oh', metavar='num_optohybrids', required=True, type=int,
                    help='Required: Number of optohybrids supported by this release')
-    parser.add_argument('-linux', metavar='linux_image_file', required=True,
+    parser.add_argument('-linux', metavar='linux_image_file', required=False, default='/home/evka/Documents/ctp7_images/LinuxImage-CTP7-GENERIC-20180529T153916-0500-4935611.img',
                    help='Required: Linux image file e.g. ../images/LinuxImage-CTP7-GENERIC-20180529T153916-0500-4935611.img')
     parser.add_argument('-linux_hash', metavar='linux_hash',
                    help='Optional: If the linux image filename is of the standard format (e.g. LinuxImage-CTP7-GENERIC-20180529T153916-0500-4935611.img), then the hash will be taken from the filename unless this is specified. If the filename has a different format, then you will need to provide this argument')
