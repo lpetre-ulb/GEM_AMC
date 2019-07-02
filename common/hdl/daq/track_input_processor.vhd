@@ -587,7 +587,7 @@ begin
                         err_evtfifo_full <= '1';
                     end if;
 
-                    if (eb_timeout_flag = '0') then
+                    if (ep_last_rx_data_valid = '1') then
                         eb_vfat_bc <= ep_last_rx_data(155 downto 144);
 --                        eb_oh_bc <= ep_last_rx_data(223 downto 192);
                         eb_vfat_ec <= ep_last_rx_data(167 downto 160);

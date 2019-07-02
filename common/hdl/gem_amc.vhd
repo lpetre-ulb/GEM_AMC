@@ -351,7 +351,7 @@ begin
         i_optohybrid_single : entity work.optohybrid
             generic map(
                 g_OH_IDX        => std_logic_vector(to_unsigned(i, 4)),
-                g_DEBUG         => i = 1
+                g_DEBUG         => i = 0
             )
             port map(
                 reset_i                 => reset or link_reset,

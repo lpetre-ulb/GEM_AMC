@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190619";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190702";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 3;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 8;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 5;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 6;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -105,7 +105,8 @@ package gem_pkg is
     -- 3.8.2  Added BC0 and RESYNC markers to the trigger receivers (backwards compatible with older OH fw versions). For now it's not doing anything with those, but just doesn't count them as errors.
     -- 3.8.3  Fixed the trigger link missed comma counter so that it starts counting errors after 128 clock cycles after reset (previously it would only start counting after the first occurance of good frame marker, which sometimes made a link look good even if it was completely bad)
     -- 3.8.4  Added a possibility to switch to 40MHz promless programming mode; added VFAT-VFAT mixed BC and mixed EC flags in the data format; removed ADC monitoring from the SCA controller; SCA TTC_HARD_RESET_EN is now an OH mask instead of just one bit; BC now starts at 1 instead of 0 to match VFAT BC counting
-    -- 3.8.5  Small fix in the TX FSM for the OH FPGA -- during link reset the send_idle and send_header signals were undefined, so could possibly send some false data for OH slow control during reset 
+    -- 3.8.5  Small fix in the TX FSM for the OH FPGA -- during link reset the send_idle and send_header signals were undefined, so could possibly send some false data for OH slow control during reset
+    -- 3.8.6  Small fix in DAQ input processor: previously a condition existed for event word count to be lower by one VFAT if a new event came exactly at the clock cycle when the old one timed out. Hopefully this will solve the EC/BC mismatch problem seen at GE1/1 QC8 cosmic stand  
 
     --======================--
     --==      General     ==--
@@ -115,6 +116,9 @@ package gem_pkg is
 
     function count_ones(s : std_logic_vector) return integer;
     function bool_to_std_logic(L : BOOLEAN) return std_logic;
+    function log2ceil(arg : positive) return natural; -- returns the number of bits needed to encode the given number
+    function up_to_power_of_2(arg : positive) return natural; -- "rounds" the given number up to the closest power of 2 number (e.g. if you give 6, it will say 8, which is 2^3)
+    function div_ceil(numerator, denominator : positive) return natural; -- poor man's division, rounding up to the closest integer
 
     --======================--
     --== Config Constants ==--
@@ -431,4 +435,37 @@ package body gem_pkg is
         end if;
     end function bool_to_std_logic;
     
+    function log2ceil(arg : positive) return natural is
+        variable tmp : positive     := 1;
+        variable log : natural      := 0;
+    begin
+        if arg = 1 then return 1; end if;
+        while arg >= tmp loop
+            tmp := tmp * 2;
+            log := log + 1;
+        end loop;
+        return log;
+    end function;   
+
+    function up_to_power_of_2(arg : positive) return natural is
+        variable tmp : positive     := 1;
+    begin
+        while arg > tmp loop
+            tmp := tmp * 2;
+        end loop;
+        return tmp;
+    end function;   
+
+    function div_ceil(numerator, denominator : positive) return natural is
+        variable tmp : positive     := denominator;
+        variable ret : positive     := 1;
+    begin
+        if numerator = 0 then return 0; end if;
+        while numerator > tmp loop
+            tmp := tmp + denominator;
+            ret := ret + 1;
+        end loop;
+        return ret;
+    end function;  
+        
 end gem_pkg;
