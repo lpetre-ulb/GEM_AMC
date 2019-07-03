@@ -4,15 +4,141 @@ from utils import *
 import signal
 import sys
 import os
+import fnmatch
 import struct
 import zlib
 import math
 import analyze_events
 
-#FORMAT_VERSION = 201
-FORMAT_VERSION = 300
+IS_MINIDAQ_FORMAT = False
+VERBOSE = False
+DEBUG = False
 
-class GemEvent(object):
+class Amc13(object):
+
+    #header data
+    headerMarker1 = None # should be 0x5
+    headerMarker2 = None # should be 0x0
+    eventType = None
+    l1aId = None
+    bxId = None
+    fedId = None
+    numberAmcs = None
+    orbitId = None
+
+    amcBlockSizes = []
+    amcIds = []
+
+    #trailer data
+    trailerMarker = None # should be 0xa
+    eventLength = None
+    eventStatus = None
+    ttsState = None
+
+    amcs = []
+
+    def __init__(self):
+        self.amcs = []
+        self.amcBlockSizes = []
+        self.amcIds = []
+
+    def unpackAmc13Block(self, str, verbose=False):
+        # pad with zeros if necessary to align to 64bit boundary
+        while len(str) % 8 != 0:
+            if verbose:
+                print "adding a zero at the end of the string to align to 64bit boundary"
+            str += '\0'
+
+        words = struct.unpack("%dQ" % int(len(str) / 8), str)
+
+        idx = self.unpackAmc13Header(words, 0, verbose)
+
+        for i in range(len(self.amcIds)):
+            amc = GemAmc(self)
+            self.amcs.append(amc)
+            idx = amc.unpackGemAmcBlock(words, idx, verbose)
+
+        idx = self.unpackAmc13Trailer(words, idx, verbose)
+
+    def unpackAmc13Header(self, words, idx, verbose=False):
+        self.headerMarker1 = (words[idx] >> 60) & 0xf
+        self.eventType = (words[idx] >> 56) & 0xf
+        self.l1aId = (words[idx] >> 32) & 0xffffff
+        self.bxId = (words[idx] >> 20) & 0xfff
+        self.fedId = (words[idx] >> 8) & 0xfff
+        idx += 1
+        self.numberAmcs = (words[idx] >> 52) & 0xf
+        self.orbitId = (words[idx] >> 4) & 0xffffffff
+        self.headerMarker2 = (words[idx] >> 0) & 0xf
+        idx += 1
+
+        for i in range(self.numberAmcs):
+            self.amcBlockSizes.append((words[idx] >> 32) & 0xffffff)
+            self.amcIds.append((words[idx] >> 16) & 0xf)
+            idx += 1
+
+        if verbose:
+            self.printAmc13Header()
+
+        return idx
+
+    def unpackAmc13Trailer(self, words, idx, verbose=False):
+        idx += 1
+        self.trailerMarker = (words[idx] >> 60) & 0xf
+        self.eventLength = (words[idx] >> 32) & 0xffffff
+        self.eventStatus = (words[idx] >> 8) & 0xf
+        self.ttsState = (words[idx] >> 4) & 0xf
+
+        if verbose:
+            self.printAmc13Trailer()
+
+        return idx
+
+
+    def printAmc13Header(self):
+        printCyan("--------------------------------------")
+        printCyan("AMC13 Header")
+        printCyan("--------------------------------------")
+        printGreenRed("Header marker1: %s" % hexPadded(self.headerMarker1, 0.5), self.headerMarker1, 0x5)
+        printGreenRed("Header marker2: %s" % hexPadded(self.headerMarker2, 0.5), self.headerMarker2, 0x0)
+        print "Event type: %s" % hexPadded(self.eventType, 0.5)
+        print "FED ID: %s" % hexPadded(self.fedId, 1.5)
+        print "Number of AMCs: %d" % self.numberAmcs
+        print "L1A ID: %d" % self.l1aId
+        print "BX ID: %d" % self.bxId
+        print "Orbit ID: %d" % self.orbitId
+
+        print "AMC block data:"
+        for i in range(self.numberAmcs):
+            print "    Slot %d, size = %d" % (self.amcIds[i], self.amcBlockSizes[i])
+
+
+    def printAmc13Trailer(self):
+        printCyan("--------------------------------------")
+        printCyan("AMC13 Trailer")
+        printCyan("--------------------------------------")
+        printGreenRed("Trailer marker: %s" % hexPadded(self.trailerMarker, 0.5), self.trailerMarker, 0xa)
+        printGreenRed("TTS state: %s" % hexPadded(self.ttsState, 0.5), self.ttsState, 0x8)
+        print "Event status: %s" % hexPadded(self.eventStatus, 0.5)
+        print "Event length: %d" % self.eventLength
+
+
+    def printEvent(self):
+        self.printAmc13Header()
+        for amc in self.amcs:
+            amc.printEvent()
+        self.printAmc13Trailer()
+
+
+    def hasError(self, verbose):
+        for amc in self.amcs:
+            if amc.hasError(verbose):
+                return True
+        return False
+
+class GemAmc(object):
+
+    amc13 = None
 
     #header data
     amcNum = None
@@ -40,12 +166,13 @@ class GemEvent(object):
 
     chambers = []
 
-    def __init__(self):
+    def __init__(self, amc13):
+        self.amc13 = amc13
         self.chambers = []
         pass
 
-    def unpackGemFedBlock(self, str, verbose=False):
-        #pad with zeros if necessary to align to 64bit boundary
+    def unpackGemAmcBlockStr(self, str, verbose=False):
+        # pad with zeros if necessary to align to 64bit boundary
         while len(str) % 8 != 0:
             if verbose:
                 print "adding a zero at the end of the string to align to 64bit boundary"
@@ -53,7 +180,8 @@ class GemEvent(object):
 
         words = struct.unpack("%dQ" % int(len(str) / 8), str)
 
-        idx = self.unpackGemAmcHeader(words, 0, verbose)
+    def unpackGemAmcBlock(self, words, idx, verbose=False):
+        idx = self.unpackGemAmcHeader(words, idx, verbose)
         idx = self.unpackGemEventHeader(words, idx, verbose)
         chamberIdx = 0
         while chamberIdx < self.davCount:
@@ -64,6 +192,8 @@ class GemEvent(object):
 
         idx = self.unpackGemEventTrailer(words, idx, verbose)
         idx = self.unpackGemAmcTrailer(words, idx, verbose)
+
+        return idx
 
     def unpackGemAmcHeader(self, words, idx, verbose=False):
         self.amcNum = (words[idx] >> 56) & 0xf
@@ -180,6 +310,25 @@ class GemEvent(object):
 
         return numVfats
 
+    def hasError(self, verbose):
+        ret = False
+
+        if (self.bufStatus != 0 or self.ttsState != 8 or self.davTimeoutFlags != 0 or self.daqAlmostFull or not self.mmcmLocked or not self.daqClkLocked or not self.daqReady or not self.bc0Locked):
+            if verbose:
+                printRed("AMC error:")
+                self.printGemAmcHeader()
+                self.printGemEventHeader()
+                self.printGemEventTrailer()
+                self.printGemAmcTrailer()
+
+            ret = True
+
+        for chamber in self.chambers:
+            if chamber.hasError(verbose):
+                ret = True
+
+        return ret
+
 class GemChamber(object):
 
     event = None
@@ -203,8 +352,6 @@ class GemChamber(object):
     vfatWordCntTrail = None
     evtFifoUnf = None
     inFifoUnf = None
-    ohEc = None
-    ohBc = None
 
     #vfat data
     vfats = []
@@ -275,8 +422,6 @@ class GemChamber(object):
         self.vfatWordCntTrail = (words[idx] >> 36) & 0xfff
         self.evtFifoUnf = True if ((words[idx] >> 35) & 0x1) == 1 else False
         self.inFifoUnf = True if ((words[idx] >> 33) & 0x1) == 1 else False
-        self.ohBc = (words[idx] >> 20) & 0xfff
-        self.ohEc = (words[idx] >> 0) & 0xfffff
 
         idx += 1
 
@@ -293,15 +438,30 @@ class GemChamber(object):
         printGreenRed("    VFAT word count in trailer: %d" % self.vfatWordCntTrail, self.vfatWordCntTrail, self.vfatWordCnt)
         printGreenRed("    Event FIFO underflow: %r" % self.evtFifoUnf, self.evtFifoUnf, False)
         printGreenRed("    Input FIFO underflow: %r" % self.inFifoUnf, self.inFifoUnf, False)
-        print "    OH EC: %d" % self.ohEc
-        printGreenRed("    OH BC: %d" % self.ohBc, self.ohBc, self.event.bxId + 1)
-
 
     def printChamber(self):
         self.printGemChamberHeader()
         for vfat in self.vfats:
-            vfat.printVfat3Block()
+            vfat.printVfatBlock()
         self.printGemChamberTrailer()
+
+
+    def hasError(self, verbose):
+        ret = False
+
+        if (self.evtFifoFull or self.inFifoFull or self.l1aFifoFull or self.evtSizeOvf or self.evtFifoNearFull or self.inFifoNearFull or self.l1aFifoNearFull or self.evtSizeMoreThan24 or self.noVfatMarker or self.evtFifoUnf or self.inFifoUnf):
+            if verbose:
+                printRed("Chamber error")
+                self.printGemChamberHeader()
+                self.printGemChamberTrailer()
+
+            ret = True
+
+        for vfat in self.vfats:
+            if vfat.hasError(verbose):
+                ret = True
+
+        return ret
 
 class GemVfat2(object):
 
@@ -345,11 +505,11 @@ class GemVfat2(object):
         self.numHits = bin(self.chanData).count("1")
 
         if verbose:
-            self.printVfat2Block()
+            self.printVfatBlock()
 
         return idx
 
-    def printVfat2Block(self):
+    def printVfatBlock(self):
         printCyan("        --------------------------------------")
         printCyan("        VFAT Block #%d" % self.vfatIdx)
         printCyan("        --------------------------------------")
@@ -405,19 +565,27 @@ class GemVfat3(object):
 
         return idx
 
-    def printVfat3Block(self):
+    def printVfatBlock(self):
         printCyan("        --------------------------------------")
         printCyan("        VFAT Block #%d" % self.vfatIdx)
         printCyan("        --------------------------------------")
         print("        Position: %d" % self.position)
-        printGreenRed("        BC: %d" % self.bc, self.bc, self.chamber.event.bxId)
-        print "        EC: %d" % self.ec
-        printGreenRed("        Header: %s" % hexPadded(self.marker, 1), self.marker, 0x1e)
+        printGreenRed("        BC: %s" % hexPadded(self.bc, 2), self.bc, self.chamber.event.bxId + 1)
+        print "        EC: %s" % hexPadded(self.ec, 1)
+        printGreenRed("        Header: %s" % hexPadded(self.header, 1), self.header, 0x1e)
         printGreenRed("        Warning: %r" % self.warning, self.warning, False)
         printGreenRed("        CRC error: %r" % self.crcError, self.crcError, False)
         print "        Channel data: %s" % hexPadded(self.chanData, 16)
         print "        Number of hit channels: %d" % self.numHits
         print "        CRC: %s" % hexPadded(self.crc, 2)
+
+    def hasError(self, verbose):
+        if (self.bc != self.chamber.event.bxId + 1) or (self.header != 0x1e) or self.warning or self.crcError:
+            if verbose:
+                printRed("VFAT error")
+                self.printVfatBlock()
+
+            return True
 
 def main():
 
@@ -425,69 +593,124 @@ def main():
     command = ''
     evtNumToPrint = -1
     countNonZero = False
+    printError = False
 
     if len(sys.argv) < 3:
         print('Usage: unpack.py <gem_raw_file> <command> [command_params]')
+        print('The filename can contain some regexp features to match multiple files. Supported expressions are: * -- wildcard, ? -- match any single character, [seq] -- matches any char in seq, [!seq] -- matches any char not in seq')
+        print('When using regexp filename, make sure to enclose that in double quotes')
         print('Commands:')
         print('    print <evt_number> -- prints the requested event')
         print('    print_non_zero_event <non_zero_evt_number> -- prints the requested event while only counting events that contain at least one vfat block')
+        print('    print_error -- prints the first even with error')
         return
     else:
         rawFilename = sys.argv[1]
         command = sys.argv[2]
 
+    files = []
+
+    # do regexp
+    if ("*" in rawFilename or "?" in rawFilename or "[" in rawFilename):
+        dir = os.path.expanduser(os.path.dirname(rawFilename))
+        for file in sorted(os.listdir(dir)):
+            if fnmatch.fnmatch(file, os.path.basename(rawFilename)):
+                files.append(dir + "/" + file)
+        if len(files) == 0:
+            printRed("No files found..")
+            return
+    else:
+        files.append(rawFilename)
+        if not os.path.exists(rawFilename):
+            printRed("Input file %s does not exist." % rawFilename)
+            return
+
+
     if "print" in command:
         evtNumToPrint = int(sys.argv[3])
+        print("Event num to print: %d" % evtNumToPrint)
     if "non_zero_event" in command:
         countNonZero = True
-
-    if not os.path.exists(rawFilename):
-        print "Input file %s does not exist." % rawFilename
-        return
-
-    f = open(rawFilename, 'rb')
-    fileSize = os.fstat(f.fileno()).st_size
-
-    evtHeaderSize = readInitRecord(f)
-    print "File size = %d bytes" % fileSize
+    if "print_error" in command:
+        printError = True
 
     events = []
     i = 0
     nonZeroI = 0
-    while True:
-        if f.tell() >= fileSize - 1:
-            printCyan("End of file reached")
-            f.close()
-            break
 
-        event = readEvtRecord(f, fileSize, evtHeaderSize)
-        print("Analyzed %d events" % i)
-        if event is not None:
-            events.append(event)
+    for file in files:
+        print("Opening file: %s" % file)
+        f = open(file, 'rb')
+        fileSize = os.fstat(f.fileno()).st_size
 
-            if not countNonZero and (i == evtNumToPrint):
-                event.printEvent()
-                printRed("Event #%d (ending at byte %d in the file)" % (i, f.tell()))
+        if IS_MINIDAQ_FORMAT:
+            evtHeaderSize = readInitRecord(f, VERBOSE)
+
+        print "File size = %d bytes" % fileSize
+
+        while True:
+            if f.tell() >= fileSize - 1:
+                printCyan("End of file reached")
+                f.close()
                 break
-            elif countNonZero and (event.getNumVfatBlocks() > 0):
-                if nonZeroI == evtNumToPrint:
+
+            event = None
+            if IS_MINIDAQ_FORMAT:
+                event = readEvtRecord(f, fileSize, evtHeaderSize, VERBOSE, DEBUG)
+            else:
+                event = readAmc13Evt(f, fileSize, VERBOSE, DEBUG)
+
+            if event is not None:
+                #events.append(event)
+
+                if printError and event.hasError(True):
+                    #event.printEvent()
+                    printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
+                    print("Print the whole event? (y/n)")
+                    yn = raw_input()
+                    if (yn == "y"):
+                        print ""
+                        print ""
+                        print "======================================================================================"
+                        print ""
+                        event.printEvent()
+
+                    print("Do you want to continue? (y/n)")
+                    yn = raw_input()
+                    if (yn != "y"):
+                        return
+                elif not countNonZero and (i == evtNumToPrint):
                     event.printEvent()
-                    printRed("Event #%d (ending at byte %d in the file)" % (i, f.tell()))
-                    break
-                nonZeroI += 1
+                    printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
+                    return
+                elif countNonZero and (event.getNumVfatBlocks() > 0):
+                    if nonZeroI == evtNumToPrint:
+                        event.printEvent()
+                        printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
+                        return
+                    nonZeroI += 1
 
-            i += 1
+                i += 1
 
-        #print "Read event #%d ending at byte %d" % (i, f.tell())
+            #print "Read event #%d ending at byte %d" % (i, f.tell())
 
-    f.close()
+        f.close()
 
     # some quick and dirty analysis runs
+    if "analyze_bx_diff" in sys.argv:
+        analyze_events.analyzeBxDiff(events)
+
     if "analyze_bx" in sys.argv:
         analyze_events.analyzeBx(events)
 
     if "analyze_num_chambers" in sys.argv:
         analyze_events.analyzeNumChambers(events)
+
+    if "analyze_num_vfats" in sys.argv:
+        analyze_events.analyzeNumVfats(events)
+
+    if "analyze_vfat_bx_matching" in sys.argv:
+        analyze_events.analyzeVfatBxMatching(events)
 
 def readInitRecord(f, verbose=False):
     code = readNumber(f, 1)
@@ -557,8 +780,43 @@ def readEvtRecord(f, fileSize, evtHeaderSize, verbose=False, debug=False):
 
         printCyan("**********************************************")
 
-    event = GemEvent()
-    event.unpackGemFedBlock(fedData, verbose)
+    event = GemAmc(None)
+    event.unpackGemAmcBlockStr(fedData, verbose)
+
+    if verbose:
+        printCyan("**********************************************")
+
+    return event
+
+def readAmc13Evt(f, fileSize, verbose=False, debug=False):
+    startIdx = f.tell()
+    if (startIdx + 24 >= fileSize):
+        printRed("Unexpected end of file, startIdx = %d, filesize = %d" % (startIdx, fileSize))
+    f.read(16)
+    fedBlockSize = readNumber(f, 2)
+    f.read(6)
+    if (startIdx + 24 + fedBlockSize > fileSize):
+        printRed("Unexpected end of file, startIdx = %d, fedBlockSize = %d, filesize = %d" % (startIdx, fedBlockSize, fileSize))
+    fedData = f.read(fedBlockSize)
+
+    if verbose:
+        print ""
+        print "====================================================="
+        print "EVENT MESSAGE"
+        print "====================================================="
+        print "start idx = %s" % hexPadded(startIdx, 4)
+        print "fed block size = %d" % fedBlockSize
+
+        if debug:
+            print "----------------------------------------------"
+            print "FED data:"
+            printHexBlock64BigEndian(fedData, fedBlockSize)
+            print "----------------------------------------------"
+
+        printCyan("**********************************************")
+
+    event = Amc13()
+    event.unpackAmc13Block(fedData, verbose)
 
     if verbose:
         printCyan("**********************************************")
