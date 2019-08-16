@@ -9,10 +9,39 @@ import struct
 import zlib
 import math
 import analyze_events
+from enum import Enum
 
 IS_MINIDAQ_FORMAT = False
 VERBOSE = False
 DEBUG = False
+
+class Error(Enum):
+    AMC_BUF_STATUS = 1
+    AMC_TTS_STATE = 2
+    AMC_DAV_TIMEOUT = 3
+    AMC_DAQLINK_FULL = 4
+    AMC_MMCM_UNLOCKED = 5
+    AMC_DAQ_CLK_UNLOCKED = 6
+    AMC_DAQ_NOT_READY = 7
+    AMC_BC0_NOT_LOCKED = 8
+
+    CHAMBER_EVT_FIFO_FULL = 51
+    CHAMBER_IN_FIFO_FULL = 52
+    CHAMBER_L1A_FIFO_FULL = 53
+    CHAMBER_EVENT_SIZE_OVF = 54
+    CHAMBER_EVT_FIFO_NEAR_FULL = 55
+    CHAMBER_IN_FIFO_NEAR_FULL = 56
+    CHAMBER_L1A_FIFO_NEAR_FULL = 57
+    CHAMBER_EVT_SIZE_MORE_THAN_24 = 58
+    CHAMBER_NO_VFAT_MARKER = 59
+    CHAMBER_EVT_FIFO_UNF = 60
+    CHAMBER_IN_FIFO_UNF = 61
+    CHAMBER_NUM_VFATS_NOT_24 = 62
+
+    VFAT_BC_MISMATCH = 101
+    VFAT_BAD_HEADER = 102
+    VFAT_WARNING = 103
+    VFAT_CRC_ERR = 104
 
 class Amc13(object):
 
@@ -56,7 +85,10 @@ class Amc13(object):
         for i in range(len(self.amcIds)):
             amc = GemAmc(self)
             self.amcs.append(amc)
+            idx_before = idx
             idx = amc.unpackGemAmcBlock(words, idx, verbose)
+            if (amc.prematureEoeReached):
+                idx = idx_before + self.amcBlockSizes[i]
 
         idx = self.unpackAmc13Trailer(words, idx, verbose)
 
@@ -164,6 +196,9 @@ class GemAmc(object):
     l1aIdTrail = None
     wordCnt = None
 
+    #errors
+    prematureEoeReached = False
+
     chambers = []
 
     def __init__(self, amc13):
@@ -189,6 +224,9 @@ class GemAmc(object):
             self.chambers.append(chamber)
             chamberIdx += 1
             idx = chamber.unpackGemChamberBlock(words, idx, verbose)
+            if (chamber.prematureEoeReached):
+                self.prematureEoeReached = True
+                return idx
 
         idx = self.unpackGemEventTrailer(words, idx, verbose)
         idx = self.unpackGemAmcTrailer(words, idx, verbose)
@@ -245,6 +283,7 @@ class GemAmc(object):
         print "DAV list: %s" % hexPadded(self.davList, 3)
         printGreenRed("Buffer status: %s" % hexPadded(self.bufStatus, 3), self.bufStatus, 0)
         printGreenRed("TTS state: %s" % hexPadded(self.ttsState, 1), self.ttsState, 8)
+        printGreenRed("Premature EOE reached: %r" % self.prematureEoeReached, self.prematureEoeReached, False)
 
 
     def unpackGemEventTrailer(self, words, idx, verbose=False):
@@ -313,7 +352,7 @@ class GemAmc(object):
     def hasError(self, verbose):
         ret = False
 
-        if (self.bufStatus != 0 or self.ttsState != 8 or self.davTimeoutFlags != 0 or self.daqAlmostFull or not self.mmcmLocked or not self.daqClkLocked or not self.daqReady or not self.bc0Locked):
+        if (self.bufStatus != 0 or self.ttsState != 8 or self.davTimeoutFlags != 0 or self.daqAlmostFull or not self.mmcmLocked or not self.daqClkLocked or not self.daqReady or not self.bc0Locked or self.prematureEoeReached):
             if verbose:
                 printRed("AMC error:")
                 self.printGemAmcHeader()
@@ -348,6 +387,9 @@ class GemChamber(object):
     evtSizeMoreThan24 = None
     noVfatMarker = None
 
+    #errors
+    prematureEoeReached = False
+
     #trailer data
     vfatWordCntTrail = None
     evtFifoUnf = None
@@ -367,6 +409,10 @@ class GemChamber(object):
         if self.vfatWordCnt % 3 != 0:
             printRed("Invalid VFAT word count that doesn't divide by 3: %d !! exiting.." % self.vfatWordCnt)
             sys.exit(0)
+
+        if (idx + self.vfatWordCnt > len(words)):
+            self.prematureEoeReached = True
+            return idx
 
         vfatIdx = 0
         while vfatIdx < self.vfatWordCnt / 3:
@@ -416,6 +462,8 @@ class GemChamber(object):
         printGreenRed("    L1A FIFO near full: %r" % self.l1aFifoNearFull, self.l1aFifoNearFull, False)
         printGreenRed("    Event size more than 24 VFATs: %r" % self.evtSizeMoreThan24, self.evtSizeMoreThan24, False)
         printGreenRed("    No VFAT marker: %r" % self.noVfatMarker, self.noVfatMarker, False)
+        printGreenRed("    Premature EOE reached: %r" % self.prematureEoeReached, self.prematureEoeReached, False)
+        printGreenRed("    Number of VFAT blocks: %d" % len(self.vfats), len(self.vfats), 24)
 
 
     def unpackGemChamberTrailer(self, words, idx, verbose=False):
@@ -449,7 +497,7 @@ class GemChamber(object):
     def hasError(self, verbose):
         ret = False
 
-        if (self.evtFifoFull or self.inFifoFull or self.l1aFifoFull or self.evtSizeOvf or self.evtFifoNearFull or self.inFifoNearFull or self.l1aFifoNearFull or self.evtSizeMoreThan24 or self.noVfatMarker or self.evtFifoUnf or self.inFifoUnf):
+        if (self.evtFifoFull or self.inFifoFull or self.l1aFifoFull or self.evtSizeOvf or self.evtFifoNearFull or self.inFifoNearFull or self.l1aFifoNearFull or self.evtSizeMoreThan24 or self.noVfatMarker or self.evtFifoUnf or self.inFifoUnf or len(self.vfats) != 24 or self.prematureEoeReached):
             if verbose:
                 printRed("Chamber error")
                 self.printGemChamberHeader()
@@ -561,7 +609,7 @@ class GemVfat3(object):
         self.numHits = bin(self.chanData).count("1")
 
         if verbose:
-            self.printVfat3Block()
+            self.printVfatBlock()
 
         return idx
 
@@ -633,6 +681,10 @@ def main():
         countNonZero = True
     if "print_error" in command:
         printError = True
+        print "Will print errors"
+        evtNumToPrint = int(sys.argv[3])
+        if evtNumToPrint >= 0:
+            print "Will start printing errors only after event #%d" % evtNumToPrint
 
     events = []
     i = 0
@@ -656,29 +708,30 @@ def main():
 
             event = None
             if IS_MINIDAQ_FORMAT:
-                event = readEvtRecord(f, fileSize, evtHeaderSize, VERBOSE, DEBUG)
+                event = readEvtRecord(f, fileSize, evtHeaderSize, VERBOSE, DEBUG, i)
             else:
-                event = readAmc13Evt(f, fileSize, VERBOSE, DEBUG)
+                event = readAmc13Evt(f, fileSize, VERBOSE, DEBUG, i)
 
             if event is not None:
                 #events.append(event)
 
-                if printError and event.hasError(True):
-                    #event.printEvent()
-                    printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
-                    print("Print the whole event? (y/n)")
-                    yn = raw_input()
-                    if (yn == "y"):
-                        print ""
-                        print ""
-                        print "======================================================================================"
-                        print ""
-                        event.printEvent()
+                if printError:
+                    if i > evtNumToPrint and event.hasError(True):
+                        #event.printEvent()
+                        printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
+                        print("Print the whole event? (y/n)")
+                        yn = raw_input()
+                        if (yn == "y"):
+                            print ""
+                            print ""
+                            print "======================================================================================"
+                            print ""
+                            event.printEvent()
 
-                    print("Do you want to continue? (y/n)")
-                    yn = raw_input()
-                    if (yn != "y"):
-                        return
+                        print("Do you want to continue? (y/n)")
+                        yn = raw_input()
+                        if (yn != "y"):
+                            return
                 elif not countNonZero and (i == evtNumToPrint):
                     event.printEvent()
                     printRed("Event #%d (ending at byte %d in file %s)" % (i, f.tell(), file))
@@ -736,7 +789,7 @@ def readInitRecord(f, verbose=False):
 
     return evtHeaderSize
 
-def readEvtRecord(f, fileSize, evtHeaderSize, verbose=False, debug=False):
+def readEvtRecord(f, fileSize, evtHeaderSize, verbose=False, debug=False, evtNum=-1):
     startIdx = f.tell()
     code = readNumber(f, 1)
     size = readNumber(f, 4)
@@ -758,7 +811,7 @@ def readEvtRecord(f, fileSize, evtHeaderSize, verbose=False, debug=False):
     if verbose:
         print ""
         print "====================================================="
-        print "EVENT MESSAGE"
+        print "EVENT MESSAGE (event #%d)" % evtNum
         print "====================================================="
         print "start idx = %s" % hexPadded(startIdx, 4)
         print "code = %s" % hexPadded(code, 1)
@@ -788,7 +841,7 @@ def readEvtRecord(f, fileSize, evtHeaderSize, verbose=False, debug=False):
 
     return event
 
-def readAmc13Evt(f, fileSize, verbose=False, debug=False):
+def readAmc13Evt(f, fileSize, verbose=False, debug=False, evtNum=-1):
     startIdx = f.tell()
     if (startIdx + 24 >= fileSize):
         printRed("Unexpected end of file, startIdx = %d, filesize = %d" % (startIdx, fileSize))
@@ -802,7 +855,7 @@ def readAmc13Evt(f, fileSize, verbose=False, debug=False):
     if verbose:
         print ""
         print "====================================================="
-        print "EVENT MESSAGE"
+        print "EVENT MESSAGE (event #%d)" % evtNum
         print "====================================================="
         print "start idx = %s" % hexPadded(startIdx, 4)
         print "fed block size = %d" % fedBlockSize
