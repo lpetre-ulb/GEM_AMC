@@ -31,8 +31,7 @@ entity gem_amc is
         g_NUM_TRIG_TX_LINKS  : integer;
         
         g_NUM_IPB_SLAVES     : integer;
-        g_DAQ_CLK_FREQ       : integer;
-        g_SYSTEM             : string := "GE11"
+        g_DAQ_CLK_FREQ       : integer
     );
     port(
         reset_i                 : in   std_logic;
@@ -363,7 +362,6 @@ begin
                 vfat3_sync_i            => vfat3_sync,
                 vfat3_sync_verify_i     => vfat3_sync_verify,
 
-                gbt_rx_ready_i          => (gbt_ready_arr(i * 3 + 0), gbt_ready_arr(i * 3 + 1), gbt_ready_arr(i * 3 + 2)),
                 fpga_tx_data_o          => oh_fpga_tx_data_arr(i),
                 fpga_rx_data_i          => oh_fpga_rx_data_arr(i),
 
@@ -476,8 +474,6 @@ begin
             ipb_reset_i                 => ipb_reset_i,
             ipb_mosi_i                  => ipb_mosi_arr_i(C_IPB_SLV.system),
             ipb_miso_o                  => ipb_miso_arr(C_IPB_SLV.system),
-            tk_rx_polarity_o            => open,
-            tk_tx_polarity_o            => open,
             board_id_o                  => open,
             loopback_gbt_test_en_o      => loopback_gbt_test_en,
             use_oh_vfat3_connectors_o   => use_oh_vfat3_connectors,

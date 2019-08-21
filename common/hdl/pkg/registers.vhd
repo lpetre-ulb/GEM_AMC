@@ -1750,19 +1750,9 @@ package registers is
     -- This module is controlling GEM AMC System wide settings
     --============================================================================
 
-    constant REG_GEM_SYSTEM_NUM_REGS : integer := 13;
+    constant REG_GEM_SYSTEM_NUM_REGS : integer := 11;
     constant REG_GEM_SYSTEM_ADDRESS_MSB : integer := 16;
     constant REG_GEM_SYSTEM_ADDRESS_LSB : integer := 0;
-    constant REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0000";
-    constant REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_MSB    : integer := 23;
-    constant REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_LSB     : integer := 0;
-    constant REG_GEM_SYSTEM_TK_LINK_RX_POLARITY_DEFAULT : std_logic_vector(23 downto 0) := x"000000";
-
-    constant REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0001";
-    constant REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_MSB    : integer := 23;
-    constant REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_LSB     : integer := 0;
-    constant REG_GEM_SYSTEM_TK_LINK_TX_POLARITY_DEFAULT : std_logic_vector(23 downto 0) := x"000000";
-
     constant REG_GEM_SYSTEM_BOARD_ID_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0002";
     constant REG_GEM_SYSTEM_BOARD_ID_MSB    : integer := 15;
     constant REG_GEM_SYSTEM_BOARD_ID_LSB     : integer := 0;
@@ -1783,6 +1773,10 @@ package registers is
     constant REG_GEM_SYSTEM_RELEASE_MAJOR_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0003";
     constant REG_GEM_SYSTEM_RELEASE_MAJOR_MSB    : integer := 23;
     constant REG_GEM_SYSTEM_RELEASE_MAJOR_LSB     : integer := 16;
+
+    constant REG_GEM_SYSTEM_RELEASE_GEM_STATION_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0003";
+    constant REG_GEM_SYSTEM_RELEASE_GEM_STATION_MSB    : integer := 25;
+    constant REG_GEM_SYSTEM_RELEASE_GEM_STATION_LSB     : integer := 24;
 
     constant REG_GEM_SYSTEM_RELEASE_DATE_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0004";
     constant REG_GEM_SYSTEM_RELEASE_DATE_MSB    : integer := 31;

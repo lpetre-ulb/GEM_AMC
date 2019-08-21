@@ -364,12 +364,6 @@
               sw_ctrl_configure_set="0x1"/>
       </node>
 
-      <node id="TK_LINK_RX_POLARITY" address="0x0" mask="0x00ffffff" permission="rw"
-            description="RX polarity of the track/control links (bit 0 corresponds to link 0)"
-            fw_signal="tk_rx_polarity" fw_default="0x000000"/>
-      <node id="TK_LINK_TX_POLARITY" address="0x1" mask="0x00ffffff" permission="rw"
-            description="TX polarity of the track/control links (bit 0 corresponds to link 0)"
-            fw_signal="tk_tx_polarity" fw_default="0x000000"/>
       <node id="BOARD_ID" address="0x2" mask="0x0000ffff" permission="rw"
             description="Board ID that gets embedded in the AMC13 header"
             fw_signal="board_id" fw_default="0xbeef"/>
@@ -387,6 +381,9 @@
         <node id="BUILD" address="0x0" mask="0x000000ff" permission="r"
               description="Firmware release build version"
               fw_signal="std_logic_vector(to_unsigned(version_build, 8))"/>
+        <node id="GEM_STATION" address="0x0" mask="0x03000000" permission="r"
+              description="GEM station that this firmware was compiled for (0 means ME0, 1 means GE1/1, 2 means GE2/1)"
+              fw_signal="std_logic_vector(to_unsigned(gem_station, 2))"/>
         <node id="DATE" address="0x1" permission="r"
               description="Firmware release date (read as hex)"
               fw_signal="firmware_date"/>
@@ -1513,6 +1510,9 @@
           description="This module contains counters and control registers of all the optical links on the board (regardless of link rate or what they connect to)"
           fw_is_module="true"
           fw_is_module_external="true">
+
+      <node id="DISABLE_TTC_PHASE_ALIGN" address="0x11000" mask="0x00000001" permission="rw"
+            description="Disables TTC phase alignment when set to 1 (default is 0). In setups that don't have AMC13 and are running on local oscillator clock, this should be set to 1 immediately after programming the CTP7 FPGA, which will allow the optical links to initialize. Otherwise this register should not be touched, except perhaps it could be toggled in case there has been a TTC clock interruption, which should realign the fabric clocks to it (note that GTH reset is required after such action)"/>
 
       <node id="MGT_CHANNEL_${MGT}" address="0x0"
             description="MGT channel ${MGT} control and status. Note: these are MGT channles, which do not correspond 1-to-1 with the fiber numbering. Please refer here for MGT channel to fiber mapping: https://docs.google.com/spreadsheets/d/1-AE7GeeU10GfLB-9FYOMN4k0-Z7bVkiQpLfXC4G2irI"

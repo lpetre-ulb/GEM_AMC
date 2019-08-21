@@ -256,6 +256,8 @@ architecture system_arch of system is
   signal s_clk_gth_rx_usrclk_arr : std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
   signal s_gth_cpll_status_arr   : t_gth_cpll_status_arr(g_NUM_OF_GTH_GTs-1 downto 0);
 
+  signal s_disable_ttc_phase_align : std_logic;
+
 ----
   signal s_DRP_MMCM_clk   : std_logic;
   signal s_DRP_MMCM_daddr : std_logic_vector (6 downto 0);
@@ -344,14 +346,15 @@ begin
   
   i_ttc_clocks : entity work.ttc_clocks
       port map(
-          clk_40_ttc_p_i      => clk_40_ttc_p_i,
-          clk_40_ttc_n_i      => clk_40_ttc_n_i,
-          clk_160_ttc_clean_i => ttc_clk_160_clean,
-          mmcm_rst_i          => '0', --ttc_clks_reset,
-          mmcm_locked_o       => ttc_clks_locked,
-          clocks_o            => ttc_clks,
-          pll_lock_time_o     => open,
-          unlock_cnt_o        => open
+          clk_40_ttc_p_i        => clk_40_ttc_p_i,
+          clk_40_ttc_n_i        => clk_40_ttc_n_i,
+          clk_160_ttc_clean_i   => ttc_clk_160_clean,
+          disable_phase_align_i => s_disable_ttc_phase_align,
+          mmcm_rst_i            => '0', --ttc_clks_reset,
+          mmcm_locked_o         => ttc_clks_locked,
+          clocks_o              => ttc_clks,
+          pll_lock_time_o       => open,
+          unlock_cnt_o          => open
       ); 
   
   ttc_clks_o <= ttc_clks;
@@ -455,7 +458,9 @@ begin
       gth_misc_status_arr_i   => s_gth_misc_status_arr,
 
       clk_gth_tx_usrclk_arr_i => s_clk_gth_tx_usrclk_arr,
-      clk_gth_rx_usrclk_arr_i => s_clk_gth_rx_usrclk_arr
+      clk_gth_rx_usrclk_arr_i => s_clk_gth_rx_usrclk_arr,
+      
+      disable_ttc_phase_align_o => s_disable_ttc_phase_align
       );
 
   i_drp_controller : entity work.drp_controller

@@ -37,7 +37,6 @@ entity optohybrid is
         vfat3_sync_verify_i     : in std_logic;
         
         -- FPGA control link
-        gbt_rx_ready_i          : in  std_logic_vector(2 downto 0);
         fpga_tx_data_o          : out std_logic_vector(7 downto 0);
         fpga_rx_data_i          : in  std_logic_vector(7 downto 0);
 

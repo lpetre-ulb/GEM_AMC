@@ -33,6 +33,7 @@ entity ttc_clocks is
         clk_40_ttc_p_i          : in  std_logic; -- TTC backplane clock signals
         clk_40_ttc_n_i          : in  std_logic;
         clk_160_ttc_clean_i     : in  std_logic; -- TTC jitter cleaned 160MHz TTC clock (should come from MGT ref)
+        disable_phase_align_i   : in  std_logic; -- completely disables the phase alignment mechanism and just forwards MMCM lock signal to mmcm_locked, instead of the SYNC_DONE. This is useful for setups without AMC13 and running on the local oscilator clock
         mmcm_rst_i              : in  std_logic;
         mmcm_locked_o           : out std_logic;
         clocks_o                : out t_ttc_clks;
@@ -258,16 +259,8 @@ begin
     --------- Phase Alignment to TTC backplane clock ---------
     ----------------------------------------------------------
   
-    gen_use_backplane_ref:
-    if not CFG_DISABLE_TTC_PHASE_LOCKING generate
-        fsm_reset <= '0';
-        mmcm_locked_o <= '1' when pa_state = SYNC_DONE else '0';
-    end generate;
-    gen_no_backplane_ref:
-    if CFG_DISABLE_TTC_PHASE_LOCKING generate
-        fsm_reset <= '1';
-        mmcm_locked_o <= mmcm_locked_raw;
-    end generate;
+    fsm_reset <= disable_phase_align_i;
+    mmcm_locked_o <= mmcm_locked_raw when disable_phase_align_i = '1' else '1' when pa_state = SYNC_DONE else '0';
     
     mmcm_ps_clk <= clk_160_ttc_clean_i;
     pll_lock_time_o <= std_logic_vector(pll_lock_wait_timer);
