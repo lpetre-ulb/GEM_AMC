@@ -1786,9 +1786,6 @@ package registers is
     constant REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_MSB    : integer := 4;
     constant REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_LSB     : integer := 0;
 
-    constant REG_GEM_SYSTEM_CONFIG_USE_TRIG_LINKS_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0005";
-    constant REG_GEM_SYSTEM_CONFIG_USE_TRIG_LINKS_BIT    : integer := 9;
-
     constant REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_ADDR    : std_logic_vector(16 downto 0) := '0' & x"0011";
     constant REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT    : integer := 0;
     constant REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_DEFAULT : std_logic := '0';

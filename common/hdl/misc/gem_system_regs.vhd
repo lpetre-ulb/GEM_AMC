@@ -53,7 +53,6 @@ architecture gem_system_regs_arch of gem_system_regs is
     signal firmware_date            : std_logic_vector(31 downto 0);
     signal num_of_oh                : std_logic_vector(4 downto 0);
     signal board_type               : std_logic_vector(3 downto 0);
-    signal use_trig_links           : std_logic;
     
     signal loopback_gbt_test_en     : std_logic;
     signal use_oh_vfat3_connectors  : std_logic;
@@ -99,7 +98,6 @@ begin
     --=== board type and configuration parameters ===--
     board_type     <= CFG_BOARD_TYPE;
     num_of_oh      <= std_logic_vector(to_unsigned(CFG_NUM_OF_OHs, 5));
-    use_trig_links <= bool_to_std_logic(CFG_USE_TRIG_LINKS); 
     
     --=== version and date === --
     -- TODO: remove legacy firmware date and version once the software is ready
@@ -170,7 +168,6 @@ begin
     regs_read_arr(1)(REG_GEM_SYSTEM_RELEASE_GEM_STATION_MSB downto REG_GEM_SYSTEM_RELEASE_GEM_STATION_LSB) <= std_logic_vector(to_unsigned(gem_station, 2));
     regs_read_arr(2)(REG_GEM_SYSTEM_RELEASE_DATE_MSB downto REG_GEM_SYSTEM_RELEASE_DATE_LSB) <= firmware_date;
     regs_read_arr(3)(REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_MSB downto REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_LSB) <= num_of_oh;
-    regs_read_arr(3)(REG_GEM_SYSTEM_CONFIG_USE_TRIG_LINKS_BIT) <= use_trig_links;
     regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT) <= use_oh_vfat3_connectors;
     regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_BIT) <= vfat3_sc_only_mode;
     regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_BIT) <= use_v3b_elink_mapping;

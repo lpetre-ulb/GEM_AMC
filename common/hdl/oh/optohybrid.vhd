@@ -65,11 +65,6 @@ entity optohybrid is
         sbit_clusters_o         : out t_oh_sbits;
         sbit_links_status_o     : out t_oh_sbit_links;
         
-        -- DAQ data
-        tk_data_link_o          : out t_data_link;
-        tk_error_o              : out std_logic;
-        tk_evt_received_o       : out std_logic;
-        
         -- OH reg forwarding IPbus
         oh_reg_ipb_reset_i      : in  std_logic;
         oh_reg_ipb_clk_i        : in  std_logic;
@@ -177,19 +172,6 @@ begin
     --==========================--
     vfat3_tx_data_o <= vfat3_tx_data;
     fpga_rx_data <= fpga_rx_data_i;
-    
-    --------------------------------------- old
-    tk_data_link_o.clk <= ttc_clk_i.clk_80;
-    
---    tk_data_link_o.data_en <= evt_en;
---    tk_data_link_o.data <= evt_data;
-
-    ------------- zero wiring -------------
-    tk_data_link_o.data <= (others => '0');
-    tk_data_link_o.data_en <= '0';
-    tk_error_o <= '0';
-    tk_evt_received_o <= '0';
-    --------------------------------------- 
 
     --==========================--
     --==       VFAT3 TX       ==--

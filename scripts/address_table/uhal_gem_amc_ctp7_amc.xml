@@ -488,7 +488,6 @@
       </node>
       <node id="CONFIG" address="0x5" >
         <node id="NUM_OF_OH" address="0x0" permission="r" mask="0x1f" />
-        <node id="USE_TRIG_LINKS" address="0x0" permission="r" mask="0x200" />
       </node>
       <node id="VFAT3" address="0x10" >
         <node id="USE_OH_VFAT3_SLOTS" address="0x1" permission="rw" mask="0x1" />
@@ -3453,6 +3452,7 @@
       </node>
     </node>
     <node id="OPTICAL_LINKS" address="0x1400000" >
+      <node id="DISABLE_TTC_PHASE_ALIGN" address="0x11000" permission="rw" mask="0x1" />
       <node id="MGT_CHANNEL_0" address="0x0" >
         <node id="RESET" address="0x1" permission="rw" >
           <node id="TX_RESET" address="0x0" permission="rw" mask="0x1" />
