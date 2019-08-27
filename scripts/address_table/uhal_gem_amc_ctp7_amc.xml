@@ -490,7 +490,6 @@
         <node id="NUM_OF_OH" address="0x0" permission="r" mask="0x1f" />
       </node>
       <node id="VFAT3" address="0x10" >
-        <node id="USE_OH_VFAT3_SLOTS" address="0x1" permission="rw" mask="0x1" />
         <node id="SC_ONLY_MODE" address="0x1" permission="rw" mask="0x2" />
         <node id="USE_OH_V3B_MAPPING" address="0x1" permission="rw" mask="0x4" />
       </node>

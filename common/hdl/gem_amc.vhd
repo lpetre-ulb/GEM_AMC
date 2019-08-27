@@ -163,7 +163,6 @@ architecture gem_amc_arch of gem_amc is
     signal vfat3_rx_data_arr            : t_vfat3_elinks_arr(g_NUM_OF_OHs - 1 downto 0);
     
     --== VFAT3 ==--
-    signal use_oh_vfat3_connectors      : std_logic;
     signal vfat3_sc_only_mode           : std_logic;
     signal vfat3_tx_stream              : std_logic_vector(7 downto 0);
     signal vfat3_tx_idle                : std_logic;
@@ -182,6 +181,7 @@ architecture gem_amc_arch of gem_amc is
     signal vfat3_sc_status              : t_vfat_slow_control_status;    
     
     signal vfat3_daq_link_arr           : t_oh_vfat_daq_link_arr(g_NUM_OF_OHs - 1 downto 0);
+    signal vfat3_gbt_ready_arr          : t_std24_array(g_NUM_OF_OHs - 1 downto 0);
     
     signal vfat_mask_arr                : t_std24_array(g_NUM_OF_OHs - 1 downto 0);
     
@@ -341,6 +341,7 @@ begin
                 vfat3_rx_data_i         => vfat3_rx_data_arr(i),
                 vfat3_link_status_o     => vfat3_link_status_arr(i),
                 vfat_mask_arr_i         => vfat_mask_arr(i),
+                vfat_gbt_ready_arr_i    => vfat3_gbt_ready_arr(i),
 
                 vfat3_sc_tx_data_i      => vfat3_sc_tx_data,
                 vfat3_sc_tx_empty_i     => vfat3_sc_tx_empty,
@@ -444,7 +445,6 @@ begin
             ipb_miso_o                  => ipb_miso_arr(C_IPB_SLV.system),
             board_id_o                  => open,
             loopback_gbt_test_en_o      => loopback_gbt_test_en,
-            use_oh_vfat3_connectors_o   => use_oh_vfat3_connectors,
             vfat3_sc_only_mode_o        => vfat3_sc_only_mode,
             use_v3b_elink_mapping_o     => use_v3b_elink_mapping,
             manual_link_reset_o         => manual_link_reset
@@ -577,7 +577,6 @@ begin
                 gbt_link_status_arr_i       => gbt_link_status_arr,
     
                 link_test_mode_i            => loopback_gbt_test_en,
-                use_oh_vfat3_connectors_i   => use_oh_vfat3_connectors,
                 use_v3b_mapping_i           => use_v3b_elink_mapping,
     
                 sca_tx_data_arr_i           => sca_tx_data_arr,
@@ -590,6 +589,7 @@ begin
                 vfat3_tx_data_arr_i         => vfat3_tx_data_arr,
                 vfat3_rx_data_arr_o         => vfat3_rx_data_arr,
                 gbt_ready_arr_o             => gbt_ready_arr,
+                vfat3_gbt_ready_arr_o       => vfat3_gbt_ready_arr,
                 
                 tst_gbt_rx_data_arr_o       => test_gbt_rx_data_arr,
                 tst_gbt_tx_data_arr_i       => test_gbt_tx_data_arr,
@@ -611,7 +611,6 @@ begin
                 gbt_link_status_arr_i       => gbt_link_status_arr,
     
                 link_test_mode_i            => loopback_gbt_test_en,
-                use_oh_vfat3_connectors_i   => use_oh_vfat3_connectors,
                 use_v3b_mapping_i           => use_v3b_elink_mapping,
     
                 sca_tx_data_arr_i           => sca_tx_data_arr,
@@ -624,6 +623,7 @@ begin
                 vfat3_tx_data_arr_i         => vfat3_tx_data_arr,
                 vfat3_rx_data_arr_o         => vfat3_rx_data_arr,
                 gbt_ready_arr_o             => gbt_ready_arr,
+                vfat3_gbt_ready_arr_o       => vfat3_gbt_ready_arr,
                 
                 tst_gbt_rx_data_arr_o       => test_gbt_rx_data_arr,
                 tst_gbt_tx_data_arr_i       => test_gbt_tx_data_arr,

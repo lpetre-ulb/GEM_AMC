@@ -33,7 +33,6 @@ port(
     board_id_o                  : out std_logic_vector(15 downto 0);
 
     loopback_gbt_test_en_o      : out std_logic;
-    use_oh_vfat3_connectors_o   : out std_logic;
     use_v3b_elink_mapping_o     : out std_logic;
 
     vfat3_sc_only_mode_o        : out std_logic;
@@ -55,7 +54,6 @@ architecture gem_system_regs_arch of gem_system_regs is
     signal board_type               : std_logic_vector(3 downto 0);
     
     signal loopback_gbt_test_en     : std_logic;
-    signal use_oh_vfat3_connectors  : std_logic;
     
     signal vfat3_sc_only_mode       : std_logic;
     
@@ -112,7 +110,6 @@ begin
             
     --=== Tests === --
     loopback_gbt_test_en_o <= loopback_gbt_test_en; 
-    use_oh_vfat3_connectors_o <= use_oh_vfat3_connectors;
     
     vfat3_sc_only_mode_o <= vfat3_sc_only_mode;
     use_v3b_elink_mapping_o <= use_v3b_elink_mapping;
@@ -168,7 +165,6 @@ begin
     regs_read_arr(1)(REG_GEM_SYSTEM_RELEASE_GEM_STATION_MSB downto REG_GEM_SYSTEM_RELEASE_GEM_STATION_LSB) <= std_logic_vector(to_unsigned(gem_station, 2));
     regs_read_arr(2)(REG_GEM_SYSTEM_RELEASE_DATE_MSB downto REG_GEM_SYSTEM_RELEASE_DATE_LSB) <= firmware_date;
     regs_read_arr(3)(REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_MSB downto REG_GEM_SYSTEM_CONFIG_NUM_OF_OH_LSB) <= num_of_oh;
-    regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT) <= use_oh_vfat3_connectors;
     regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_BIT) <= vfat3_sc_only_mode;
     regs_read_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_BIT) <= use_v3b_elink_mapping;
     regs_read_arr(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= loopback_gbt_test_en;
@@ -178,7 +174,6 @@ begin
 
     -- Connect write signals
     board_id <= regs_write_arr(0)(REG_GEM_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_BOARD_ID_LSB);
-    use_oh_vfat3_connectors <= regs_write_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT);
     vfat3_sc_only_mode <= regs_write_arr(4)(REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_BIT);
     use_v3b_elink_mapping <= regs_write_arr(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_BIT);
     loopback_gbt_test_en <= regs_write_arr(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT);
@@ -195,7 +190,6 @@ begin
 
     -- Defaults
     regs_defaults(0)(REG_GEM_SYSTEM_BOARD_ID_MSB downto REG_GEM_SYSTEM_BOARD_ID_LSB) <= REG_GEM_SYSTEM_BOARD_ID_DEFAULT;
-    regs_defaults(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_BIT) <= REG_GEM_SYSTEM_VFAT3_USE_OH_VFAT3_SLOTS_DEFAULT;
     regs_defaults(4)(REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_BIT) <= REG_GEM_SYSTEM_VFAT3_SC_ONLY_MODE_DEFAULT;
     regs_defaults(4)(REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_BIT) <= REG_GEM_SYSTEM_VFAT3_USE_OH_V3B_MAPPING_DEFAULT;
     regs_defaults(7)(REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_BIT) <= REG_GEM_SYSTEM_TESTS_GBT_LOOPBACK_EN_DEFAULT;

@@ -45,6 +45,7 @@ entity optohybrid is
         vfat3_rx_data_i         : in  t_std8_array(23 downto 0);
         vfat3_link_status_o     : out t_vfat_link_status_arr(23 downto 0);
         vfat_mask_arr_i         : in  std_logic_vector(23 downto 0);
+        vfat_gbt_ready_arr_i    : in  std_logic_vector(23 downto 0);
         
         -- VFAT3 slow control
         vfat3_sc_tx_data_i      : in std_logic;
@@ -224,7 +225,7 @@ begin
                 reset_i             => reset_i,
                 ttc_clk_i           => ttc_clk_i,
 
-                mask_i              => vfat_mask_arr_i(i),
+                mask_i              => vfat_mask_arr_i(i) or not vfat_gbt_ready_arr_i(i),
 
                 data_i              => vfat3_rx_aligned_data(i),
                 sync_ok_i           => vfat3_sync_ok(i),
