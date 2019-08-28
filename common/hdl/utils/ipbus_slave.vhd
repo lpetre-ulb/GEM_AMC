@@ -46,7 +46,7 @@ entity ipbus_slave is
 end ipbus_slave;
 
 architecture Behavioral of ipbus_slave is
-    type t_ipb_state is (IDLE, RSPD, SYNC_WRITE, SYNC_READ, RST);
+    type t_ipb_state is (IDLE, RSPD, SYNC_WRITE, SYNC_READ, RST, WAIT_LATCH);
     signal ipb_state        : t_ipb_state := IDLE;
     signal ipb_reg_sel      : integer range 0 to g_NUM_REGS - 1 := 0;
     signal ipb_addr_valid   : std_logic := '0';
@@ -166,7 +166,9 @@ begin
                     when RST =>
                         ipb_miso.ipb_ack <= '0';
                         ipb_miso.ipb_err <= '0';
-                        ipb_state          <= IDLE;
+                        ipb_state        <= WAIT_LATCH;
+                    when WAIT_LATCH =>
+                        ipb_state <= IDLE;
                     when others =>
                         ipb_miso  <= (ipb_ack => '0', ipb_err => '0', ipb_rdata => (others => '0'));
                         ipb_state   <= IDLE;
