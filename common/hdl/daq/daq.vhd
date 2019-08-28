@@ -20,6 +20,7 @@ use work.gem_pkg.all;
 use work.ttc_pkg.all;
 use work.ipbus.all;
 use work.registers.all;
+use work.gem_board_config_package.CFG_USE_CHIPSCOPE;
 
 entity daq is
 generic(
@@ -56,8 +57,8 @@ port(
     -- IPbus
     ipb_reset_i                 : in  std_logic;
     ipb_clk_i                   : in std_logic;
-	ipb_mosi_i                  : in ipb_wbus;
-	ipb_miso_o                  : out ipb_rbus;
+    ipb_mosi_i                  : in ipb_wbus;
+    ipb_miso_o                  : out ipb_rbus;
     
     -- Other
     board_sn_i                  : in std_logic_vector(15 downto 0) -- board serial ID, needed for the header to AMC13
@@ -123,20 +124,6 @@ architecture Behavioral of daq is
         );
     end component;
 
-    component ila_daq
-        port(
-            clk    : in std_logic;
-            probe0 : in std_logic_vector(3 downto 0);
-            probe1 : in std_logic_vector(3 downto 0);
-            probe2 : in std_logic;
-            probe3 : in std_logic;
-            probe4 : in std_logic;
-            probe5 : in std_logic_vector(63 downto 0);
-            probe6 : in std_logic;
-            probe7 : in std_logic
-        );
-    end component;
-    
     --================== SIGNALS ==================--
 
     -- Reset
@@ -1169,9 +1156,25 @@ begin
 
     ------------------------- DEBUG -----------------------
     gen_debug:
-    if g_DEBUG generate
+    if g_DEBUG and CFG_USE_CHIPSCOPE generate
+
+        component ila_daq
+            port(
+                clk    : in std_logic;
+                probe0 : in std_logic_vector(3 downto 0);
+                probe1 : in std_logic_vector(3 downto 0);
+                probe2 : in std_logic;
+                probe3 : in std_logic;
+                probe4 : in std_logic;
+                probe5 : in std_logic_vector(63 downto 0);
+                probe6 : in std_logic;
+                probe7 : in std_logic
+            );
+       end component;
+
+    begin
         
-        i_daq_ila : ila_daq
+        i_daq_ila : component ila_daq
             port map(
                 clk    => daq_clk_i,
                 probe0 => std_logic_vector(daq_state),
@@ -1183,7 +1186,7 @@ begin
                 probe6 => daqfifo_dout(65),
                 probe7 => daqfifo_dout(64)
             );
-        
+
     end generate;
     -------------------------------------------------------
 

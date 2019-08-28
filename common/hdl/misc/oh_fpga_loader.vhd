@@ -14,6 +14,7 @@ use ieee.numeric_std.all;
 
 use work.ttc_pkg.all;
 use work.gem_pkg.all;
+use work.gem_board_config_package.CFG_USE_CHIPSCOPE;
 
 entity oh_fpga_loader is
     generic(
@@ -36,29 +37,6 @@ end oh_fpga_loader;
 architecture Behavioral of oh_fpga_loader is
     
     ------------- components -------------
-    
-    COMPONENT ila_gem_loader
-        PORT(
-            clk    : IN STD_LOGIC;
-            probe0 : IN STD_LOGIC;
-            probe1 : IN STD_LOGIC;
-            probe2 : IN STD_LOGIC;
-            probe3 : IN STD_LOGIC;
-            probe4 : IN STD_LOGIC;
-            probe5 : IN STD_LOGIC;
-            probe6 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-            probe7 : IN STD_LOGIC
-        );
-    END COMPONENT;
-    
-    COMPONENT vio_gem_loader
-        PORT(
-            clk        : IN  STD_LOGIC;
-            probe_in0  : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-            probe_in1  : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-            probe_out0 : OUT STD_LOGIC
-        );
-    END COMPONENT;
     
     COMPONENT fifo_gemloader_gbt
         PORT(
@@ -257,25 +235,56 @@ begin
         loader_valid <= from_gem_loader_i.valid;
     end generate;
 
-    i_ila : ila_gem_loader
-        port map(
-            clk    => loader_clk_i,
-            probe0 => loader_en,
-            probe1 => from_gem_loader_i.ready,
-            probe2 => from_gem_loader_i.valid,
-            probe3 => from_gem_loader_i.first,
-            probe4 => from_gem_loader_i.last,
-            probe5 => from_gem_loader_i.error,
-            probe6 => from_gem_loader_i.data,
-            probe7 => gap_detected
-        );
+    ------------------------- DEBUG -----------------------
+    gen_debug:
+    if CFG_USE_CHIPSCOPE generate
 
-    i_vio : vio_gem_loader
-        port map(
-            clk        => gbt_clk_i,
-            probe_in0  => std_logic_vector(success_cnt),
-            probe_in1  => std_logic_vector(fail_cnt),
-            probe_out0 => hard_reset_local
-        );
+        component ila_gem_loader
+            port(
+                clk    : in std_logic;
+                probe0 : in std_logic;
+                probe1 : in std_logic;
+                probe2 : in std_logic;
+                probe3 : in std_logic;
+                probe4 : in std_logic;
+                probe5 : in std_logic;
+                probe6 : in std_logic_vector(7 downto 0);
+                probe7 : in std_logic
+            );
+        end component;
+        
+        component vio_gem_loader
+            port(
+                clk        : in  std_logic;
+                probe_in0  : in  std_logic_vector(7 downto 0);
+                probe_in1  : in  std_logic_vector(7 downto 0);
+                probe_out0 : out std_logic
+            );
+        end component;
+
+    begin
+
+        i_ila : component ila_gem_loader
+            port map(
+                clk    => loader_clk_i,
+                probe0 => loader_en,
+                probe1 => from_gem_loader_i.ready,
+                probe2 => from_gem_loader_i.valid,
+                probe3 => from_gem_loader_i.first,
+                probe4 => from_gem_loader_i.last,
+                probe5 => from_gem_loader_i.error,
+                probe6 => from_gem_loader_i.data,
+                probe7 => gap_detected
+            );
+
+        i_vio : component vio_gem_loader
+            port map(
+                clk        => gbt_clk_i,
+                probe_in0  => std_logic_vector(success_cnt),
+                probe_in1  => std_logic_vector(fail_cnt),
+                probe_out0 => hard_reset_local
+            );
+
+    end generate;
 
 end Behavioral;

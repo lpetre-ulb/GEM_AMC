@@ -95,53 +95,6 @@ end gem_amc;
 architecture gem_amc_arch of gem_amc is
 
     --================================--
-    -- Components  
-    --================================--
-
-    component ila_gbt
-        port(
-            clk     : in std_logic;
-            probe0  : in std_logic_vector(83 downto 0);
-            probe1  : in std_logic_vector(83 downto 0);
-            probe2  : in std_logic;
-            probe3  : in std_logic;
-            probe4  : in std_logic;
-            probe5  : in std_logic;
-            probe6  : in std_logic;
-            probe7  : in std_logic;
-            probe8  : in std_logic_vector(5 downto 0)
-        );
-    end component;
-
-    component ila_lpgbt
-        port(
-            clk     : in std_logic;
-            probe0  : in std_logic_vector(31 downto 0);
-            probe1  : in std_logic_vector(223 downto 0);
-            probe2  : in std_logic;
-            probe3  : in std_logic;
-            probe4  : in std_logic;
-            probe5  : in std_logic;
-            probe6  : in std_logic;
-            probe7  : in std_logic_vector(1 downto 0);
-            probe8  : in std_logic_vector(1 downto 0);
-            probe9  : in std_logic_vector(1 downto 0);
-            probe10 : in std_logic_vector(1 downto 0);
-            probe11  : in std_logic
-        );
-    end component;
-
-    component vio_debug_link_selector
-        port(
-            clk        : in  std_logic;
-            probe_out0 : out std_logic_vector(5 downto 0);
-            probe_out1 : out std_logic_vector(4 downto 0);
-            probe_out2 : out std_logic;
-            probe_out3 : out std_logic
-        );
-    end component;
-
-    --================================--
     -- Signals
     --================================--
 
@@ -747,69 +700,124 @@ begin
     -- Configuration Blaster  
     --================================--
     
-    i_config_blaster : entity work.config_blaster
-        generic map(
-            g_NUM_OF_OHs => g_NUM_OF_OHs,
-            g_DEBUG      => false
-        )
-        port map(
-            reset_i     => reset,
-            ttc_clks_i  => ttc_clocks_i,
-            ttc_cmds_i  => ttc_cmd,
-            ipb_reset_i => ipb_reset,
-            ipb_clk_i   => ipb_clk_i,
-            ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
-            ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
-        );
-        
+    gen_config_blaster:
+    if CFG_BOARD_TYPE /= 0 generate
+        -- TODO port the config blaster RAMs to the GLIB
+
+        i_config_blaster : entity work.config_blaster
+            generic map(
+                g_NUM_OF_OHs => g_NUM_OF_OHs,
+                g_DEBUG      => false
+            )
+            port map(
+                reset_i     => reset,
+                ttc_clks_i  => ttc_clocks_i,
+                ttc_cmds_i  => ttc_cmd,
+                ipb_reset_i => ipb_reset,
+                ipb_clk_i   => ipb_clk_i,
+                ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
+                ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
+            );
+
+    end generate;
+
     --=============--
     --    Debug    --
-    --=============--    
-    
-    i_debug_link_selector : vio_debug_link_selector
-        port map(
-            clk        => ttc_clocks_i.clk_40,
-            probe_out0 => dbg_gbt_link_select,
-            probe_out1 => dbg_vfat_link_select,
-            probe_out2 => lpgbt_reset_tx,
-            probe_out3 => lpgbt_reset_rx
-        );
+    --=============--
+    gen_debug:
+    if CFG_USE_CHIPSCOPE generate
 
-    g_gbt_debug : if CFG_GBT_DEBUG generate
-        g_gbtx_ila : if (g_GEM_STATION = 1) or (g_GEM_STATION = 2) generate
-            i_ila_gbt : component ila_gbt
-                port map(
-                    clk     => ttc_clocks_i.clk_40,
-                    probe0  => dbg_gbt_tx_data,
-                    probe1  => dbg_gbt_rx_data,
-                    probe2  => dbg_gbt_tx_gearbox_aligned,
-                    probe3  => dbg_gbt_tx_gearbox_align_done,
-                    probe4  => dbg_gbt_rx_ready,
-                    probe5  => dbg_gbt_rx_header,
-                    probe6  => dbg_gbt_rx_header_locked,
-                    probe7  => dbg_gbt_rx_valid,
-                    probe8  => dbg_gbt_rx_bitslip_nbr
-                );
+        component vio_debug_link_selector
+            port(
+                clk        : in  std_logic;
+                probe_out0 : out std_logic_vector(5 downto 0);
+                probe_out1 : out std_logic_vector(4 downto 0);
+                probe_out2 : out std_logic;
+                probe_out3 : out std_logic
+            );
+        end component;
+
+        component ila_gbt
+            port(
+                clk     : in std_logic;
+                probe0  : in std_logic_vector(83 downto 0);
+                probe1  : in std_logic_vector(83 downto 0);
+                probe2  : in std_logic;
+                probe3  : in std_logic;
+                probe4  : in std_logic;
+                probe5  : in std_logic;
+                probe6  : in std_logic;
+                probe7  : in std_logic;
+                probe8  : in std_logic_vector(5 downto 0)
+            );
+        end component;
+
+        component ila_lpgbt
+            port(
+                clk     : in std_logic;
+                probe0  : in std_logic_vector(31 downto 0);
+                probe1  : in std_logic_vector(223 downto 0);
+                probe2  : in std_logic;
+                probe3  : in std_logic;
+                probe4  : in std_logic;
+                probe5  : in std_logic;
+                probe6  : in std_logic;
+                probe7  : in std_logic_vector(1 downto 0);
+                probe8  : in std_logic_vector(1 downto 0);
+                probe9  : in std_logic_vector(1 downto 0);
+                probe10 : in std_logic_vector(1 downto 0);
+                probe11  : in std_logic
+            );
+        end component;
+
+    begin
+
+        i_debug_link_selector : component vio_debug_link_selector
+            port map(
+                clk        => ttc_clocks_i.clk_40,
+                probe_out0 => dbg_gbt_link_select,
+                probe_out1 => dbg_vfat_link_select,
+                probe_out2 => lpgbt_reset_tx,
+                probe_out3 => lpgbt_reset_rx
+            );
+
+        g_gbt_debug : if CFG_GBT_DEBUG generate
+            g_gbtx_ila : if (g_GEM_STATION = 1) or (g_GEM_STATION = 2) generate
+                i_ila_gbt : component ila_gbt
+                    port map(
+                        clk     => ttc_clocks_i.clk_40,
+                        probe0  => dbg_gbt_tx_data,
+                        probe1  => dbg_gbt_rx_data,
+                        probe2  => dbg_gbt_tx_gearbox_aligned,
+                        probe3  => dbg_gbt_tx_gearbox_align_done,
+                        probe4  => dbg_gbt_rx_ready,
+                        probe5  => dbg_gbt_rx_header,
+                        probe6  => dbg_gbt_rx_header_locked,
+                        probe7  => dbg_gbt_rx_valid,
+                        probe8  => dbg_gbt_rx_bitslip_nbr
+                    );
+            end generate;
+
+            g_lpgbt_ila : if g_GEM_STATION = 0 generate
+                i_ila_lpgbt : component ila_lpgbt
+                    port map(
+                        clk     => ttc_clocks_i.clk_40,
+                        probe0  => dbg_lpgbt_tx_data.tx_data,
+                        probe1  => dbg_lpgbt_rx_data.rx_data,
+                        probe2  => dbg_gbt_link_status.gbt_rx_ready,
+                        probe3  => dbg_gbt_link_status.gbt_rx_gearbox_ready,
+                        probe4  => dbg_gbt_link_status.gbt_rx_header_locked,
+                        probe5  => dbg_gbt_link_status.gbt_tx_ready,
+                        probe6  => dbg_gbt_link_status.gbt_tx_gearbox_ready,
+                        probe7  => dbg_lpgbt_tx_data.tx_ic_data,
+                        probe8  => dbg_lpgbt_tx_data.tx_ec_data,
+                        probe9  => dbg_lpgbt_rx_data.rx_ic_data,
+                        probe10 => dbg_lpgbt_rx_data.rx_ec_data,
+                        probe11 => dbg_gbt_link_status.gbt_rx_correction_flag
+                    );
+            end generate;
         end generate;
-    
-        g_lpgbt_ila : if g_GEM_STATION = 0 generate
-            i_ila_lpgbt : component ila_lpgbt
-                port map(
-                    clk     => ttc_clocks_i.clk_40,
-                    probe0  => dbg_lpgbt_tx_data.tx_data,
-                    probe1  => dbg_lpgbt_rx_data.rx_data,
-                    probe2  => dbg_gbt_link_status.gbt_rx_ready,
-                    probe3  => dbg_gbt_link_status.gbt_rx_gearbox_ready,
-                    probe4  => dbg_gbt_link_status.gbt_rx_header_locked,
-                    probe5  => dbg_gbt_link_status.gbt_tx_ready,
-                    probe6  => dbg_gbt_link_status.gbt_tx_gearbox_ready,
-                    probe7  => dbg_lpgbt_tx_data.tx_ic_data,
-                    probe8  => dbg_lpgbt_tx_data.tx_ec_data,
-                    probe9  => dbg_lpgbt_rx_data.rx_ic_data,
-                    probe10 => dbg_lpgbt_rx_data.rx_ec_data,
-                    probe11 => dbg_gbt_link_status.gbt_rx_correction_flag
-                );
-        end generate;
+
     end generate;
 
 end gem_amc_arch;

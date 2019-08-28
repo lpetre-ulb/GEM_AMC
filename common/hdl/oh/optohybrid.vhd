@@ -16,6 +16,7 @@ use ieee.std_logic_misc.all;
 use work.ttc_pkg.all;
 use work.gem_pkg.all;
 use work.ipbus.all;
+use work.gem_board_config_package.CFG_USE_CHIPSCOPE;
 
 entity optohybrid is
     generic(
@@ -80,28 +81,6 @@ entity optohybrid is
 end optohybrid;
 
 architecture optohybrid_arch of optohybrid is
-    
-    component ila_vfat3
-        port(
-            clk     : in std_logic;
-            probe0  : in std_logic_vector(7 DOWNTO 0);
-            probe1  : in std_logic;
-            probe2  : in std_logic;
-            probe3  : in std_logic;
-            probe4  : in std_logic;
-            probe5  : in std_logic_vector(7 DOWNTO 0);
-            probe6  : in std_logic_vector(7 DOWNTO 0);
-            probe7  : in std_logic;
-            probe8  : in std_logic_vector(2 DOWNTO 0);
-            probe9  : in std_logic_vector(3 DOWNTO 0);
-            probe10 : in std_logic_vector(7 DOWNTO 0);
-            probe11 : in std_logic;
-            probe12 : in std_logic;
-            probe13 : in std_logic;
-            probe14 : in std_logic_vector(7 DOWNTO 0);
-            probe15 : in std_logic_vector(7 DOWNTO 0)
-        );
-    end component;
     
     component sync_fifo_8b10b_16
         port(
@@ -348,7 +327,31 @@ begin
     --============================--
     
     gen_debug:
-    if g_DEBUG generate
+    if g_DEBUG and CFG_USE_CHIPSCOPE generate
+
+        component ila_vfat3
+            port(
+                clk     : in std_logic;
+                probe0  : in std_logic_vector(7 downto 0);
+                probe1  : in std_logic;
+                probe2  : in std_logic;
+                probe3  : in std_logic;
+                probe4  : in std_logic;
+                probe5  : in std_logic_vector(7 downto 0);
+                probe6  : in std_logic_vector(7 downto 0);
+                probe7  : in std_logic;
+                probe8  : in std_logic_vector(2 downto 0);
+                probe9  : in std_logic_vector(3 downto 0);
+                probe10 : in std_logic_vector(7 downto 0);
+                probe11 : in std_logic;
+                probe12 : in std_logic;
+                probe13 : in std_logic;
+                probe14 : in std_logic_vector(7 downto 0);
+                probe15 : in std_logic_vector(7 downto 0)
+            );
+        end component;
+
+    begin
 
         dbg_vfat3_tx_data           <= vfat3_tx_data(to_integer(unsigned(debug_vfat_select_i)));
         dbg_vfat3_rx_data           <= vfat3_rx_data_i(to_integer(unsigned(debug_vfat_select_i)));
@@ -363,7 +366,7 @@ begin
         dbg_vfat3_cnt_events        <= vfat3_daq_cnt_evt_arr(to_integer(unsigned(debug_vfat_select_i)));
         dbg_vfat3_cnt_crc_errors    <= vfat3_daq_cnt_crc_err_arr(to_integer(unsigned(debug_vfat_select_i)));
         
-        i_vfat_ila : ila_vfat3
+        i_vfat_ila : component ila_vfat3
             port map(
                 clk    => ttc_clk_i.clk_40,
                 probe0 => dbg_vfat3_tx_data,

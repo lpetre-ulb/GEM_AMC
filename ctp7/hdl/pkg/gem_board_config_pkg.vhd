@@ -36,6 +36,7 @@ package gem_board_config_package is
     constant CFG_BOARD_TYPE         : std_logic_vector(3 downto 0) := x"1"; -- 0 = GLIB; 1 = CTP7
     
     ------------ DEBUG FLAGS ------------
+    constant CFG_USE_CHIPSCOPE              : boolean := true; -- setting this to true will instantiate ILA and VIO cores for debugging
     constant CFG_LPGBT_2P56G_LOOPBACK_TEST  : boolean := false; -- setting this to true will result in a test firmware with 2.56Gbps transceivers only usable for PRBS loopback tests with LpGBT chip, note that none of the GEM logic will be included (also no LpGBT core will be instantiated)
     constant CFG_ILA_GBT0_MGT_EN            : boolean := false; -- setting this to 1 enables the instantiation of ILA on GBT link 0 MGT
 

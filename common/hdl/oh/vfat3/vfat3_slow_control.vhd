@@ -15,6 +15,7 @@ use ieee.std_logic_misc.all;
 use work.ttc_pkg.all;
 use work.gem_pkg.all;
 use work.ipbus.all;
+use work.gem_board_config_package.CFG_USE_CHIPSCOPE;
 
 entity vfat3_slow_control is
     generic(
@@ -63,44 +64,6 @@ architecture vfat3_slow_control_arch of vfat3_slow_control is
         );
     end component;
 
-    component vio_vfat3_sc
-        port(
-            clk       : IN STD_LOGIC;
-            probe_in0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe_in1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe_in2 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe_in3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe_in4 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe_in5 : IN STD_LOGIC_VECTOR(111 DOWNTO 0);
-            probe_in6 : IN STD_LOGIC_VECTOR(95 DOWNTO 0)
-        );
-    end component;
-
-	component ila_vfat3_slow_control
-		port(
-			clk    : in std_logic;
-			probe0 : in std_logic;
-			probe1 : in std_logic;
-			probe2 : in std_logic;
-			probe3 : in std_logic;
-			probe4 : in std_logic;
-			probe5 : in std_logic;
-			probe6 : in std_logic;
-			probe7 : in std_logic_vector(7 DOWNTO 0);
-			probe8 : in std_logic_vector(3 DOWNTO 0);
-			probe9 : in std_logic_vector(4 DOWNTO 0);
-			probe10 : in std_logic;
-			probe11 : in std_logic;
-			probe12 : in std_logic_vector(1 DOWNTO 0);
-			probe13 : in std_logic;
-			probe14 : in std_logic;
-			probe15 : in std_logic;
-            probe16 : in std_logic_vector(11 downto 0); 
-            probe17 : in std_logic_vector(31 downto 0); 
-            probe18 : in std_logic_vector(15 downto 0) 
-		);
-	end component;
-	
     component bram_vfat3_sc_adc
         port(
             clka  : in  std_logic;
@@ -112,7 +75,7 @@ architecture vfat3_slow_control_arch of vfat3_slow_control is
         );
     end component;
 	
-	constant TRANSACTION_TIMEOUT	: unsigned(11 downto 0) := x"7ff";
+    constant TRANSACTION_TIMEOUT	: unsigned(11 downto 0) := x"7ff";
 	
     type state_t is (IDLE, RSPD, RSPD_CACHE, RST, WAIT_CACHE_UPDATE);
         
@@ -122,9 +85,9 @@ architecture vfat3_slow_control_arch of vfat3_slow_control is
     signal rx_reset             : std_logic;
 
     signal transaction_id       : unsigned(15 downto 0) := (others => '0');
-	signal transaction_timer	: unsigned(11 downto 0) := (others => '0');
-	signal timeout_err_cnt      : unsigned(15 downto 0) := (others => '0');
-	signal axi_strobe_err_cnt   : unsigned(15 downto 0) := (others => '0');
+    signal transaction_timer	: unsigned(11 downto 0) := (others => '0');
+    signal timeout_err_cnt      : unsigned(15 downto 0) := (others => '0');
+    signal axi_strobe_err_cnt   : unsigned(15 downto 0) := (others => '0');
 	
     signal tx_din               : std_logic := '0';
     signal tx_en                : std_logic := '0';
@@ -500,41 +463,86 @@ begin
             douta => adc_cache_dout
         );
 
---    -- DEBUG
---    i_vfat3_sc_vio : vio_vfat3_sc
---        port map(
---            clk       => ttc_clk_i.clk_40,
---            probe_in0 => rx_packet_err_cnt,
---            probe_in1 => rx_bitstuff_err_cnt,
---            probe_in2 => rx_crc_err_cnt,
---            probe_in3 => tx_calc_crc_last,
---            probe_in4 => rx_calc_crc_last,
---            probe_in5 => tx_raw_last_packet_last,
---            probe_in6 => rx_raw_last_reply_last
---        );
---    
---    i_vfat3_sc_ila : ila_vfat3_slow_control
---    	port map(
---    		clk    => ttc_clk_i.clk_40,
---    		probe0 => tx_reset,
---    		probe1 => rx_reset,
---    		probe2 => tx_din,
---    		probe3 => tx_en,
---    		probe4 => rx_data,
---    		probe5 => rx_data_en,
---    		probe6 => tx_is_write,
---    		probe7 => std_logic_vector(transaction_id(7 downto 0)),
---    		probe8 => tx_oh_idx,
---    		probe9 => tx_vfat_idx,
---    		probe10 => rx_valid,
---    		probe11 => rx_error,
---    		probe12 => std_logic_vector(to_unsigned(state_t'pos(state), 2)),
---    		probe13 => ipb_mosi_i.ipb_strobe,
---    		probe14 => tx_command_en,
---    		probe15 => tx_command_en_sync,
---    		probe16 => std_logic_vector(transaction_timer),
---    		probe17 => rx_reg_value,
---    		probe18 => rx_calc_crc
---    	);
-    
+    ------------------------- DEBUG -----------------------
+    gen_debug:
+    if CFG_USE_CHIPSCOPE generate
+
+        component vio_vfat3_sc
+            port(
+                clk       : in std_logic;
+                probe_in0 : in std_logic_vector(15 downto 0);
+                probe_in1 : in std_logic_vector(15 downto 0);
+                probe_in2 : in std_logic_vector(15 downto 0);
+                probe_in3 : in std_logic_vector(15 downto 0);
+                probe_in4 : in std_logic_vector(15 downto 0);
+                probe_in5 : in std_logic_vector(111 downto 0);
+                probe_in6 : in std_logic_vector(95 downto 0)
+            );
+        end component;
+
+        component ila_vfat3_slow_control
+            port(
+                clk    : in std_logic;
+                probe0 : in std_logic;
+                probe1 : in std_logic;
+                probe2 : in std_logic;
+                probe3 : in std_logic;
+                probe4 : in std_logic;
+                probe5 : in std_logic;
+                probe6 : in std_logic;
+                probe7 : in std_logic_vector(7 downto 0);
+                probe8 : in std_logic_vector(3 downto 0);
+                probe9 : in std_logic_vector(4 downto 0);
+                probe10 : in std_logic;
+                probe11 : in std_logic;
+                probe12 : in std_logic_vector(1 downto 0);
+                probe13 : in std_logic;
+                probe14 : in std_logic;
+                probe15 : in std_logic;
+                probe16 : in std_logic_vector(11 downto 0);
+                probe17 : in std_logic_vector(31 downto 0);
+                probe18 : in std_logic_vector(15 downto 0)
+            );
+       end component;
+
+    begin
+
+    --    i_vfat3_sc_vio : component vio_vfat3_sc
+    --        port map(
+    --            clk       => ttc_clk_i.clk_40,
+    --            probe_in0 => rx_packet_err_cnt,
+    --            probe_in1 => rx_bitstuff_err_cnt,
+    --            probe_in2 => rx_crc_err_cnt,
+    --            probe_in3 => tx_calc_crc_last,
+    --            probe_in4 => rx_calc_crc_last,
+    --            probe_in5 => tx_raw_last_packet_last,
+    --            probe_in6 => rx_raw_last_reply_last
+    --        );
+    --
+    --    i_vfat3_sc_ila : component ila_vfat3_slow_control
+    --    	port map(
+    --    		clk    => ttc_clk_i.clk_40,
+    --    		probe0 => tx_reset,
+    --    		probe1 => rx_reset,
+    --    		probe2 => tx_din,
+    --    		probe3 => tx_en,
+    --    		probe4 => rx_data,
+    --    		probe5 => rx_data_en,
+    --    		probe6 => tx_is_write,
+    --    		probe7 => std_logic_vector(transaction_id(7 downto 0)),
+    --    		probe8 => tx_oh_idx,
+    --    		probe9 => tx_vfat_idx,
+    --    		probe10 => rx_valid,
+    --    		probe11 => rx_error,
+    --    		probe12 => std_logic_vector(to_unsigned(state_t'pos(state), 2)),
+    --    		probe13 => ipb_mosi_i.ipb_strobe,
+    --    		probe14 => tx_command_en,
+    --    		probe15 => tx_command_en_sync,
+    --    		probe16 => std_logic_vector(transaction_timer),
+    --    		probe17 => rx_reg_value,
+    --    		probe18 => rx_calc_crc
+    --    	);
+
+    end generate;
+
 end vfat3_slow_control_arch;

@@ -13,6 +13,7 @@ use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
 use work.gem_pkg.all;
+use work.gem_board_config_package.CFG_USE_CHIPSCOPE;
 
 entity link_rx_trigger is
     generic(
@@ -35,25 +36,6 @@ entity link_rx_trigger is
 end link_rx_trigger;
 
 architecture Behavioral of link_rx_trigger is    
-
-    COMPONENT ila_trig_rx_link
-        PORT(
-            clk     : IN STD_LOGIC;
-            probe0  : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-            probe1  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-            probe2  : IN STD_LOGIC_VECTOR(58 DOWNTO 0);
-            probe3  : IN STD_LOGIC_VECTOR(58 DOWNTO 0);
-            probe4  : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-            probe5  : IN STD_LOGIC;
-            probe6  : IN STD_LOGIC;
-            probe7  : IN STD_LOGIC;
-            probe8  : IN STD_LOGIC;
-            probe9  : IN STD_LOGIC;
-            probe10 : IN STD_LOGIC;
-            probe11 : IN STD_LOGIC;
-            probe12 : IN STD_LOGIC
-        );
-    END COMPONENT;
 
     component sbit_cluster_fifo is
         port(
@@ -210,7 +192,29 @@ begin
     sbit_cluster3_o.address  <= fifo_dout(52 downto 42);
     
     gen_debug:
-    if g_DEBUG generate
+    if g_DEBUG and CFG_USE_CHIPSCOPE generate
+
+        component ila_trig_rx_link
+            port(
+                clk     : in std_logic;
+                probe0  : in std_logic_vector(1 downto 0);
+                probe1  : in std_logic_vector(15 downto 0);
+                probe2  : in std_logic_vector(58 downto 0);
+                probe3  : in std_logic_vector(58 downto 0);
+                probe4  : in std_logic_vector(1 downto 0);
+                probe5  : in std_logic;
+                probe6  : in std_logic;
+                probe7  : in std_logic;
+                probe8  : in std_logic;
+                probe9  : in std_logic;
+                probe10 : in std_logic;
+                probe11 : in std_logic;
+                probe12 : in std_logic
+            );
+        end component;
+
+    begin
+
         i_dbg_ila : component ila_trig_rx_link
             port map(
                 clk     => gt_rx_trig_usrclk_i,
@@ -228,6 +232,7 @@ begin
                 probe11 => ttc_clk_i,
                 probe12 => fifo_almost_full
             );
+
     end generate;
-    
+
 end Behavioral;
