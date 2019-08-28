@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.gem_board_config_package.CFG_NUM_OF_OHs;
+use work.vendor_specific_gbt_bank_package.WORD_WIDTH;
 
 package gem_pkg is
 
@@ -224,7 +225,7 @@ package gem_pkg is
     type t_gt_8b10b_tx_data_arr is array(integer range <>) of t_gt_8b10b_tx_data;
     type t_gt_8b10b_rx_data_arr is array(integer range <>) of t_gt_8b10b_rx_data;
 
-    type t_gt_gbt_data_arr is array(integer range <>) of std_logic_vector(39 downto 0);
+    type t_gt_gbt_data_arr is array(integer range <>) of std_logic_vector(WORD_WIDTH-1 downto 0);
 
     type t_mgt_ctrl is record
         txreset     : std_logic;
