@@ -55,12 +55,13 @@ entity gem_amc is
         gt_trig_tx_data_arr_o   : out t_gt_8b10b_tx_data_arr(g_NUM_TRIG_TX_LINKS - 1 downto 0);
         gt_trig_tx_clk_i        : in  std_logic;
 
-        -- GBT DAQ + Control GTX / GTH links (4.8Gbs, 40bit @ 120MHz without encoding)
+        -- GBT DAQ + Control GTX / GTH links (4.8Gbs, 40bit @ 120MHz without encoding when using GBTX, and 10.24Gbp, lower 32bit @ 320MHz without encoding when using LpGBT)
         gt_gbt_rx_data_arr_i    : in  t_gt_gbt_data_arr(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
         gt_gbt_tx_data_arr_o    : out t_gt_gbt_data_arr(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
         gt_gbt_rx_clk_arr_i     : in  std_logic_vector(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
         gt_gbt_tx_clk_arr_i     : in  std_logic_vector(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
         gt_gbt_rx_common_clk_i  : in  std_logic;
+        gt_gbt_ctrl_arr_o       : out t_mgt_ctrl_arr(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
 
         -- IPbus
         ipb_reset_i             : in  std_logic;
@@ -223,6 +224,8 @@ begin
     ipb_reset <= ipb_reset_i or reset_pwrup;
     ipb_miso_arr_o <= ipb_miso_arr;
     link_reset <= manual_link_reset or ttc_cmd.hard_reset;
+
+    gt_gbt_ctrl_arr_o <= (others => (txreset => '0', rxreset => '0', rxslide => '0')); -- GBT MGT controls, currently not used but at least rxslide will be used soon for ME0
 
     -- select the GBT link to debug
     dbg_gbt_tx_data               <= gbt_tx_data_arr(to_integer(unsigned(dbg_gbt_link_select)));

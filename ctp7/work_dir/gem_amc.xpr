@@ -40,13 +40,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="164"/>
-    <Option Name="WTModelSimExportSim" Val="164"/>
-    <Option Name="WTQuestaExportSim" Val="164"/>
-    <Option Name="WTIesExportSim" Val="164"/>
-    <Option Name="WTVcsExportSim" Val="164"/>
-    <Option Name="WTRivieraExportSim" Val="164"/>
-    <Option Name="WTActivehdlExportSim" Val="164"/>
+    <Option Name="WTXSimExportSim" Val="165"/>
+    <Option Name="WTModelSimExportSim" Val="165"/>
+    <Option Name="WTQuestaExportSim" Val="165"/>
+    <Option Name="WTIesExportSim" Val="165"/>
+    <Option Name="WTVcsExportSim" Val="165"/>
+    <Option Name="WTRivieraExportSim" Val="165"/>
+    <Option Name="WTActivehdlExportSim" Val="165"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -1305,6 +1305,18 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../common/hdl/daq/data_concatenator.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../hdl/system/gth_single_9p6g.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../hdl/system/gth_single_10p24g.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>

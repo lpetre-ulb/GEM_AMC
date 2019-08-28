@@ -193,6 +193,14 @@ package gem_pkg is
 
     type t_gt_gbt_data_arr is array(integer range <>) of std_logic_vector(39 downto 0);
 
+    type t_mgt_ctrl is record
+        txreset     : std_logic;
+        rxreset     : std_logic;
+        rxslide     : std_logic;
+    end record;
+
+    type t_mgt_ctrl_arr is array(integer range <>) of t_mgt_ctrl;
+
     --========================--
     --== SBit cluster data  ==--
     --========================--

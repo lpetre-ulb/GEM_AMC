@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 --                                                                            
---       Unit Name: gth_single_4p8g                                            
+--       Unit Name: gth_single_9p6g                                            
 --                                                                            
 --     Description: 
 --
 --                                                                            
 -------------------------------------------------------------------------------
 --                                                                            
---           Notes:                                                           
+--           Notes: Requires 320MHz refclk                                                          
 --                                                                            
 -------------------------------------------------------------------------------
 
@@ -26,12 +26,12 @@ use work.gem_pkg.all;
 --============================================================================
 --                                                          Entity declaration
 --============================================================================
-entity gth_single_4p8g is
+entity gth_single_9p6g is
   generic
     (
       -- Simulation attributes
       g_GT_SIM_GTRESET_SPEEDUP : string := "TRUE";  -- Set to "TRUE" to speed up sim reset
-      g_REFCLK_01              : integer range 0 to 1 := 0      
+      g_REFCLK_01              : integer range 0 to 1 := 0
       );
   port
     (
@@ -67,12 +67,12 @@ entity gth_single_4p8g is
       );
 
 
-end gth_single_4p8g;
+end gth_single_9p6g;
 
 --============================================================================
 --                                                        Architecture section
 --============================================================================
-architecture gth_single_4p8g_arch of gth_single_4p8g is
+architecture gth_single_9p6g_arch of gth_single_9p6g is
 
 
 --============================================================================
@@ -83,8 +83,7 @@ architecture gth_single_4p8g_arch of gth_single_4p8g is
   signal s_rxchariscomma_float : std_logic_vector(3 downto 0);
   signal s_rxcharisk_float     : std_logic_vector(3 downto 0);
   signal s_rxdisperr_float     : std_logic_vector(3 downto 0);
-
-  signal s_rxnotintable : std_logic_vector(7 downto 0) := "00000000";
+  signal s_rxnotintable_float  : std_logic_vector(3 downto 0);
 
   constant s_txchardispmode_float : std_logic_vector(3 downto 0) := "0000";
   constant s_txchardispval_float  : std_logic_vector(3 downto 0) := "0000";
@@ -97,13 +96,12 @@ architecture gth_single_4p8g_arch of gth_single_4p8g is
 
   attribute equivalent_register_removal of s_cpllpd_wait    : signal is "no";
   attribute equivalent_register_removal of s_cpllreset_wait : signal is "no";
-
-  signal s_cpllpd_ovrd    : std_logic;
-  signal s_cpllreset_ovrd : std_logic;
-  signal s_cpll_reset     : std_logic;
-  signal s_cpllreset_sync : std_logic;
-  signal s_cpll_pd        : std_logic;
-  signal s_cpllpd_sync    : std_logic;
+  signal s_cpllpd_ovrd                                      : std_logic;
+  signal s_cpllreset_ovrd                                   : std_logic;
+  signal s_cpll_reset                                       : std_logic;
+  signal s_cpllreset_sync                                   : std_logic;
+  signal s_cpll_pd                                          : std_logic;
+  signal s_cpllpd_sync                                      : std_logic;
 
   signal refclks    : std_logic_vector(1 downto 0);
 
@@ -118,7 +116,7 @@ begin
 
   g_ref_clk1: if g_REFCLK_01 = 1 generate
     refclks(1) <= gth_gt_clk_i.GTREFCLK1;
-end generate;
+  end generate;
 
   ----------------------------- GTHE2 Instance  --------------------------   
 
@@ -137,28 +135,28 @@ end generate;
       ------------------RX Byte and Word Alignment Attributes---------------
       ALIGN_COMMA_DOUBLE => ("FALSE"),
       ALIGN_COMMA_ENABLE => ("1111111111"),
-      ALIGN_COMMA_WORD   => (1),
+      ALIGN_COMMA_WORD   => (4),
       ALIGN_MCOMMA_DET   => ("TRUE"),
       ALIGN_MCOMMA_VALUE => ("1010000011"),
       ALIGN_PCOMMA_DET   => ("TRUE"),
       ALIGN_PCOMMA_VALUE => ("0101111100"),
-      SHOW_REALIGN_COMMA => ("FALSE"),
+      SHOW_REALIGN_COMMA => ("TRUE"),
       RXSLIDE_AUTO_WAIT  => (7),
       RXSLIDE_MODE       => ("PCS"),
       RX_SIG_VALID_DLY   => (10),
 
       ------------------RX 8B/10B Decoder Attributes---------------
-      RX_DISPERR_SEQ_MATCH => ("FALSE"),
+      RX_DISPERR_SEQ_MATCH => ("TRUE"),
       DEC_MCOMMA_DETECT    => ("TRUE"),
       DEC_PCOMMA_DETECT    => ("TRUE"),
       DEC_VALID_COMMA_ONLY => ("FALSE"),
 
       ------------------------RX Clock Correction Attributes----------------------
-      CBCC_DATA_SOURCE_SEL => ("ENCODED"),
+      CBCC_DATA_SOURCE_SEL => ("DECODED"),
       CLK_COR_SEQ_2_USE    => ("FALSE"),
       CLK_COR_KEEP_IDLE    => ("FALSE"),
-      CLK_COR_MAX_LAT      => (19),  -- Not used because we bypass the buffers. If buffers are used, use 9 for 20bit data width, 19 for 40bit data width 
-      CLK_COR_MIN_LAT      => (15),  -- Not used because we bypass the buffers. If buffers are used, use 7 for 20bit data width, 15 for 40bit data width
+      CLK_COR_MAX_LAT      => (19),
+      CLK_COR_MIN_LAT      => (15),
       CLK_COR_PRECEDENCE   => ("TRUE"),
       CLK_COR_REPEAT_WAIT  => (0),
       CLK_COR_SEQ_LEN      => (1),
@@ -223,8 +221,8 @@ end generate;
       TERM_RCAL_CFG     => ("100001000010000"),
       TERM_RCAL_OVRD    => ("000"),
       TST_RSV           => (x"00000000"),
-      RX_CLK25_DIV      => (7),
-      TX_CLK25_DIV      => (7),
+      RX_CLK25_DIV      => (13),
+      TX_CLK25_DIV      => (13),
       UCODEER_CLR       => ('0'),
 
       ---------------------------PCI Express Attributes----------------------------
@@ -274,7 +272,7 @@ end generate;
       --For SATA Gen2 GTP- set RXCDR_CFG=83'h0_0000_47FE_2060_2448_1010
 
       --For SATA Gen1 GTP- set RXCDR_CFG=83'h0_0000_47FE_1060_2448_1010
-      RXCDR_CFG               => (x"0002007FE2000C2080018"),
+      RXCDR_CFG               => (x"0002007FE2000C208001A"),
       RXCDR_FR_RESET_ON_EIDLE => ('0'),
       RXCDR_HOLD_DURING_EIDLE => ('0'),
       RXCDR_PH_RESET_ON_EIDLE => ('0'),
@@ -395,10 +393,10 @@ end generate;
       TX_CLKMUX_PD => ('1'),
 
       -------------------------FPGA RX Interface Attribute-------------------------
-      RX_INT_DATAWIDTH => (1), -- 0 for 20bit internal data path, produces 240MHz RXOUTCLK; 1 for 40bit internal data path, produces 120MHz RXOUTCLK
+      RX_INT_DATAWIDTH => (1),
 
       -------------------------FPGA TX Interface Attribute-------------------------
-      TX_INT_DATAWIDTH => (1), -- 0 for 20bit internal data path (requires TXUSRCLK=240MHz and TXUSRCLK2=120MHz); 1 for 40bit internal data path (requires TXUSRCLK=120MHz and TXUSRCLK2=120MHz)
+      TX_INT_DATAWIDTH => (1),
 
       ------------------TX Configurable Driver Attributes---------------
       TX_QPI_STATUS_EN => ('0'),
@@ -419,12 +417,12 @@ end generate;
 
       ------------------ RX Phase Interpolator Attributes---------------
       RXPI_CFG0 => ("00"),
-      RXPI_CFG1 => ("00"),
-      RXPI_CFG2 => ("00"),
+      RXPI_CFG1 => ("11"),
+      RXPI_CFG2 => ("11"),
       RXPI_CFG3 => ("11"),
-      RXPI_CFG4 => ('1'),
-      RXPI_CFG5 => ('1'),
-      RXPI_CFG6 => ("001"),
+      RXPI_CFG4 => ('0'),
+      RXPI_CFG5 => ('0'),
+      RXPI_CFG6 => ("100"),
 
       --------------RX Decision Feedback Equalizer(DFE)-------------
       RX_DFELPM_CFG0             => ("0110"),
@@ -524,7 +522,7 @@ end generate;
       RXSYSCLKSEL                => gth_rx_ctrl_i.rxsysclksel,
       TXSYSCLKSEL                => gth_tx_ctrl_i.txsysclksel,
       ----------------- FPGA TX Interface Datapath Configuration  ----------------
-      TX8B10BEN                  => '0',
+      TX8B10BEN                  => '1',
       ------------------------------- Loopback Ports -----------------------------
       LOOPBACK                   => gth_misc_ctrl_i.loopback,
       ----------------------------- PCI Express Ports ----------------------------
@@ -568,7 +566,7 @@ end generate;
       ------------------- Receive Ports - Digital Monitor Ports ------------------
       DMONITOROUT                => open,
       ---------- Receive Ports - FPGA RX Interface Datapath Configuration --------
-      RX8B10BEN                  => '0',
+      RX8B10BEN                  => '1',
       ------------------ Receive Ports - FPGA RX Interface Ports -----------------
       RXUSRCLK                   => gth_gt_clk_i.rxusrclk,
       RXUSRCLK2                  => gth_gt_clk_i.rxusrclk2,
@@ -583,7 +581,8 @@ end generate;
       ------------------ Receive Ports - RX 8B/10B Decoder Ports -----------------
       RXDISPERR(7 downto 4)      => s_rxdisperr_float,
       RXDISPERR(3 downto 0)      => gth_rx_data_o.rxdisperr,
-      RXNOTINTABLE(7 downto 0)   => s_rxnotintable,
+      RXNOTINTABLE(7 downto 4)   => s_rxnotintable_float,
+      RXNOTINTABLE(3 downto 0)   => gth_rx_data_o.rxnotintable,
       ------------------------ Receive Ports - RX AFE Ports ----------------------
       GTHRXN                     => gth_rx_serial_i.gthrxn,
       ------------------- Receive Ports - RX Buffer Bypass Ports -----------------
@@ -614,8 +613,8 @@ end generate;
       RXBYTEREALIGN              => gth_rx_data_o.rxbyterealign,
       RXCOMMADET                 => gth_rx_data_o.rxcommadet,
       RXCOMMADETEN               => '1',
-      RXMCOMMAALIGNEN            => '0',
-      RXPCOMMAALIGNEN            => '0',
+      RXMCOMMAALIGNEN            => '1',
+      RXPCOMMAALIGNEN            => '1',
       ------------------ Receive Ports - RX Channel Bonding Ports ----------------
       RXCHANBONDSEQ              => open,
       RXCHBONDEN                 => '0',
@@ -818,7 +817,7 @@ end generate;
       ----------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
       TXOUTCLK                  => gth_gt_clk_o.txoutclk,
       TXOUTCLKFABRIC            => open,
-      TXOUTCLKPCS               => gth_gt_clk_o.txoutpcs,
+      TXOUTCLKPCS               => open,
       TXOUTCLKSEL               => gth_tx_ctrl_i.TXOUTCLKSEL,
       TXRATEDONE                => open,
       --------------------- Transmit Ports - TX Gearbox Ports --------------------
@@ -878,7 +877,7 @@ end generate;
 
   s_cpll_reset <= gth_cpll_init_i.CPLLRESET;
 
-end gth_single_4p8g_arch;
+end gth_single_9p6g_arch;
 --============================================================================
 --                                                            Architecture end
 --============================================================================

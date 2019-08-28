@@ -138,6 +138,7 @@ architecture gem_ctp7_arch of gem_ctp7 is
     signal gem_gt_gbt_tx_clk_arr    : std_logic_vector(CFG_NUM_OF_OHs * CFG_NUM_GBTS_PER_OH - 1 downto 0);
     signal gth_gbt_common_rxusrclk  : std_logic;
 
+    signal gem_gt_gbt_ctrl_arr      : t_mgt_ctrl_arr(CFG_NUM_OF_OHs * CFG_NUM_GBTS_PER_OH - 1 downto 0);
 
     -------------------- AMC13 DAQLink ---------------------------------
     signal daq_to_daqlink       : t_daq_to_daqlink;
@@ -294,6 +295,7 @@ begin
             gt_gbt_rx_clk_arr_i     => gem_gt_gbt_rx_clk_arr,
             gt_gbt_tx_clk_arr_i     => gem_gt_gbt_tx_clk_arr,
             gt_gbt_rx_common_clk_i  => gth_gbt_common_rxusrclk,
+            gt_gbt_ctrl_arr_o       => gem_gt_gbt_ctrl_arr,
             
             ipb_reset_i             => ipb_reset,
             ipb_clk_i               => ipb_clk,

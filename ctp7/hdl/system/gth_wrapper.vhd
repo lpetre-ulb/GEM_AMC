@@ -406,6 +406,7 @@ begin
       i_gth_single_3p2g : entity work.gth_single_3p2g
         generic map
         (
+          g_REFCLK_01 => 0,
                                         -- Simulation attributes
           g_GT_SIM_GTRESET_SPEEDUP => g_GT_SIM_GTRESET_SPEEDUP
           )
@@ -485,6 +486,7 @@ begin
       i_gth_single_4p8g : entity work.gth_single_4p8g
         generic map
         (
+          g_REFCLK_01 => 0,
                                         -- Simulation attributes
           g_GT_SIM_GTRESET_SPEEDUP => g_GT_SIM_GTRESET_SPEEDUP
           )
