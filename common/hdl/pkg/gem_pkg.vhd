@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190705";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190829";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 3;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 9;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 0;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 1;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -108,6 +108,7 @@ package gem_pkg is
     -- 3.8.5  Small fix in the TX FSM for the OH FPGA -- during link reset the send_idle and send_header signals were undefined, so could possibly send some false data for OH slow control during reset
     -- 3.8.6  Small fix in DAQ input processor: previously a condition existed for event word count to be lower by one VFAT if a new event came exactly at the clock cycle when the old one timed out. Hopefully this will solve the EC/BC mismatch problem seen at GE1/1 QC8 cosmic stand
     -- 3.9.0  Calibration mode data format added - it's a very aggressive bandwidth saving mode designed for calibration runs, which drops most of the VFAT data, except for the VFAT position, 2 bits of EC, and just one channel bit for the selected channel number, so each VFAT only takes up 8 bits. Note: addresses of existing DAQ registers have been changed in order to accomodate the new registers, so it's necessary to update the address table for this version
+    -- 3.9.1  LpGBT and ME0 support added (no trigger data yet, but all other features should work)! The firmware has been restructured to better support different GEM stations.
 
     --======================--
     --==      General     ==--
