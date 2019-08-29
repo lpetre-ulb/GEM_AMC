@@ -222,7 +222,7 @@ begin
         gbt_rx_ready_arr(i * 2 + 1) <= gbt_link_status_arr_i(i * 2 + 1).gbt_rx_ready;
 
         g_vfat_gbt_ready: for vfat in 0 to 23 generate
-            vfat3_gbt_ready_arr_o(i)(vfat) <= gbt_rx_ready_arr(i * 3 + VFAT_TO_GBT_MAP(vfat));
+            vfat3_gbt_ready_arr_o(i)(vfat) <= gbt_rx_ready_arr(i * 2 + VFAT_TO_GBT_MAP(vfat));
         end generate;
 
         oh_fpga_rx_data_arr_o (i) <= real_gbt_rx_data(i * 2 + 0)(79 downto 72);

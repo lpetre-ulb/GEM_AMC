@@ -133,7 +133,13 @@ package gem_pkg is
     --============--   
     
     type t_std_array is array(integer range <>) of std_logic;
+
+    type t_std234_array is array(integer range <>) of std_logic_vector(233 downto 0);
+
+    type t_std256_array is array(integer range <>) of std_logic_vector(255 downto 0);
   
+    type t_std64_array is array(integer range <>) of std_logic_vector(63 downto 0);
+
     type t_std32_array is array(integer range <>) of std_logic_vector(31 downto 0);
         
     type t_std24_array is array(integer range <>) of std_logic_vector(23 downto 0);
@@ -159,6 +165,25 @@ package gem_pkg is
     --============--   
 
     type t_gbt_frame_array is array(integer range <>) of std_logic_vector(83 downto 0);
+
+    --============--
+    --==   LpGBT  ==--
+    --============--   
+
+    type t_lpgbt_tx_frame is record
+        tx_data         : std_logic_vector(31 downto 0);
+        tx_ec_data      : std_logic_vector(1 downto 0);
+        tx_ic_data      : std_logic_vector(1 downto 0);
+    end record;
+
+    type t_lpgbt_rx_frame is record
+        rx_data         : std_logic_vector(223 downto 0);
+        rx_ec_data      : std_logic_vector(1 downto 0);
+        rx_ic_data      : std_logic_vector(1 downto 0);
+    end record;
+
+    type t_lpgbt_tx_frame_array is array(integer range <>) of t_lpgbt_tx_frame;
+    type t_lpgbt_rx_frame_array is array(integer range <>) of t_lpgbt_rx_frame;
 
     --=============--
     --==  VFAT3  ==--
@@ -200,6 +225,15 @@ package gem_pkg is
     end record;
 
     type t_mgt_ctrl_arr is array(integer range <>) of t_mgt_ctrl;
+
+    type t_mgt_status is record
+        tx_reset_done   : std_logic;
+        rx_reset_done   : std_logic;
+        tx_cpll_locked  : std_logic;
+        rx_cpll_locked  : std_logic;
+    end record;
+
+    type t_mgt_status_arr is array(integer range <>) of t_mgt_status;
 
     --========================--
     --== SBit cluster data  ==--
@@ -358,9 +392,16 @@ package gem_pkg is
     end record;
 
     type t_gbt_link_status is record
-        gbt_rx_sync_status      : t_sync_fifo_status;
-        gbt_rx_ready            : std_logic;
-        gbt_rx_had_not_ready    : std_logic;
+        gbt_tx_ready                : std_logic;
+        gbt_tx_had_not_ready        : std_logic;
+        gbt_tx_gearbox_ready        : std_logic;
+        gbt_rx_sync_status          : t_sync_fifo_status;
+        gbt_rx_ready                : std_logic;
+        gbt_rx_had_not_ready        : std_logic;
+        gbt_rx_header_locked        : std_logic;
+        gbt_rx_header_had_unlock    : std_logic;
+        gbt_rx_gearbox_ready        : std_logic;
+        gbt_rx_correction_cnt       : std_logic_vector(7 downto 0);
     end record;
     
     type t_vfat_link_status is record

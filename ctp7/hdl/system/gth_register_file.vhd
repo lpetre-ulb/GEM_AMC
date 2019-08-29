@@ -65,7 +65,7 @@ entity gth_register_file is
     clk_gth_rx_usrclk_arr_i : in std_logic_vector(g_NUM_OF_GTH_GTs-1 downto 0);
 
     disable_ttc_phase_align_o : out std_logic
-
+    
     );
 end gth_register_file;
 

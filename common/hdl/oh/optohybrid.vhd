@@ -19,6 +19,7 @@ use work.ipbus.all;
 
 entity optohybrid is
     generic(
+        g_GEM_STATION   : integer;
         g_OH_IDX        : std_logic_vector(3 downto 0);
         g_DEBUG         : boolean := false -- if this is set to true, some chipscope cores will be inserted
     );
@@ -260,74 +261,88 @@ begin
     --==       OH Slow Control       ==--
     --=================================--
     
-    i_oh_slow_control : entity work.link_oh_fpga
-        port map(
-            reset_i    => reset_i or oh_reg_ipb_reset_i,
-            ttc_clk_i  => ttc_clk_i,
-            ipb_clk_i  => oh_reg_ipb_clk_i,
-            ttc_cmds_i => ttc_cmds_i,
-            ipb_mosi_i => oh_reg_ipb_mosi_i,
-            ipb_miso_o => oh_reg_ipb_miso_o,
-            rx_elink_i => fpga_rx_data,
-            tx_elink_o => fpga_tx_data_o
-        );
+    g_use_fpga_links : if (g_GEM_STATION = 1) or (g_GEM_STATION = 2) generate
+        i_oh_slow_control : entity work.link_oh_fpga
+            port map(
+                reset_i    => reset_i or oh_reg_ipb_reset_i,
+                ttc_clk_i  => ttc_clk_i,
+                ipb_clk_i  => oh_reg_ipb_clk_i,
+                ttc_cmds_i => ttc_cmds_i,
+                ipb_mosi_i => oh_reg_ipb_mosi_i,
+                ipb_miso_o => oh_reg_ipb_miso_o,
+                rx_elink_i => fpga_rx_data,
+                tx_elink_o => fpga_tx_data_o
+            );
+    end generate;
+    
+    g_no_fpga_links : if g_GEM_STATION = 0 generate
+        oh_reg_ipb_miso_o <= (ipb_rdata => (others => '0'), ipb_ack => '0', ipb_err => '0');
+    end generate;
      
     --=========================--
     --==   RX Trigger Link   ==--
     --=========================--
-    
-    gen_trig_links: for i in 0 to 1 generate
 
-        -- Sync FIFO
-        i_sync_rx_trig : component sync_fifo_8b10b_16
-            port map(
-                rst       => reset_i,
-                wr_clk    => gth_rx_trig_usrclk_i(i),
-                rd_clk    => ttc_clk_i.clk_160,
-                din       => sync_trig_rx_din_arr(i),
-                wr_en     => '1',
-                rd_en     => '1',
-                dout      => sync_trig_rx_dout_arr(i),
-                full      => open,
-                overflow  => sync_trig_rx_ovf_arr(i),
-                empty     => open,
-                valid     => open,
-                underflow => sync_trig_rx_unf_arr(i)
-            );
-            
-        sync_trig_rx_din_arr(i) <= gth_rx_trig_data_i(i).rxdisperr(1 downto 0) & 
-                                   gth_rx_trig_data_i(i).rxnotintable(1 downto 0) & 
-                                   gth_rx_trig_data_i(i).rxchariscomma(1 downto 0) & 
-                                   gth_rx_trig_data_i(i).rxcharisk(1 downto 0) & 
-                                   gth_rx_trig_data_i(i).rxdata(15 downto 0);
-                                   
-        sync_trig_rx_gth_data_arr(i).rxdata(15 downto 0) <= sync_trig_rx_dout_arr(i)(15 downto 0);
-        sync_trig_rx_gth_data_arr(i).rxcharisk(1 downto 0) <= sync_trig_rx_dout_arr(i)(17 downto 16);
-        sync_trig_rx_gth_data_arr(i).rxchariscomma(1 downto 0) <= sync_trig_rx_dout_arr(i)(19 downto 18);
-        sync_trig_rx_gth_data_arr(i).rxnotintable(1 downto 0) <= sync_trig_rx_dout_arr(i)(21 downto 20);
-        sync_trig_rx_gth_data_arr(i).rxdisperr(1 downto 0) <= sync_trig_rx_dout_arr(i)(23 downto 22);
-        
-        -- TODO: report rxnotintable and also the overflow/underflow of this fifo
-        
-        i_link_rx_trigger : entity work.link_rx_trigger
-            generic map (
-                g_DEBUG => false
-            )
-            port map(
-                ttc_clk_i           => ttc_clk_i.clk_40,
-                reset_i             => reset_i,
-                gt_rx_trig_usrclk_i => ttc_clk_i.clk_160,
-                rx_kchar_i          => sync_trig_rx_gth_data_arr(i).rxcharisk(1 downto 0),
-                rx_data_i           => sync_trig_rx_gth_data_arr(i).rxdata(15 downto 0),
-                sbit_cluster0_o     => sbit_clusters_o(i * 4 + 0),
-                sbit_cluster1_o     => sbit_clusters_o(i * 4 + 1),
-                sbit_cluster2_o     => sbit_clusters_o(i * 4 + 2),
-                sbit_cluster3_o     => sbit_clusters_o(i * 4 + 3),
-                link_status_o       => sbit_links_status_o(i)
-            );        
+    g_use_trig_links : if (g_GEM_STATION = 1) or (g_GEM_STATION = 2) generate
     
+        gen_trig_links: for i in 0 to 1 generate
+    
+            -- Sync FIFO
+            i_sync_rx_trig : component sync_fifo_8b10b_16
+                port map(
+                    rst       => reset_i,
+                    wr_clk    => gth_rx_trig_usrclk_i(i),
+                    rd_clk    => ttc_clk_i.clk_160,
+                    din       => sync_trig_rx_din_arr(i),
+                    wr_en     => '1',
+                    rd_en     => '1',
+                    dout      => sync_trig_rx_dout_arr(i),
+                    full      => open,
+                    overflow  => sync_trig_rx_ovf_arr(i),
+                    empty     => open,
+                    valid     => open,
+                    underflow => sync_trig_rx_unf_arr(i)
+                );
+                
+            sync_trig_rx_din_arr(i) <= gth_rx_trig_data_i(i).rxdisperr(1 downto 0) & 
+                                       gth_rx_trig_data_i(i).rxnotintable(1 downto 0) & 
+                                       gth_rx_trig_data_i(i).rxchariscomma(1 downto 0) & 
+                                       gth_rx_trig_data_i(i).rxcharisk(1 downto 0) & 
+                                       gth_rx_trig_data_i(i).rxdata(15 downto 0);
+                                       
+            sync_trig_rx_gth_data_arr(i).rxdata(15 downto 0) <= sync_trig_rx_dout_arr(i)(15 downto 0);
+            sync_trig_rx_gth_data_arr(i).rxcharisk(1 downto 0) <= sync_trig_rx_dout_arr(i)(17 downto 16);
+            sync_trig_rx_gth_data_arr(i).rxchariscomma(1 downto 0) <= sync_trig_rx_dout_arr(i)(19 downto 18);
+            sync_trig_rx_gth_data_arr(i).rxnotintable(1 downto 0) <= sync_trig_rx_dout_arr(i)(21 downto 20);
+            sync_trig_rx_gth_data_arr(i).rxdisperr(1 downto 0) <= sync_trig_rx_dout_arr(i)(23 downto 22);
+            
+            -- TODO: report rxnotintable and also the overflow/underflow of this fifo
+            
+            i_link_rx_trigger : entity work.link_rx_trigger
+                generic map (
+                    g_DEBUG => false
+                )
+                port map(
+                    ttc_clk_i           => ttc_clk_i.clk_40,
+                    reset_i             => reset_i,
+                    gt_rx_trig_usrclk_i => ttc_clk_i.clk_160,
+                    rx_kchar_i          => sync_trig_rx_gth_data_arr(i).rxcharisk(1 downto 0),
+                    rx_data_i           => sync_trig_rx_gth_data_arr(i).rxdata(15 downto 0),
+                    sbit_cluster0_o     => sbit_clusters_o(i * 4 + 0),
+                    sbit_cluster1_o     => sbit_clusters_o(i * 4 + 1),
+                    sbit_cluster2_o     => sbit_clusters_o(i * 4 + 2),
+                    sbit_cluster3_o     => sbit_clusters_o(i * 4 + 3),
+                    link_status_o       => sbit_links_status_o(i)
+                );        
+        
+        end generate;
     end generate;
         
+    g_no_trig_links : if g_GEM_STATION = 0 generate
+        sbit_links_status_o <= (others => (sbit_overflow => '0', missed_comma => '1', underflow => '1', overflow => '0', sync_word => '0'));
+        sbit_clusters_o <= (others => (address => "111" & x"FA", size => "000"));
+    end generate;
+            
     --============================--
     --==        Debug           ==--
     --============================--
