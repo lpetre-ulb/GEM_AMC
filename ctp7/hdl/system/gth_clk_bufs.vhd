@@ -142,7 +142,7 @@ begin
 
   gen_bufh_outclks : for n in 0 to g_NUM_OF_GTH_GTs-1 generate
   
-    gen_gth_gbt_txuserclk : if c_gth_config_arr(n).gth_link_type = gth_4p8g or c_gth_config_arr(n).gth_link_type = gth_10p24g generate
+    gen_gth_gbt_txuserclk : if c_gth_config_arr(n).gth_link_type = gth_4p8g or c_gth_config_arr(n).gth_link_type = gth_10p24g or c_gth_config_arr(n).gth_link_type = gth_2p56g generate
       gen_gth_gbt_txuserclk_master : if c_gth_config_arr(n).gth_txclk_out_master = true generate
 
         s_gth_gbt_txoutclk <= gth_gt_clk_out_arr_i(n).txoutclk;

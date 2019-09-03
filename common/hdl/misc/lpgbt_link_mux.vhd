@@ -117,17 +117,25 @@ begin
         gbt_tx_data_arr_o(i * 2 + 0).tx_ic_data <= gbt_ic_tx_data_arr_i(i * 2 + 0);
         gbt_tx_data_arr_o(i * 2 + 1).tx_ic_data <= gbt_ic_tx_data_arr_i(i * 2 + 1);
         
-        g_tx_pizza_pos1 : if i mod 2 = 0 generate 
-            gbt_tx_data_arr_o(i * 2 + 0).tx_data(23 downto 16) <= vfat3_tx_data_arr_i(i)(4); -- this also covers position 5
-            gbt_tx_data_arr_o(i * 2 + 0).tx_data(15 downto 8) <= vfat3_tx_data_arr_i(i)(3); -- this also covers position 1
-            gbt_tx_data_arr_o(i * 2 + 0).tx_data(7 downto 0) <= vfat3_tx_data_arr_i(i)(2); -- this also covers position 0
-        end generate;
+--        g_tx_pizza_pos1 : if i mod 2 = 0 generate 
+--            gbt_tx_data_arr_o(i * 2 + 0).tx_data(31 downto 24) <= (others => '0');
+--            gbt_tx_data_arr_o(i * 2 + 0).tx_data(23 downto 16) <= vfat3_tx_data_arr_i(i)(4); -- this also covers position 5
+--            gbt_tx_data_arr_o(i * 2 + 0).tx_data(15 downto 8) <= vfat3_tx_data_arr_i(i)(3); -- this also covers position 1
+--            gbt_tx_data_arr_o(i * 2 + 0).tx_data(7 downto 0) <= vfat3_tx_data_arr_i(i)(2); -- this also covers position 0
+--        end generate;
 
-        g_tx_pizza_pos2 : if i mod 2 /= 0 generate 
+--        g_tx_pizza_pos2 : if i mod 2 /= 0 generate 
+            gbt_tx_data_arr_o(i * 2 + 0).tx_data(31 downto 24) <= (others => '0');
             gbt_tx_data_arr_o(i * 2 + 0).tx_data(23 downto 16) <= vfat3_tx_data_arr_i(i)(3); -- this also covers position 1
             gbt_tx_data_arr_o(i * 2 + 0).tx_data(15 downto 8) <= vfat3_tx_data_arr_i(i)(0); -- this also covers position 2
             gbt_tx_data_arr_o(i * 2 + 0).tx_data(7 downto 0) <= vfat3_tx_data_arr_i(i)(5); -- this also covers position 4
-        end generate;
+
+            gbt_tx_data_arr_o(i * 2 + 1).tx_data(31 downto 24) <= (others => '0');
+            gbt_tx_data_arr_o(i * 2 + 1).tx_data(23 downto 16) <= vfat3_tx_data_arr_i(i)(3); -- this also covers position 1
+            gbt_tx_data_arr_o(i * 2 + 1).tx_data(15 downto 8) <= vfat3_tx_data_arr_i(i)(0); -- this also covers position 2
+            gbt_tx_data_arr_o(i * 2 + 1).tx_data(7 downto 0) <= vfat3_tx_data_arr_i(i)(5); -- this also covers position 4
+--        end generate;
+
 
     end generate;
 

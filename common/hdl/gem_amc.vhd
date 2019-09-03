@@ -598,7 +598,7 @@ begin
         i_gbt : entity work.lpgbt
             generic map(
                 g_NUM_LINKS             => g_NUM_OF_OHs * g_NUM_GBTS_PER_OH,
-                g_SKIP_ODD_TX           => true,
+                g_SKIP_ODD_TX           => false,
                 g_RX_RATE               => DATARATE_10G24,
                 g_RX_ENCODING           => FEC5,
                 g_RESET_MGT_ON_EVEN     => 0,

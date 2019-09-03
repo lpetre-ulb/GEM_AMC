@@ -21,7 +21,7 @@ use work.lpgbtfpga_package.all;
 entity lpgbt is
     generic(
         g_NUM_LINKS             : integer;
-        g_SKIP_ODD_TX          : boolean := true; -- when set to true, only even numbered TX cores will be instantiated (this is what we need for ME0 since every other LpGBT link is only in the direction to the backend)
+        g_SKIP_ODD_TX           : boolean := true; -- when set to true, only even numbered TX cores will be instantiated (this is what we need for ME0 since every other LpGBT link is only in the direction to the backend)
         g_RX_RATE               : integer := DATARATE_10G24; -- dynamic not supported
         g_RX_ENCODING           : integer := FEC5;
         g_RESET_MGT_ON_EVEN     : integer := 0;
