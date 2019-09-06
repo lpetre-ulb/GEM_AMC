@@ -1503,7 +1503,6 @@
       <Filter Type="Constrs"/>
       <File Path="$PPRDIR/../constraints/top_constraints.xdc">
         <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
@@ -1517,6 +1516,7 @@
       </File>
       <File Path="$PPRDIR/../constraints/top_constraints_lpgbt_loopback.xdc">
         <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
