@@ -30,6 +30,8 @@ entity lpgbt is
     );
     port(
         reset_i                     : in  std_logic;
+        reset_tx_i                  : in  std_logic;
+        reset_rx_i                  : in  std_logic;
         cnt_reset_i                 : in  std_logic;
 
         --========--
@@ -138,7 +140,7 @@ begin
         gen_skip_even_tx : if (not g_SKIP_ODD_TX) or (i mod 2 = 0) generate
 
             --------- Resets ---------
-            tx_gb_reset(i) <= not (mgt_status_arr_i(i).tx_reset_done and mgt_status_arr_i(i).tx_cpll_locked);
+            tx_gb_reset(i) <= (not (mgt_status_arr_i(i).tx_reset_done and mgt_status_arr_i(i).tx_cpll_locked)) or reset_tx_i;
             tx_dp_reset(i) <= not tx_gb_ready(i);
 
             --------- Status ---------
@@ -156,6 +158,9 @@ begin
             --------- TX datapath ---------
 
             i_tx_datapath : entity work.LpGBT_FPGA_Downlink_datapath
+                    generic map (
+                        MULTICYCLE_DELAY => 0
+                    )
                 port map(
                     donwlinkClk_i               => tx_frame_clk_i,
                     downlinkClkEn_i             => '1',
@@ -272,7 +277,7 @@ begin
     g_gbt_rx_link : for i in 0 to g_NUM_LINKS - 1 generate
 
         --------- Resets ---------
-        rx_fa_reset(i) <= not (mgt_status_arr_i(i).rx_reset_done and mgt_status_arr_i(i).rx_cpll_locked);
+        rx_fa_reset(i) <= (not (mgt_status_arr_i(i).rx_reset_done and mgt_status_arr_i(i).rx_cpll_locked)) or reset_rx_i;
         rx_gb_reset(i) <= not (rx_header_locked(i) and rx_sync_valid(i));
         rx_dp_reset(i) <= not rx_gb_ready(i);
 
@@ -326,7 +331,8 @@ begin
         i_rx_datapath : entity work.LpGBT_FPGA_Uplink_datapath
             generic map(
                 DATARATE         => g_RX_RATE,
-                FEC              => g_RX_ENCODING
+                FEC              => g_RX_ENCODING,
+                MULTICYCLE_DELAY => 0
             )
             port map(
                 uplinkClk_i                     => rx_frame_clk_i,
@@ -405,6 +411,8 @@ begin
                 
                 dat_word_i              => rx_mgt_data(i)(1 downto 0)
             );
+
+        mgt_ctrl_arr_o(i).txreset <= '0';
 
         g_use_mgt_reset_on_even : if g_RESET_MGT_ON_EVEN = 1 generate
             mgt_ctrl_arr_o(i).rxreset <= rx_mgt_reset(i);

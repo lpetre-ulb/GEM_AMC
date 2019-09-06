@@ -24,7 +24,7 @@ package gem_board_config_package is
     
     ----------------------------------------------------------------------------------------------
     
-    constant CFG_GEM_STATION        : integer range 0 to 2 := 2; -- 0 = ME0; 1 = GE1/1; 2 = GE2/1
+    constant CFG_GEM_STATION        : integer range 0 to 2 := 1; -- 0 = ME0; 1 = GE1/1; 2 = GE2/1
     constant CFG_NUM_OF_OHs         : integer := 12;   -- total number of OHs to instanciate (remember to adapt the CFG_OH_LINK_CONFIG_ARR accordingly)
     constant CFG_NUM_GBTS_PER_OH    : integer := get_num_gbts_per_oh(CFG_GEM_STATION);
     constant CFG_NUM_VFATS_PER_OH   : integer := get_num_vfats_per_oh(CFG_GEM_STATION);
@@ -35,7 +35,9 @@ package gem_board_config_package is
     constant CFG_GBT_DEBUG          : boolean := true; -- if set to true, an ILA will be instantiated which allows probing any GBT link
     constant CFG_BOARD_TYPE         : std_logic_vector(3 downto 0) := x"1"; -- 0 = GLIB; 1 = CTP7
     
-    constant CFG_LPGBT_2P56G_LOOPBACK_TEST : boolean := false; -- setting this to true will result in a test firmware with 2.56Gbps transceivers only usable for PRBS loopback tests with LpGBT chip, note that none of the GEM logic will be included (also no LpGBT core will be instantiated) 
+    ------------ DEBUG FLAGS ------------
+    constant CFG_LPGBT_2P56G_LOOPBACK_TEST  : boolean := false; -- setting this to true will result in a test firmware with 2.56Gbps transceivers only usable for PRBS loopback tests with LpGBT chip, note that none of the GEM logic will be included (also no LpGBT core will be instantiated)
+    constant CFG_ILA_GBT0_MGT_EN            : boolean := false; -- setting this to 1 enables the instantiation of ILA on GBT link 0 MGT
 
     --========================--
     --== Link configuration ==--

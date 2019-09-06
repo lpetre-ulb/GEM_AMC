@@ -93,9 +93,11 @@ END COMPONENT  ;
     signal ttc_clocks_bufg      : t_ttc_clks;
     
     -- this function determines the feedback clock multiplication factor based on whether the station is using LpGBT or GBTX
-    function get_clkfbout_mult(gem_station : integer) return real is
+    function get_clkfbout_mult(gem_station : integer; is_lpgbt_loopback : boolean) return real is
     begin
-        if gem_station = 0 then
+        if is_lpgbt_loopback then
+            return 3.0;
+        elsif gem_station = 0 then
             return 3.0;
         elsif gem_station = 1 then
             return 6.0;
@@ -107,9 +109,11 @@ END COMPONENT  ;
     end function get_clkfbout_mult;    
 
     -- this function determines the division factor to get the MGT user clk based on whether the station is using LpGBT or GBTX
-    function get_gbt_mgt_clk_divide(gem_station : integer) return integer is
+    function get_gbt_mgt_clk_divide(gem_station : integer; is_lpgbt_loopback : boolean) return integer is
     begin
-        if gem_station = 0 then
+        if is_lpgbt_loopback then
+            return 12;
+        elsif gem_station = 0 then
             return 3;
         elsif gem_station = 1 then
             return 8;
@@ -120,8 +124,25 @@ END COMPONENT  ;
         end if;
     end function get_gbt_mgt_clk_divide;    
 
-    constant CLKFBOUT_MULT : real := get_clkfbout_mult(CFG_GEM_STATION);
-    constant GBT_MGT_CLK_DIVIDE : integer := get_gbt_mgt_clk_divide(CFG_GEM_STATION);
+    function get_txoutclk_period(gem_station : integer; is_lpgbt_loopback : boolean) return real is
+    begin
+        if is_lpgbt_loopback then
+            return 3.125;
+        elsif gem_station = 0 then
+            return 3.125;
+        elsif gem_station = 1 then
+            return 6.25;
+        elsif gem_station = 2 then
+            return 6.25;
+        else -- hmm whatever, lets say 6.25
+            return 6.25;  
+        end if;
+    end function get_txoutclk_period;    
+
+
+    constant CFG_CLKFBOUT_MULT : real := get_clkfbout_mult(CFG_GEM_STATION, CFG_LPGBT_2P56G_LOOPBACK_TEST);
+    constant CFG_GBT_MGT_CLK_DIVIDE : integer := get_gbt_mgt_clk_divide(CFG_GEM_STATION, CFG_LPGBT_2P56G_LOOPBACK_TEST);
+    constant CFG_CLKIN1_PERIOD : real := get_txoutclk_period(CFG_GEM_STATION, CFG_LPGBT_2P56G_LOOPBACK_TEST);
     
     ----------------- phase alignment ------------------
     constant MMCM_PS_DONE_TIMEOUT : unsigned(7 downto 0) := x"9f"; -- datasheet says MMCM should complete a phase shift in 12 clocks, but we check it with some margin, just in case
@@ -189,7 +210,7 @@ begin
             COMPENSATION         => "ZHOLD",
             STARTUP_WAIT         => false,
             DIVCLK_DIVIDE        => 1,
-            CLKFBOUT_MULT_F      => CLKFBOUT_MULT,
+            CLKFBOUT_MULT_F      => CFG_CLKFBOUT_MULT,
             CLKFBOUT_PHASE       => 0.000,
             CLKFBOUT_USE_FINE_PS => true,
             CLKOUT0_DIVIDE_F     => 24.000,
@@ -200,7 +221,7 @@ begin
             CLKOUT1_PHASE        => 0.000,
             CLKOUT1_DUTY_CYCLE   => 0.500,
             CLKOUT1_USE_FINE_PS  => false,
-            CLKOUT2_DIVIDE       => GBT_MGT_CLK_DIVIDE,
+            CLKOUT2_DIVIDE       => CFG_GBT_MGT_CLK_DIVIDE,
             CLKOUT2_PHASE        => 0.000,
             CLKOUT2_DUTY_CYCLE   => 0.500,
             CLKOUT2_USE_FINE_PS  => false,
@@ -212,7 +233,7 @@ begin
             CLKOUT4_PHASE        => 0.000,
             CLKOUT4_DUTY_CYCLE   => 0.500,
             CLKOUT4_USE_FINE_PS  => false,
-            CLKIN1_PERIOD        => 6.25,
+            CLKIN1_PERIOD        => CFG_CLKIN1_PERIOD,
             REF_JITTER1          => 0.010)
         port map(
             -- Output clocks

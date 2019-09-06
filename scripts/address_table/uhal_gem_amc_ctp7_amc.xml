@@ -3387,7 +3387,7 @@
         <node id="WRITE_DATA" address="0x2" permission="rw" />
         <node id="EXECUTE_WRITE" address="0x3" permission="w" />
         <node id="EXECUTE_READ" address="0x4" permission="w" />
-        <node id="GBTX_I2C_ADDR" address="0x5" permission="rw" mask="0xf" />
+        <node id="GBTX_I2C_ADDR" address="0x5" permission="rw" mask="0x7f" />
         <node id="GBTX_LINK_SELECT" address="0x6" permission="rw" mask="0x3f" />
       </node>
       <node id="VFAT3" address="0x4000" >

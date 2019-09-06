@@ -1166,9 +1166,9 @@
         <node id="EXECUTE_READ" address="0x4" permission="w"
               description="writing any value here will execute a GBTx register read operation"
               fw_write_pulse_signal="ic_read_req"/>
-        <node id="GBTX_I2C_ADDR" address="0x5" mask="0x0000000f" permission="rw"
+        <node id="GBTX_I2C_ADDR" address="0x5" mask="0x0000007f" permission="rw"
               description="GBTx I2C address as defined by the I2CADDRESS pins of the GBTx chip"
-              fw_signal="ic_gbtx_i2c_addr" fw_default="0x1"/>
+              fw_signal="ic_gbtx_i2c_addr" fw_default="0b0000001"/>
         <node id="GBTX_LINK_SELECT" address="0x6" mask="0x0000003f" permission="rw"
               description="Selects the GBT link to use"
               fw_signal="ic_link_select" fw_default="0b000000"/>

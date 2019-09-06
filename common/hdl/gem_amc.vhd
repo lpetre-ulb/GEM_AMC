@@ -130,7 +130,9 @@ architecture gem_amc_arch of gem_amc is
         port(
             clk        : in  std_logic;
             probe_out0 : out std_logic_vector(5 downto 0);
-            probe_out1 : out std_logic_vector(4 downto 0)
+            probe_out1 : out std_logic_vector(4 downto 0);
+            probe_out2 : out std_logic;
+            probe_out3 : out std_logic
         );
     end component;
 
@@ -169,6 +171,9 @@ architecture gem_amc_arch of gem_amc is
     
     signal gbt_link_status_arr          : t_gbt_link_status_arr(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
     signal gbt_ready_arr                : std_logic_vector(g_NUM_OF_OHs * g_NUM_GBTS_PER_OH - 1 downto 0);
+    
+    signal lpgbt_reset_tx               : std_logic;
+    signal lpgbt_reset_rx               : std_logic;
 
     --== GBT elinks ==--
     signal sca_tx_data_arr              : t_std2_array(g_NUM_OF_OHs - 1 downto 0);
@@ -245,8 +250,6 @@ begin
     ipb_reset <= ipb_reset_i or reset_pwrup;
     ipb_miso_arr_o <= ipb_miso_arr;
     link_reset <= manual_link_reset or ttc_cmd.hard_reset;
-
-    gt_gbt_ctrl_arr_o <= (others => (txreset => '0', rxreset => '0', rxslide => '0')); -- GBT MGT controls, currently not used but at least rxslide will be used soon for ME0
 
     -- select the GBT link to debug
     dbg_gbt_tx_data               <= gbt_tx_data_arr(to_integer(unsigned(dbg_gbt_link_select)));
@@ -607,6 +610,8 @@ begin
             )
             port map(
                 reset_i              => reset_i,
+                reset_tx_i           => lpgbt_reset_tx,
+                reset_rx_i           => lpgbt_reset_rx,
                 cnt_reset_i          => link_reset,
                 tx_frame_clk_i       => ttc_clocks_i.clk_40,
                 rx_frame_clk_i       => ttc_clocks_i.clk_40,
@@ -760,7 +765,9 @@ begin
         port map(
             clk        => ttc_clocks_i.clk_40,
             probe_out0 => dbg_gbt_link_select,
-            probe_out1 => dbg_vfat_link_select
+            probe_out1 => dbg_vfat_link_select,
+            probe_out2 => lpgbt_reset_tx,
+            probe_out3 => lpgbt_reset_rx
         );
 
     g_gbt_debug : if CFG_GBT_DEBUG generate
