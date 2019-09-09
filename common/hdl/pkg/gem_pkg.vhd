@@ -10,10 +10,10 @@ package gem_pkg is
     --==  Firmware version  ==--
     --========================-- 
 
-    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190906";
+    constant C_FIRMWARE_DATE    : std_logic_vector(31 downto 0) := x"20190909";
     constant C_FIRMWARE_MAJOR   : integer range 0 to 255        := 3;
     constant C_FIRMWARE_MINOR   : integer range 0 to 255        := 9;
-    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 4;
+    constant C_FIRMWARE_BUILD   : integer range 0 to 255        := 6;
     
     ------ Change log ------
     -- 1.8.6 no gbt sync procedure with oh
@@ -112,6 +112,8 @@ package gem_pkg is
     -- 3.9.2  Fixed a bug in LpGBT MGTs -- the data buses weren't actually connected before
     -- 3.9.3  Increased the I2C address range from 4 bits to 7 bits to support the LpGBT default address of 0x70
     -- 3.9.4  Fixed LpGBT downlink and uplink by setting the MULTICYCLE_DELAY to 0
+    -- 3.9.5  Fixed VFAT elink inversions for ME0 (though note that positions 5 and 1 on the classic slot, and 1 and 2 on the spicy slot won't work since they are inverted in the asiago pizza differently than the VFATs that they share the connection to)
+    -- 3.9.6  Fixed LpGBT header flag latency going into the rxGearbox; also updated the LpGBT ILA to split off the IC and EC
 
     --======================--
     --==      General     ==--
@@ -139,6 +141,8 @@ package gem_pkg is
     type t_std_array is array(integer range <>) of std_logic;
 
     type t_std234_array is array(integer range <>) of std_logic_vector(233 downto 0);
+
+    type t_std33_array is array(integer range <>) of std_logic_vector(32 downto 0);
 
     type t_std256_array is array(integer range <>) of std_logic_vector(255 downto 0);
   
@@ -406,6 +410,7 @@ package gem_pkg is
         gbt_rx_header_had_unlock    : std_logic;
         gbt_rx_gearbox_ready        : std_logic;
         gbt_rx_correction_cnt       : std_logic_vector(7 downto 0);
+        gbt_rx_correction_flag      : std_logic;
     end record;
     
     type t_vfat_link_status is record

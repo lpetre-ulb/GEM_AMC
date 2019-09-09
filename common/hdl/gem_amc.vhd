@@ -115,14 +115,19 @@ architecture gem_amc_arch of gem_amc is
 
     component ila_lpgbt
         port(
-            clk    : in std_logic;
-            probe0 : in std_logic_vector(35 downto 0);
-            probe1 : in std_logic_vector(227 downto 0);
-            probe2 : in std_logic;
-            probe3 : in std_logic;
-            probe4 : in std_logic;
-            probe5 : in std_logic;
-            probe6 : in std_logic
+            clk     : in std_logic;
+            probe0  : in std_logic_vector(31 downto 0);
+            probe1  : in std_logic_vector(223 downto 0);
+            probe2  : in std_logic;
+            probe3  : in std_logic;
+            probe4  : in std_logic;
+            probe5  : in std_logic;
+            probe6  : in std_logic;
+            probe7  : in std_logic_vector(1 downto 0);
+            probe8  : in std_logic_vector(1 downto 0);
+            probe9  : in std_logic_vector(1 downto 0);
+            probe10 : in std_logic_vector(1 downto 0);
+            probe11  : in std_logic
         );
     end component;
 
@@ -790,14 +795,19 @@ begin
         g_lpgbt_ila : if g_GEM_STATION = 0 generate
             i_ila_lpgbt : component ila_lpgbt
                 port map(
-                    clk    => ttc_clocks_i.clk_40,
-                    probe0 => dbg_lpgbt_tx_data.tx_ic_data & dbg_lpgbt_tx_data.tx_ec_data & dbg_lpgbt_tx_data.tx_data,
-                    probe1 => dbg_lpgbt_rx_data.rx_ic_data & dbg_lpgbt_rx_data.rx_ec_data & dbg_lpgbt_rx_data.rx_data,
-                    probe2 => dbg_gbt_link_status.gbt_rx_ready,
-                    probe3 => dbg_gbt_link_status.gbt_rx_gearbox_ready,
-                    probe4 => dbg_gbt_link_status.gbt_rx_header_locked,
-                    probe5 => dbg_gbt_link_status.gbt_tx_ready,
-                    probe6 => dbg_gbt_link_status.gbt_tx_gearbox_ready
+                    clk     => ttc_clocks_i.clk_40,
+                    probe0  => dbg_lpgbt_tx_data.tx_data,
+                    probe1  => dbg_lpgbt_rx_data.rx_data,
+                    probe2  => dbg_gbt_link_status.gbt_rx_ready,
+                    probe3  => dbg_gbt_link_status.gbt_rx_gearbox_ready,
+                    probe4  => dbg_gbt_link_status.gbt_rx_header_locked,
+                    probe5  => dbg_gbt_link_status.gbt_tx_ready,
+                    probe6  => dbg_gbt_link_status.gbt_tx_gearbox_ready,
+                    probe7  => dbg_lpgbt_tx_data.tx_ic_data,
+                    probe8  => dbg_lpgbt_tx_data.tx_ec_data,
+                    probe9  => dbg_lpgbt_rx_data.rx_ic_data,
+                    probe10 => dbg_lpgbt_rx_data.rx_ec_data,
+                    probe11 => dbg_gbt_link_status.gbt_rx_correction_flag
                 );
         end generate;
     end generate;
