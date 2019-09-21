@@ -22,6 +22,8 @@
 #NET "xpoint1_clk3_n"                         TNM_NET = "xpoint1_clk3_n"                                                       ;
 #TIMESPEC TS_xpoint1_clk3_p =             PERIOD "xpoint1_clk3_p" 25 ns HIGH 50 %                                          ;
 #TIMESPEC TS_xpoint1_clk3_n =             PERIOD "xpoint1_clk3_n" TS_xpoint1_clk3_p PHASE 12.5 ns HIGH 50 %                ;
+#TIMESPEC TS_xpoint1_clk3_p =             PERIOD "xpoint1_clk3_p" 24.720 ns HIGH 50 %                                          ;
+#TIMESPEC TS_xpoint1_clk3_n =             PERIOD "xpoint1_clk3_n" TS_xpoint1_clk3_p PHASE 12.360 ns HIGH 50 %                ;
 
 ###################################
 ## CLOCK SYNTHESIZER (CDCE62005) ##
@@ -30,12 +32,12 @@
 #NET "cdce_sec_ref_p"                         LOC =    C30                                                                          ; # IO_L17P_25 (FPGA -> CDCE)
 #NET "cdce_sec_ref_n"                        LOC =    D30                                                                          ; # IO_L17N_25 (FPGA -> CDCE)
 
-#NET "cdce_out4_p"                             LOC = L23                                                                           ; # IO_L0P_GC_24
-#NET "cdce_out4_n"                            LOC = M22                                                                           ; # IO_L0N_GC_24
-#NET "cdce_out4_p"                     TNM_NET = cdce_out4_p                                                            ;
-#NET "cdce_out4_n"                            TNM_NET = cdce_out4_n                                                            ;
-#TIMESPEC TS_cdce_out4_p =                 PERIOD "cdce_out4_p" 25 ns HIGH 50%                                              ;
-#TIMESPEC TS_cdce_out4_n =                 PERIOD "cdce_out4_n" TS_cdce_out4_p PHASE 12.5 ns HIGH 50%                       ;
+NET "cdce_out4_p"                             LOC = L23                                                                           ; # IO_L0P_GC_24
+NET "cdce_out4_n"                            LOC = M22                                                                           ; # IO_L0N_GC_24
+NET "cdce_out4_p"                     TNM_NET = cdce_out4_p                                                            ;
+NET "cdce_out4_n"                            TNM_NET = cdce_out4_n                                                            ;
+TIMESPEC TS_cdce_out4_p =                 PERIOD "cdce_out4_p" 4.12 ns HIGH 50%                                              ;
+TIMESPEC TS_cdce_out4_n =                 PERIOD "cdce_out4_n" TS_cdce_out4_p PHASE 2.06 ns HIGH 50%                       ;
 
 ##########
 ## FMC1 ##

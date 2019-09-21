@@ -556,7 +556,40 @@ begin
     end generate;
 
     g_lbgbt : if g_GEM_STATION = 0 generate
-        i_gbt : entity work.lpgbt
+
+        component lpgbt is
+            generic(
+                g_NUM_LINKS             : integer;
+                g_SKIP_ODD_TX           : boolean := true;
+                g_RX_RATE               : integer := DATARATE_10G24;
+                g_RX_ENCODING           : integer := FEC5;
+                g_RESET_MGT_ON_EVEN     : integer := 0;
+                g_USE_RX_SYNC_FIFOS     : boolean := true;
+                g_USE_RX_CORRECTION_CNT : boolean := true
+            );
+            port(
+                reset_i                     : in  std_logic;
+                reset_tx_i                  : in  std_logic;
+                reset_rx_i                  : in  std_logic;
+                cnt_reset_i                 : in  std_logic;
+                tx_frame_clk_i              : in  std_logic;
+                rx_frame_clk_i              : in  std_logic;
+                tx_word_clk_arr_i           : in  std_logic_vector(g_NUM_LINKS - 1 downto 0);
+                rx_word_clk_arr_i           : in  std_logic_vector(g_NUM_LINKS - 1 downto 0);
+                rx_word_common_clk_i        : in  std_logic;
+                mgt_status_arr_i            : in  t_mgt_status_arr(g_NUM_LINKS - 1 downto 0);
+                mgt_ctrl_arr_o              : out t_mgt_ctrl_arr(g_NUM_LINKS - 1 downto 0);
+                mgt_tx_data_arr_o           : out t_gt_gbt_data_arr(g_NUM_LINKS - 1 downto 0);
+                mgt_rx_data_arr_i           : in  t_gt_gbt_data_arr(g_NUM_LINKS - 1 downto 0);
+                tx_data_arr_i               : in  t_lpgbt_tx_frame_array(g_NUM_LINKS - 1 downto 0);
+                rx_data_arr_o               : out t_lpgbt_rx_frame_array(g_NUM_LINKS - 1 downto 0);
+                link_status_arr_o           : out t_gbt_link_status_arr(g_NUM_LINKS - 1 downto 0)
+            );
+        end component lpgbt;
+
+    begin
+
+        i_gbt : component lpgbt
             generic map(
                 g_NUM_LINKS             => g_NUM_OF_OHs * g_NUM_GBTS_PER_OH,
                 g_SKIP_ODD_TX           => false,
@@ -700,26 +733,26 @@ begin
     -- Configuration Blaster  
     --================================--
     
-    gen_config_blaster:
-    if CFG_BOARD_TYPE /= 0 generate
-        -- TODO port the config blaster RAMs to the GLIB
-
-        i_config_blaster : entity work.config_blaster
-            generic map(
-                g_NUM_OF_OHs => g_NUM_OF_OHs,
-                g_DEBUG      => false
-            )
-            port map(
-                reset_i     => reset,
-                ttc_clks_i  => ttc_clocks_i,
-                ttc_cmds_i  => ttc_cmd,
-                ipb_reset_i => ipb_reset,
-                ipb_clk_i   => ipb_clk_i,
-                ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
-                ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
-            );
-
-    end generate;
+--    gen_config_blaster:
+--    if CFG_BOARD_TYPE /= 0 generate
+--        -- TODO port the config blaster RAMs to the GLIB
+--
+--        i_config_blaster : entity work.config_blaster
+--            generic map(
+--                g_NUM_OF_OHs => g_NUM_OF_OHs,
+--                g_DEBUG      => false
+--            )
+--            port map(
+--                reset_i     => reset,
+--                ttc_clks_i  => ttc_clocks_i,
+--                ttc_cmds_i  => ttc_cmd,
+--                ipb_reset_i => ipb_reset,
+--                ipb_clk_i   => ipb_clk_i,
+--                ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
+--                ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
+--            );
+--
+--    end generate;
 
     --=============--
     --    Debug    --

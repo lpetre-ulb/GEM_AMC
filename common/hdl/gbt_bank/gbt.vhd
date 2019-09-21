@@ -95,27 +95,6 @@ end gbt;
 
 architecture gbt_arch of gbt is
 
-    --================================ Component Declarations ================================--
-    
-    component sync_fifo_gth_40
-        port (
-            rst       : IN  STD_LOGIC;
-            wr_clk    : IN  STD_LOGIC;
-            rd_clk    : IN  STD_LOGIC;
-            din       : IN  STD_LOGIC_VECTOR(39 DOWNTO 0);
-            wr_en     : IN  STD_LOGIC;
-            rd_en     : IN  STD_LOGIC;
-            dout      : OUT STD_LOGIC_VECTOR(39 DOWNTO 0);
-            full      : OUT STD_LOGIC;
-            overflow  : OUT STD_LOGIC;
-            empty     : OUT STD_LOGIC;
-            valid     : OUT STD_LOGIC;
-            underflow : OUT STD_LOGIC
-        );
-    end component;
-    
-    --================================ Signal Declarations ================================--
-
     --========--
     -- GBT TX --
     --========--   
@@ -184,7 +163,7 @@ begin                                   --========####   Architecture Body   ###
     
     g_rx_sync_fifos : for i in 0 to NUM_LINKS - 1 generate
         
-        i_rx_sync_fifo : component sync_fifo_gth_40
+        i_rx_sync_fifo : entity work.sync_fifo_gth_40
             port map(
                 rst       => reset_i or not mgt_rx_rdy_arr_i(i),
                 wr_clk    => rx_word_clk_arr_i(i),

@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.ipb_addr_decode.C_NUM_IPB_SLAVES;
+
 package user_package is
 
    constant force_rarp              : boolean  := false;
@@ -19,13 +21,8 @@ package user_package is
     constant user_wb_regs                : integer  := 0 ;
 --    constant user_wb_timer                : integer  := 1 ;
 
-
     --=== ipb slaves =============--
-    constant number_of_ipb_slaves        : positive := 2 ;
-
-    constant user_ipb_stat_regs        : integer  := 0 ;
-    constant user_ipb_ctrl_regs        : integer  := 1 ;
-
+    constant number_of_ipb_slaves        : positive := C_NUM_IPB_SLAVES ;
 
 end user_package;
 

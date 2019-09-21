@@ -50,30 +50,6 @@ entity vfat3_slow_control is
 end vfat3_slow_control;
 
 architecture vfat3_slow_control_arch of vfat3_slow_control is
-
-    component vfat3_sc_tx_fifo
-        port(
-            clk   : in  std_logic;
-            srst  : in  std_logic;
-            din   : in  std_logic;
-            wr_en : in  std_logic;
-            rd_en : in  std_logic;
-            dout  : out std_logic;
-            full  : out std_logic;
-            empty : out std_logic
-        );
-    end component;
-
-    component bram_vfat3_sc_adc
-        port(
-            clka  : in  std_logic;
-            ena   : in  std_logic;
-            wea   : in  std_logic;
-            addra : in  std_logic_vector(9 downto 0);
-            dina  : in  std_logic_vector(9 downto 0);
-            douta : out std_logic_vector(9 downto 0)
-        );
-    end component;
 	
     constant TRANSACTION_TIMEOUT	: unsigned(11 downto 0) := x"7ff";
 	
@@ -419,14 +395,14 @@ begin
             raw_last_packet_o => tx_raw_last_packet
         );
 
-    i_vfat3_sc_tx_fifo : vfat3_sc_tx_fifo
+    i_vfat3_sc_tx_fifo : entity work.vfat3_sc_tx_fifo
         port map(
             clk   => ttc_clk_i.clk_40,
             srst  => reset_i or tx_reset,
-            din   => tx_din,
+            din(0)   => tx_din,
             wr_en => tx_en,
             rd_en => tx_rd_en_i,
-            dout  => tx_data_o,
+            dout(0)  => tx_data_o,
             full  => open,
             empty => tx_empty_o
         );
@@ -453,11 +429,11 @@ begin
     rx_data_en <= rx_data_en_i(to_integer(unsigned(tx_oh_idx)))(to_integer(unsigned(tx_vfat_idx)));
     rx_data <= rx_data_i(to_integer(unsigned(tx_oh_idx)))(to_integer(unsigned(tx_vfat_idx)));
 
-    i_vfat3_adc_cache : bram_vfat3_sc_adc
+    i_vfat3_adc_cache : entity work.bram_vfat3_sc_adc
         port map(
             clka  => ipb_clk_i,
             ena   => adc_cache_en,
-            wea   => adc_cache_we,
+            wea(0)   => adc_cache_we,
             addra => adc_cache_addr,
             dina  => adc_cache_din,
             douta => adc_cache_dout

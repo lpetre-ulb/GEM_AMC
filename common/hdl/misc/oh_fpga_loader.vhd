@@ -252,7 +252,7 @@ begin
                 probe7 : in std_logic
             );
         end component;
-        
+
         component vio_gem_loader
             port(
                 clk        : in  std_logic;

@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Fri Sep 20 16:02:46 2019
+# Date: Fri Sep 20 16:37:42 2019
 #
 ##############################################################
 #
@@ -12,7 +12,7 @@
 #
 ##############################################################
 #
-#  Generated from component: xilinx.com:ip:fifo_generator:8.2
+#  Generated from component: xilinx.com:ip:fifo_generator:9.3
 #
 ##############################################################
 #
@@ -36,7 +36,7 @@ SET verilogsim = false
 SET vhdlsim = true
 # END Project Options
 # BEGIN Select
-SELECT Fifo_Generator xilinx.com:ip:fifo_generator:8.2
+SELECT FIFO_Generator xilinx.com:ip:fifo_generator:9.3
 # END Select
 # BEGIN Parameters
 CSET add_ngc_constraint_axi=false
@@ -51,7 +51,7 @@ CSET axis_type=FIFO
 CSET buser_width=1
 CSET clock_enable_type=Slave_Interface_Clock_Enable
 CSET clock_type_axi=Common_Clock
-CSET component_name=slv_rd_fifo
+CSET component_name=sync_fifo_gth_40
 CSET data_count=false
 CSET data_count_width=10
 CSET disable_timing_violations=false
@@ -83,12 +83,6 @@ CSET enable_ecc_rdch=false
 CSET enable_ecc_wach=false
 CSET enable_ecc_wdch=false
 CSET enable_ecc_wrch=false
-CSET enable_handshake_flag_options_axis=false
-CSET enable_handshake_flag_options_rach=false
-CSET enable_handshake_flag_options_rdch=false
-CSET enable_handshake_flag_options_wach=false
-CSET enable_handshake_flag_options_wdch=false
-CSET enable_handshake_flag_options_wrch=false
 CSET enable_read_channel=false
 CSET enable_read_pointer_increment_by2=false
 CSET enable_reset_synchronization=true
@@ -140,7 +134,7 @@ CSET inject_sbit_error_rdch=false
 CSET inject_sbit_error_wach=false
 CSET inject_sbit_error_wdch=false
 CSET inject_sbit_error_wrch=false
-CSET input_data_width=64
+CSET input_data_width=20
 CSET input_depth=1024
 CSET input_depth_axis=1024
 CSET input_depth_rach=16
@@ -149,27 +143,27 @@ CSET input_depth_wach=16
 CSET input_depth_wdch=1024
 CSET input_depth_wrch=16
 CSET interface_type=Native
-CSET output_data_width=64
+CSET output_data_width=20
 CSET output_depth=1024
-CSET overflow_flag=false
+CSET overflow_flag=true
 CSET overflow_flag_axi=false
 CSET overflow_sense=Active_High
 CSET overflow_sense_axi=Active_High
 CSET performance_options=Standard_FIFO
 CSET programmable_empty_type=No_Programmable_Empty_Threshold
-CSET programmable_empty_type_axis=Empty
-CSET programmable_empty_type_rach=Empty
-CSET programmable_empty_type_rdch=Empty
-CSET programmable_empty_type_wach=Empty
-CSET programmable_empty_type_wdch=Empty
-CSET programmable_empty_type_wrch=Empty
+CSET programmable_empty_type_axis=No_Programmable_Empty_Threshold
+CSET programmable_empty_type_rach=No_Programmable_Empty_Threshold
+CSET programmable_empty_type_rdch=No_Programmable_Empty_Threshold
+CSET programmable_empty_type_wach=No_Programmable_Empty_Threshold
+CSET programmable_empty_type_wdch=No_Programmable_Empty_Threshold
+CSET programmable_empty_type_wrch=No_Programmable_Empty_Threshold
 CSET programmable_full_type=No_Programmable_Full_Threshold
-CSET programmable_full_type_axis=Full
-CSET programmable_full_type_rach=Full
-CSET programmable_full_type_rdch=Full
-CSET programmable_full_type_wach=Full
-CSET programmable_full_type_wdch=Full
-CSET programmable_full_type_wrch=Full
+CSET programmable_full_type_axis=No_Programmable_Full_Threshold
+CSET programmable_full_type_rach=No_Programmable_Full_Threshold
+CSET programmable_full_type_rdch=No_Programmable_Full_Threshold
+CSET programmable_full_type_wach=No_Programmable_Full_Threshold
+CSET programmable_full_type_wdch=No_Programmable_Full_Threshold
+CSET programmable_full_type_wrch=No_Programmable_Full_Threshold
 CSET rach_type=FIFO
 CSET rdch_type=FIFO
 CSET read_clock_frequency=1
@@ -184,21 +178,23 @@ CSET register_slice_mode_wrch=Fully_Registered
 CSET reset_pin=true
 CSET reset_type=Asynchronous_Reset
 CSET ruser_width=1
+CSET synchronization_stages=2
+CSET synchronization_stages_axi=2
 CSET tdata_width=64
 CSET tdest_width=4
 CSET tid_width=8
 CSET tkeep_width=4
 CSET tstrb_width=4
 CSET tuser_width=4
-CSET underflow_flag=false
+CSET underflow_flag=true
 CSET underflow_flag_axi=false
 CSET underflow_sense=Active_High
 CSET underflow_sense_axi=Active_High
 CSET use_clock_enable=false
 CSET use_dout_reset=true
-CSET use_embedded_registers=false
+CSET use_embedded_registers=true
 CSET use_extra_logic=false
-CSET valid_flag=false
+CSET valid_flag=true
 CSET valid_sense=Active_High
 CSET wach_type=FIFO
 CSET wdch_type=FIFO
@@ -211,7 +207,7 @@ CSET write_data_count_width=10
 CSET wuser_width=1
 # END Parameters
 # BEGIN Extra information
-MISC pkg_timestamp=2011-03-14T07:12:32Z
+MISC pkg_timestamp=2012-11-19T12:39:56Z
 # END Extra information
 GENERATE
-# CRC: f346b071
+# CRC: f77bd491
