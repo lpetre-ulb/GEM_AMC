@@ -7,8 +7,9 @@ use ieee.numeric_std.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.mgt_pkg.all;
+-- GEM packages
 use work.gem_pkg.all;
+use work.mgt_pkg.all;
 
 entity gtx_single_trig is
     port (

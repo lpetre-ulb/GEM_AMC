@@ -68,7 +68,4 @@ package mgt_pkg is
     end record;
     type t_gtx_status_arr is array(natural range <>) of t_gtx_status;
 
-    -- Word
-    type t_mgt_gbt_word_arr is array(natural range <>) of std_logic_vector(19 downto 0);
-
 end package;

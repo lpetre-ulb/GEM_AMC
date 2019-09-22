@@ -225,10 +225,10 @@ architecture user_logic_arch of user_logic is
     signal mgt_gbt_rx_serial_arr   : t_mgt_rx_serial_arr(0 to 3);
 
     signal mgt_gbt_tx_word_clk_arr : std_logic_vector(0 to 3);
-    signal mgt_gbt_tx_word_arr     : t_mgt_gbt_word_arr(0 to 3);
+    signal mgt_gbt_tx_word_arr     : t_gt_gbt_data_arr(0 to 3);
 
     signal mgt_gbt_rx_word_clk_arr : std_logic_vector(0 to 3);
-    signal mgt_gbt_rx_word_arr     : t_mgt_gbt_word_arr(0 to 3);
+    signal mgt_gbt_rx_word_arr     : t_gt_gbt_data_arr(0 to 3);
 
     signal mgt_gbt_ctrl_arr        : t_gtx_ctrl_arr(0 to 3);
     signal mgt_gbt_status_arr      : t_gtx_status_arr(0 to 3);

@@ -13,6 +13,7 @@ use work.vendor_specific_gbt_bank_package.all;
 use work.gbt_banks_user_setup.all;
 
 -- GEM packages
+use work.gem_pkg.all;
 use work.mgt_pkg.all;
 
 entity gtx_bank_gbt is
@@ -36,10 +37,10 @@ entity gtx_bank_gbt is
 
         -- Words --
         tx_word_clk_arr_o : out std_logic_vector(0 to g_NUM_GTX-1);
-        mgt_tx_word_arr_i : in  t_mgt_gbt_word_arr(0 to g_NUM_GTX-1);
+        mgt_tx_word_arr_i : in  t_gt_gbt_data_arr(0 to g_NUM_GTX-1);
 
         rx_word_clk_arr_o : out std_logic_vector(0 to g_NUM_GTX-1);
-        mgt_rx_word_arr_o : out t_mgt_gbt_word_arr(0 to g_NUM_GTX-1)
+        mgt_rx_word_arr_o : out t_gt_gbt_data_arr(0 to g_NUM_GTX-1)
     );
 end gtx_bank_gbt;
 
