@@ -25,7 +25,7 @@ package gem_board_config_package is
     ----------------------------------------------------------------------------------------------
 
     constant CFG_GEM_STATION        : integer range 0 to 2 := 1; -- 0 = ME0; 1 = GE1/1; 2 = GE2/1
-    constant CFG_NUM_OF_OHs         : integer := 1;   -- total number of OHs to instanciate (remember to adapt the CFG_OH_LINK_CONFIG_ARR accordingly)
+    constant CFG_NUM_OF_OHs         : integer := 2;   -- total number of OHs to instanciate (remember to adapt the CFG_OH_LINK_CONFIG_ARR accordingly)
     constant CFG_NUM_GBTS_PER_OH    : integer := get_num_gbts_per_oh(CFG_GEM_STATION);
     constant CFG_NUM_VFATS_PER_OH   : integer := get_num_vfats_per_oh(CFG_GEM_STATION);
 

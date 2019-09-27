@@ -399,10 +399,10 @@ begin
         port map(
             clk   => ttc_clk_i.clk_40,
             srst  => reset_i or tx_reset,
-            din(0)   => tx_din,
+            din   => tx_din,
             wr_en => tx_en,
             rd_en => tx_rd_en_i,
-            dout(0)  => tx_data_o,
+            dout  => tx_data_o,
             full  => open,
             empty => tx_empty_o
         );
@@ -433,7 +433,7 @@ begin
         port map(
             clka  => ipb_clk_i,
             ena   => adc_cache_en,
-            wea(0)   => adc_cache_we,
+            wea   => adc_cache_we,
             addra => adc_cache_addr,
             dina  => adc_cache_din,
             douta => adc_cache_dout

@@ -12,9 +12,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library xpm;
-use xpm.vcomponents.all;
-
 use work.ttc_pkg.all;
 use work.gem_pkg.all;
 use work.ttc_pkg.all;
@@ -99,169 +96,49 @@ begin
 
     ----==== Config RAM instantiations ====----    
 
-    i_gbtx_config_ram : xpm_memory_tdpram
+    i_gbtx_config_ram : entity work.config_blaster_bram
         generic map(
-            MEMORY_SIZE        => C_GBTX_RAM_SIZE_32 * 32,
-            MEMORY_PRIMITIVE   => "block",
-            CLOCKING_MODE      => "independent_clock",
-            ECC_MODE           => "no_ecc",
-            MEMORY_INIT_FILE   => "none",
-            MEMORY_INIT_PARAM  => "0",
-            USE_MEM_INIT       => 0,
-            WAKEUP_TIME        => "disable_sleep",
-            AUTO_SLEEP_TIME    => 0,
-            MESSAGE_CONTROL    => 0,
-            WRITE_DATA_WIDTH_A => 32,
-            READ_DATA_WIDTH_A  => 32,
-            BYTE_WRITE_WIDTH_A => 32,
-            ADDR_WIDTH_A       => 16,
-            READ_RESET_VALUE_A => "0",
-            READ_LATENCY_A     => 2,
-            WRITE_MODE_A       => "no_change",
-            WRITE_DATA_WIDTH_B => 32,
-            READ_DATA_WIDTH_B  => 32,
-            BYTE_WRITE_WIDTH_B => 32,
-            ADDR_WIDTH_B       => 16,
-            READ_RESET_VALUE_B => "0",
-            READ_LATENCY_B     => 2,
-            WRITE_MODE_B       => "no_change"
+            MEMORY_WORDS   => C_GBTX_RAM_SIZE_32
         )
         port map(
-            sleep          => '0',
             clka           => ipb_clk_i,
-            rsta           => '0',
-            ena            => '1',
-            regcea         => '1',
             wea            => (others => rama_we(C_GBT_RAMSEL)),
             addra          => rama_addr,
             dina           => rama_din,
-            injectsbiterra => '0',
-            injectdbiterra => '0',
             douta          => rama_dout(C_GBT_RAMSEL),
-            sbiterra       => open,
-            dbiterra       => open,
             clkb           => ttc_clks_i.clk_40,
-            rstb           => '0',
-            enb            => '1',
-            regceb         => '1',
-            web            => (others => '0'),
             addrb          => ramb_gbt_addr,
-            dinb           => (others => '0'),
-            injectsbiterrb => '0',
-            injectdbiterrb => '0',
-            doutb          => ramb_gbt_dout,
-            sbiterrb       => open,
-            dbiterrb       => open
+            doutb          => ramb_gbt_dout
         );
 
-    i_vfat_config_ram : xpm_memory_tdpram
+    i_vfat_config_ram : entity work.config_blaster_bram
         generic map(
-            MEMORY_SIZE        => C_VFAT_RAM_SIZE_32 * 32,
-            MEMORY_PRIMITIVE   => "block",
-            CLOCKING_MODE      => "independent_clock",
-            ECC_MODE           => "no_ecc",
-            MEMORY_INIT_FILE   => "none",
-            MEMORY_INIT_PARAM  => "0",
-            USE_MEM_INIT       => 0,
-            WAKEUP_TIME        => "disable_sleep",
-            AUTO_SLEEP_TIME    => 0,
-            MESSAGE_CONTROL    => 0,
-            WRITE_DATA_WIDTH_A => 32,
-            READ_DATA_WIDTH_A  => 32,
-            BYTE_WRITE_WIDTH_A => 32,
-            ADDR_WIDTH_A       => 16,
-            READ_RESET_VALUE_A => "0",
-            READ_LATENCY_A     => 2,
-            WRITE_MODE_A       => "no_change",
-            WRITE_DATA_WIDTH_B => 32,
-            READ_DATA_WIDTH_B  => 32,
-            BYTE_WRITE_WIDTH_B => 32,
-            ADDR_WIDTH_B       => 16,
-            READ_RESET_VALUE_B => "0",
-            READ_LATENCY_B     => 2,
-            WRITE_MODE_B       => "no_change"
+            MEMORY_WORDS       => C_VFAT_RAM_SIZE_32
         )
         port map(
-            sleep          => '0',
             clka           => ipb_clk_i,
-            rsta           => '0',
-            ena            => '1',
-            regcea         => '1',
             wea            => (others => rama_we(C_VFAT_RAMSEL)),
             addra          => rama_addr,
             dina           => rama_din,
-            injectsbiterra => '0',
-            injectdbiterra => '0',
             douta          => rama_dout(C_VFAT_RAMSEL),
-            sbiterra       => open,
-            dbiterra       => open,
             clkb           => ttc_clks_i.clk_40,
-            rstb           => '0',
-            enb            => '1',
-            regceb         => '1',
-            web            => (others => '0'),
             addrb          => ramb_vfat_addr,
-            dinb           => (others => '0'),
-            injectsbiterrb => '0',
-            injectdbiterrb => '0',
-            doutb          => ramb_vfat_dout,
-            sbiterrb       => open,
-            dbiterrb       => open
+            doutb          => ramb_vfat_dout
         );
 
-    i_oh_config_ram : xpm_memory_tdpram
+    i_oh_config_ram : entity work.config_blaster_bram
         generic map(
-            MEMORY_SIZE        => C_OH_RAM_SIZE_32 * 32,
-            MEMORY_PRIMITIVE   => "block",
-            CLOCKING_MODE      => "independent_clock",
-            ECC_MODE           => "no_ecc",
-            MEMORY_INIT_FILE   => "none",
-            MEMORY_INIT_PARAM  => "0",
-            USE_MEM_INIT       => 0,
-            WAKEUP_TIME        => "disable_sleep",
-            AUTO_SLEEP_TIME    => 0,
-            MESSAGE_CONTROL    => 0,
-            WRITE_DATA_WIDTH_A => 32,
-            READ_DATA_WIDTH_A  => 32,
-            BYTE_WRITE_WIDTH_A => 32,
-            ADDR_WIDTH_A       => 16,
-            READ_RESET_VALUE_A => "0",
-            READ_LATENCY_A     => 2,
-            WRITE_MODE_A       => "no_change",
-            WRITE_DATA_WIDTH_B => 32,
-            READ_DATA_WIDTH_B  => 32,
-            BYTE_WRITE_WIDTH_B => 32,
-            ADDR_WIDTH_B       => 16,
-            READ_RESET_VALUE_B => "0",
-            READ_LATENCY_B     => 2,
-            WRITE_MODE_B       => "no_change"
+            MEMORY_WORDS   => C_OH_RAM_SIZE_32
         )
         port map(
-            sleep          => '0',
             clka           => ipb_clk_i,
-            rsta           => '0',
-            ena            => '1',
-            regcea         => '1',
             wea            => (others => rama_we(C_OH_RAMSEL)),
             addra          => rama_addr,
             dina           => rama_din,
-            injectsbiterra => '0',
-            injectdbiterra => '0',
             douta          => rama_dout(C_OH_RAMSEL),
-            sbiterra       => open,
-            dbiterra       => open,
             clkb           => ttc_clks_i.clk_40,
-            rstb           => '0',
-            enb            => '1',
-            regceb         => '1',
-            web            => (others => '0'),
             addrb          => ramb_oh_addr,
-            dinb           => (others => '0'),
-            injectsbiterrb => '0',
-            injectdbiterrb => '0',
-            doutb          => ramb_oh_dout,
-            sbiterrb       => open,
-            dbiterrb       => open
+            doutb          => ramb_oh_dout
         );
 
     ----==== IPbus slave ====----    
@@ -347,7 +224,7 @@ begin
                 -- read handling
                 case rama_addr is
                     when x"0000" =>
-                        rama_dout(C_CTRL_RAMSEL) <= x"000" & "000" & ctrl_blaster_enabled;
+                        rama_dout(C_CTRL_RAMSEL) <= x"0000" & x"000" & "000" & ctrl_blaster_enabled;
                     when x"0100" =>
                         rama_dout(C_CTRL_RAMSEL) <= std_logic_vector(to_unsigned(C_GBTX_RAM_SIZE_32, 32));
                     when x"0101" =>

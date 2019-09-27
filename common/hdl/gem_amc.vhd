@@ -732,27 +732,21 @@ begin
     --================================--
     -- Configuration Blaster  
     --================================--
-    
---    gen_config_blaster:
---    if CFG_BOARD_TYPE /= 0 generate
---        -- TODO port the config blaster RAMs to the GLIB
---
---        i_config_blaster : entity work.config_blaster
---            generic map(
---                g_NUM_OF_OHs => g_NUM_OF_OHs,
---                g_DEBUG      => false
---            )
---            port map(
---                reset_i     => reset,
---                ttc_clks_i  => ttc_clocks_i,
---                ttc_cmds_i  => ttc_cmd,
---                ipb_reset_i => ipb_reset,
---                ipb_clk_i   => ipb_clk_i,
---                ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
---                ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
---            );
---
---    end generate;
+
+    i_config_blaster : entity work.config_blaster
+        generic map(
+            g_NUM_OF_OHs => g_NUM_OF_OHs,
+            g_DEBUG      => false
+        )
+        port map(
+            reset_i     => reset,
+            ttc_clks_i  => ttc_clocks_i,
+            ttc_cmds_i  => ttc_cmd,
+            ipb_reset_i => ipb_reset,
+            ipb_clk_i   => ipb_clk_i,
+            ipb_miso_o  => ipb_miso_arr(C_IPB_SLV.config_blaster),
+            ipb_mosi_i  => ipb_mosi_arr_i(C_IPB_SLV.config_blaster)
+        );
 
     --=============--
     --    Debug    --

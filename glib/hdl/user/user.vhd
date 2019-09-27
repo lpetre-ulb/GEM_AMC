@@ -248,7 +248,7 @@ architecture user_logic_arch of user_logic is
     signal gem_gt_gbt_rx_clk_arr    : std_logic_vector(CFG_NUM_OF_OHs * CFG_NUM_GBTS_PER_OH - 1 downto 0);
     signal gem_gt_gbt_tx_clk_arr    : std_logic_vector(CFG_NUM_OF_OHs * CFG_NUM_GBTS_PER_OH - 1 downto 0);
     signal gth_gbt_common_rxusrclk  : std_logic;
-	 signal gem_gt_gbt_status_arr    : t_mgt_status_arr(CFG_NUM_OF_OHS * CFG_NUM_GBTS_PER_OH - 1 downto 0);
+    signal gem_gt_gbt_status_arr    : t_mgt_status_arr(CFG_NUM_OF_OHS * CFG_NUM_GBTS_PER_OH - 1 downto 0);
 
     -- Trigger RX GTX / GTH links (3.2Gbs, 16bit @ 160MHz w/ 8b10b encoding)
     signal gem_gt_trig0_rx_clk_arr  : std_logic_vector(CFG_NUM_OF_OHs - 1 downto 0);
@@ -540,9 +540,9 @@ begin
     --==============--
 
     -- GTX mapping to GEM links (GBT)
-    g_mgt_gbt: for i in 0 to 2 generate
-	     gem_gt_gbt_status_arr(i) <= (rx_reset_done => '1', tx_reset_done => '1', rx_cpll_locked => '1', tx_cpll_locked => '1');
-	 
+    g_mgt_gbt: for i in 0 to 3 generate
+        gem_gt_gbt_status_arr(i) <= (rx_reset_done => '1', tx_reset_done => '1', rx_cpll_locked => '1', tx_cpll_locked => '1');
+
         gem_gt_gbt_tx_clk_arr(i) <= mgt_gbt_tx_word_clk_arr(i);
         mgt_gbt_tx_word_arr(i)   <= gem_gt_gbt_tx_data_arr(i);
 
@@ -556,5 +556,11 @@ begin
 
     gem_gt_trig0_rx_data_arr(0) <= mgt_trig_rx_word_arr(0);
     gem_gt_trig1_rx_data_arr(0) <= mgt_trig_rx_word_arr(1);
+
+    gem_gt_trig0_rx_clk_arr(1) <= mgt_trig_rx_word_clk_arr(2);
+    gem_gt_trig1_rx_clk_arr(1) <= mgt_trig_rx_word_clk_arr(3);
+
+    gem_gt_trig0_rx_data_arr(1) <= mgt_trig_rx_word_arr(2);
+    gem_gt_trig1_rx_data_arr(1) <= mgt_trig_rx_word_arr(3);
 
 end user_logic_arch;
