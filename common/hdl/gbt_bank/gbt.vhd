@@ -95,6 +95,8 @@ end gbt;
 
 architecture gbt_arch of gbt is
 
+    signal reset : std_logic;
+
     --========--
     -- GBT TX --
     --========--   
@@ -152,6 +154,13 @@ begin                                   --========####   Architecture Body   ###
     tied_to_ground <= '0';
     tied_to_vcc <= '1';
 
+    process(rx_common_word_clk)
+    begin
+        if rising_edge(rx_common_word_clk) then
+            reset <= reset_i;
+        end if;
+    end process;
+
    --===============--
    -- RX Sync FIFOs --
    --===============--
@@ -165,7 +174,7 @@ begin                                   --========####   Architecture Body   ###
         
         i_rx_sync_fifo : entity work.sync_fifo_gth_40
             port map(
-                rst       => reset_i or not mgt_rx_rdy_arr_i(i),
+                rst       => reset or not mgt_rx_rdy_arr_i(i),
                 wr_clk    => rx_word_clk_arr_i(i),
                 rd_clk    => rx_common_word_clk,
                 din       => rx_wordNbit_from_mgt(i),
@@ -183,7 +192,7 @@ begin                                   --========####   Architecture Body   ###
         
         i_gbt_rx_sync_ovf_latch : entity work.latch
             port map(
-                reset_i => reset_i or cnt_reset_i,
+                reset_i => reset or cnt_reset_i,
                 clk_i   => rx_common_word_clk,
                 input_i => rx_ovf_arr(i),
                 latch_o => link_status_arr_o(i).gbt_rx_sync_status.had_ovf
@@ -191,7 +200,7 @@ begin                                   --========####   Architecture Body   ###
 
         i_gbt_rx_sync_unf_latch : entity work.latch
             port map(
-                reset_i => reset_i or cnt_reset_i,
+                reset_i => reset or cnt_reset_i,
                 clk_i   => rx_common_word_clk,
                 input_i => rx_unf_arr(i),
                 latch_o => link_status_arr_o(i).gbt_rx_sync_status.had_unf
@@ -215,7 +224,7 @@ begin                                   --========####   Architecture Body   ###
 				)
 				port map (            
 					-- Reset & Clocks:
-					TX_RESET_I                          => reset_i,
+					TX_RESET_I                          => reset,
 					TX_FRAMECLK_I                       => tx_frame_clk_i,
 					TX_WORDCLK_I                        => tx_word_clk_arr_i(i),
 					-- Control:              
@@ -274,7 +283,7 @@ begin                                   --========####   Architecture Body   ###
 				)         
 				port map (              
 					-- Reset & Clocks:
-					RX_RESET_I                          => reset_i,
+					RX_RESET_I                          => reset,
 					RX_WORDCLK_I                        => rx_common_word_clk,
 					RX_FRAMECLK_I                       => rx_frame_clk_i,                  
 					-- Control:    
@@ -302,7 +311,7 @@ begin                                   --========####   Architecture Body   ###
 			
 			i_gbt_rx_not_ready_latch : entity work.latch
 			    port map(
-			        reset_i => reset_i or cnt_reset_i,
+			        reset_i => reset or cnt_reset_i,
 			        clk_i   => rx_frame_clk_i,
 			        input_i => not rx_ready_arr(i),
 			        latch_o => link_status_arr_o(i).gbt_rx_had_not_ready

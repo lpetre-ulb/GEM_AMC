@@ -54,6 +54,8 @@ architecture Behavioral of link_rx_trigger is
         );
     end component sbit_cluster_fifo;
 
+    signal reset : std_logic;
+
     -- trigger links will send a K-char every 4 clocks to mark a BX start, and every BX it will cycle through 4 different K-chars: 0xBC, 0xF7, 0xFB, 0xFD
     -- in case there is an overflow in that particular BX, the K-char for this BX will be 0xFC
 
@@ -77,14 +79,21 @@ architecture Behavioral of link_rx_trigger is
     signal fifo_almost_full     : std_logic;
     signal fifo_underflow       : std_logic;
 
-begin  
+begin
+
+    process(gt_rx_trig_usrclk_i)
+    begin
+        if rising_edge(gt_rx_trig_usrclk_i) then
+            reset <= reset_i;
+        end if;
+    end process;
 
     --== FSM STATE ==--
 
     process(gt_rx_trig_usrclk_i)
     begin
         if (rising_edge(gt_rx_trig_usrclk_i)) then
-            if (reset_i = '1') then
+            if (reset = '1') then
                 state <= COMMA;
                 frame_counter <= 0;
             else
@@ -112,7 +121,7 @@ begin
     process(gt_rx_trig_usrclk_i)
     begin
         if (rising_edge(gt_rx_trig_usrclk_i)) then
-            if (reset_i = '1') then
+            if (reset = '1') then
                 reset_cntdown <= x"ff";
                 missed_comma_err <= '0';
                 fifo_we <= '0';
@@ -162,7 +171,7 @@ begin
     
     i_sync_fifo : component sbit_cluster_fifo
         port map(
-            rst         => reset_i,
+            rst         => reset,
             wr_clk      => gt_rx_trig_usrclk_i,
             rd_clk      => ttc_clk_i,
             din         => fifo_din,

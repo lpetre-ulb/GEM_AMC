@@ -1032,7 +1032,6 @@
     <file xil_pn:name="../constraints/user/user_fabric_clk.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
-    <file xil_pn:name="../constraints/user/user_floorplanning.ucf" xil_pn:type="FILE_UCF"/>
     <file xil_pn:name="../constraints/user/user_mgt_amc.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
@@ -1043,9 +1042,6 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="../constraints/user/user_mgt_sfp.ucf" xil_pn:type="FILE_UCF">
-      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
-    </file>
-    <file xil_pn:name="../constraints/user/user_timingclosure.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="../ip/common/bram_vfat3_sc_adc_glib.xco" xil_pn:type="FILE_COREGEN">
@@ -1067,6 +1063,9 @@
     <file xil_pn:name="../hdl/wrappers/config_blaster_bram.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="475"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="108"/>
+    </file>
+    <file xil_pn:name="../constraints/user/user_floorplanning.ucf" xil_pn:type="FILE_UCF">
+      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="../ip/system/glib_pll.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
