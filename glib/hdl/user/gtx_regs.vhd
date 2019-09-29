@@ -32,6 +32,8 @@ end gtx_regs;
 
 architecture gtx_regs_arch of gtx_regs is
 
+    signal mgt_ctrl_arr         : t_gtx_ctrl_arr(0 to g_NUM_GTX-1);
+
     signal regs_read_arr        : t_std32_array(2*g_NUM_GTX - 1 downto 0);
     signal regs_write_arr       : t_std32_array(2*g_NUM_GTX - 1 downto 0);
     signal regs_addresses       : t_std32_array(2*g_NUM_GTX - 1 downto 0);
@@ -43,6 +45,8 @@ architecture gtx_regs_arch of gtx_regs is
     signal regs_writable_arr    : std_logic_vector(2*g_NUM_GTX - 1 downto 0) := (others => '0');
     
 begin
+
+    mgt_ctrl_arr_o <= mgt_ctrl_arr;
 
     -- IPbus slave instanciation
     ipbus_slave_inst : entity work.ipbus_slave
@@ -72,6 +76,28 @@ begin
     g_connections: for i in 0 to g_NUM_GTX-1 generate
 
         -- Connect read signals
+        -- Control
+        regs_read_arr(2*i)(2 downto 0)   <= mgt_ctrl_arr(i).loopback;
+
+        regs_read_arr(2*i)(3)            <= mgt_ctrl_arr(i).tx_reset;
+        regs_read_arr(2*i)(4)            <= mgt_ctrl_arr(i).tx_sync_reset;
+        regs_read_arr(2*i)(6 downto 5)   <= mgt_ctrl_arr(i).tx_pd;
+        regs_read_arr(2*i)(7)            <= mgt_ctrl_arr(i).tx_polarity;
+
+        regs_read_arr(2*i)(11 downto 8)  <= mgt_ctrl_arr(i).tx_conf_diff;
+        regs_read_arr(2*i)(16 downto 12) <= mgt_ctrl_arr(i).tx_post_emph;
+        regs_read_arr(2*i)(20 downto 17) <= mgt_ctrl_arr(i).tx_pre_emph;
+
+        regs_read_arr(2*i)(18)           <= mgt_ctrl_arr(i).rx_reset;
+        regs_read_arr(2*i)(19)           <= mgt_ctrl_arr(i).rx_sync_reset;
+        regs_read_arr(2*i)(21 downto 20) <= mgt_ctrl_arr(i).rx_pd;
+        regs_read_arr(2*i)(22)           <= mgt_ctrl_arr(i).rx_polarity;
+
+        regs_read_arr(2*i)(25 downto 23) <= mgt_ctrl_arr(i).prbs_pattern;
+        regs_read_arr(2*i)(26)           <= mgt_ctrl_arr(i).prbs_force_tx_err;
+        regs_read_arr(2*i)(27)           <= mgt_ctrl_arr(i).prbs_reset_rx_err_cnt;
+
+        -- Status
         regs_read_arr(2*i+1)(0) <= mgt_status_arr_i(i).ready;
         regs_read_arr(2*i+1)(1) <= mgt_status_arr_i(i).rx_word_clk_ready;
 
@@ -84,25 +110,25 @@ begin
         regs_read_arr(2*i+1)(6) <= mgt_status_arr_i(i).prbs_rx_err;
 
         -- Connect write signals
-        mgt_ctrl_arr_o(i).loopback      <= regs_write_arr(2*i)(2 downto 0);
+        mgt_ctrl_arr(i).loopback      <= regs_write_arr(2*i)(2 downto 0);
 
-        mgt_ctrl_arr_o(i).tx_reset      <= regs_write_arr(2*i)(3);
-        mgt_ctrl_arr_o(i).tx_sync_reset <= regs_write_arr(2*i)(4);
-        mgt_ctrl_arr_o(i).tx_pd         <= regs_write_arr(2*i)(6 downto 5);
-        mgt_ctrl_arr_o(i).tx_polarity   <= regs_write_arr(2*i)(7);
+        mgt_ctrl_arr(i).tx_reset      <= regs_write_arr(2*i)(3);
+        mgt_ctrl_arr(i).tx_sync_reset <= regs_write_arr(2*i)(4);
+        mgt_ctrl_arr(i).tx_pd         <= regs_write_arr(2*i)(6 downto 5);
+        mgt_ctrl_arr(i).tx_polarity   <= regs_write_arr(2*i)(7);
 
-        mgt_ctrl_arr_o(i).tx_conf_diff <= regs_write_arr(2*i)(11 downto 8);
-        mgt_ctrl_arr_o(i).tx_post_emph <= regs_write_arr(2*i)(16 downto 12);
-        mgt_ctrl_arr_o(i).tx_pre_emph  <= regs_write_arr(2*i)(20 downto 17);
+        mgt_ctrl_arr(i).tx_conf_diff <= regs_write_arr(2*i)(11 downto 8);
+        mgt_ctrl_arr(i).tx_post_emph <= regs_write_arr(2*i)(16 downto 12);
+        mgt_ctrl_arr(i).tx_pre_emph  <= regs_write_arr(2*i)(20 downto 17);
 
-        mgt_ctrl_arr_o(i).rx_reset      <= regs_write_arr(2*i)(18);
-        mgt_ctrl_arr_o(i).rx_sync_reset <= regs_write_arr(2*i)(19);
-        mgt_ctrl_arr_o(i).rx_pd         <= regs_write_arr(2*i)(21 downto 20);
-        mgt_ctrl_arr_o(i).rx_polarity   <= regs_write_arr(2*i)(22);
+        mgt_ctrl_arr(i).rx_reset      <= regs_write_arr(2*i)(18);
+        mgt_ctrl_arr(i).rx_sync_reset <= regs_write_arr(2*i)(19);
+        mgt_ctrl_arr(i).rx_pd         <= regs_write_arr(2*i)(21 downto 20);
+        mgt_ctrl_arr(i).rx_polarity   <= regs_write_arr(2*i)(22);
 
-        mgt_ctrl_arr_o(i).prbs_pattern          <= regs_write_arr(2*i)(25 downto 23);
-        mgt_ctrl_arr_o(i).prbs_force_tx_err     <= regs_write_arr(2*i)(26);
-        mgt_ctrl_arr_o(i).prbs_reset_rx_err_cnt <= regs_write_arr(2*i)(27);
+        mgt_ctrl_arr(i).prbs_pattern          <= regs_write_arr(2*i)(25 downto 23);
+        mgt_ctrl_arr(i).prbs_force_tx_err     <= regs_write_arr(2*i)(26);
+        mgt_ctrl_arr(i).prbs_reset_rx_err_cnt <= regs_write_arr(2*i)(27);
 
         -- Connect write pulse signals
 

@@ -8,12 +8,12 @@
 ## BANK_112(Q0) ##
 ##################
 
-#NET "clk125_1_p"                      LOC = AH6                                                                         ; # MGTREFCLK1P_112
-#NET "clk125_1_n"                      LOC = AH5                                                                         ; # MGTREFCLK1N_112
-#NET "clk125_1_p"                      TNM_NET = "clk125_1_p"                                                            ;
-#NET "clk125_1_n"                      TNM_NET = "clk125_1_n"                                                            ;
-#TIMESPEC TS_clk125_1_p =              PERIOD "clk125_1_p" 8 ns HIGH 50 %                                                ;
-#TIMESPEC TS_clk125_1_n =              PERIOD "clk125_1_n" TS_clk125_1_p PHASE 4 ns HIGH 50 %                            ;
+NET "clk125_1_p"                      LOC = AH6                                                                         ; # MGTREFCLK1P_112
+NET "clk125_1_n"                      LOC = AH5                                                                         ; # MGTREFCLK1N_112
+NET "clk125_1_p"                      TNM_NET = "clk125_1_p"                                                            ;
+NET "clk125_1_n"                      TNM_NET = "clk125_1_n"                                                            ;
+TIMESPEC TS_clk125_1_p =              PERIOD "clk125_1_p" 8 ns HIGH 50 %                                                ;
+TIMESPEC TS_clk125_1_n =              PERIOD "clk125_1_n" TS_clk125_1_p PHASE 4 ns HIGH 50 %                            ;
 
 NET "cdce_out0_p"                     LOC = AK6                                                                         ; # MGTREFCLK0P_112
 NET "cdce_out0_n"                     LOC = AK5                                                                         ; # MGTREFCLK0N_112

@@ -4,16 +4,21 @@
 #######################################
 #######################################
 
-#INST "usr"               AREA_GROUP = "pblock_usr";
-#AREA_GROUP "pblock_usr"  RANGE=CLOCKREGION_X1Y4:CLOCKREGION_X1Y4,
-#                               CLOCKREGION_X1Y3:CLOCKREGION_X1Y3,
-#                               CLOCKREGION_X1Y1:CLOCKREGION_X1Y1,
-#                               CLOCKREGION_X1Y0:CLOCKREGION_X1Y0,
-#                               CLOCKREGION_X0Y4:CLOCKREGION_X0Y4,
-#                               CLOCKREGION_X0Y3:CLOCKREGION_X0Y3,
-#                               CLOCKREGION_X0Y2:CLOCKREGION_X0Y2,
-#                               CLOCKREGION_X0Y1:CLOCKREGION_X0Y1,
-#                               CLOCKREGION_X0Y0:CLOCKREGION_X0Y0;
-#
-#INST "usr/i_gem_amc/*i_gbt" AREA_GROUP = "pblock_gbt";
-#AREA_GROUP "pblock_gbt"     RANGE=CLOCKREGION_X0Y0:CLOCKREGION_X1Y1;
+INST "usr/i_gem_amc/*i_gbt" AREA_GROUP = "pblock_gbt";
+AREA_GROUP "pblock_gbt"     RANGE=CLOCKREGION_X0Y0:CLOCKREGION_X0Y0,
+                                  CLOCKREGION_X1Y0:CLOCKREGION_X1Y0;
+                                  #CLOCKREGION_X1Y1:CLOCKREGION_X1Y1;
+
+INST "usr/i_gem_amc/*i_trigger" AREA_GROUP = "pblock_trigger";
+AREA_GROUP "pblock_trigger"     RANGE=CLOCKREGION_X0Y4:CLOCKREGION_X0Y4,
+                                      CLOCKREGION_X1Y4:CLOCKREGION_X1Y4;
+                                      #CLOCKREGION_X1Y3:CLOCKREGION_X1Y3;
+
+INST "usr/i_gem_amc/*gen_trig_links*" AREA_GROUP = "pblock_trigger_1";
+AREA_GROUP "pblock_trigger_1"     RANGE=CLOCKREGION_X0Y4:CLOCKREGION_X0Y4,
+                                        CLOCKREGION_X1Y4:CLOCKREGION_X1Y4;
+                                        #CLOCKREGION_X1Y3:CLOCKREGION_X1Y3;
+
+INST "usr/i_daqlink" AREA_GROUP = "pblock_daqlink";
+AREA_GROUP "pblock_daqlink"     RANGE=CLOCKREGION_X1Y3:CLOCKREGION_X1Y3,
+                                      CLOCKREGION_X1Y2:CLOCKREGION_X1Y2;

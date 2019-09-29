@@ -261,6 +261,7 @@ architecture user_logic_arch of user_logic is
     signal ipb_mosi_arr : ipb_wbus_array(number_of_ipb_slaves - 1 downto 0);
 
     -- DAQlink
+    signal daq_clk125     : std_logic;
     signal daq_clk_bufg   : std_logic;
     signal daq_clk_locked : std_logic;
     signal daq_to_daqlink : t_daq_to_daqlink;
@@ -406,14 +407,54 @@ begin
     --== DAQlink ==--
     --=============--
 
-    daq_clk_bufg <= '0';
-    daq_clk_locked <= '0';
-    -- daq_to_daqlink
-    daqlink_to_daq <= (ready => '0', almost_full => '0', disperr_cnt => x"0000", notintable_cnt => x"0000");
+    i_daqlink_ibufds_gtxe1 : ibufds_gtxe1
+    port map(
+        o       => daq_clk125,
+        odiv2   => open,
+        ceb     => '0',
+        i       => clk125_1_p,
+        ib      => clk125_1_n
+    );
+
+    i_daq_clocks : entity work.daq_clocks
+    port map
+    (
+        CLK_IN1            => daq_clk125,
+        CLK_OUT1           => daq_clk_bufg, -- 25MHz
+        CLK_OUT2           => open, -- 250MHz, not used
+        RESET              => reset_i,
+        LOCKED             => daq_clk_locked
+    );
+
+    i_daqlink : entity work.daqlink_wrapper
+    port map(
+        RESET_IN               => reset_pwrup,
+        MGT_REF_CLK_IN         => clk125_2_i,
+        GTX_TXN_OUT            => amc_port_tx_n(1),
+        GTX_TXP_OUT            => amc_port_tx_p(1),
+        GTX_RXN_IN             => amc_port_rx_n(1),
+        GTX_RXP_IN             => amc_port_rx_p(1),
+        DATA_CLK_IN            => daq_clk_bufg,
+        EVENT_DATA_IN          => daq_to_daqlink.event_data,
+        EVENT_DATA_HEADER_IN   => daq_to_daqlink.event_header,
+        EVENT_DATA_TRAILER_IN  => daq_to_daqlink.event_trailer,
+        DATA_WRITE_EN_IN       => daq_to_daqlink.event_valid,
+        READY_OUT              => daqlink_to_daq.ready,
+        ALMOST_FULL_OUT        => daqlink_to_daq.almost_full,
+        TTS_CLK_IN             => daq_to_daqlink.tts_clk,
+        TTS_STATE_IN           => daq_to_daqlink.tts_state,
+        GTX_CLK_OUT            => open,
+        ERR_DISPER_COUNT       => daqlink_to_daq.disperr_cnt,
+        ERR_NOT_IN_TABLE_COUNT => daqlink_to_daq.notintable_cnt,
+        BC0_IN                 => daq_to_daqlink.ttc_bc0,
+        RESYNC_IN              => '0', -- TODO to be implemented
+        CLK125_IN              => daq_clk125
+    );
 
     --================--
     --== GEM loader ==--
     --================--
+
     sram1_bwa <= '0';
     sram1_bwb <= '0';
     sram1_bwc <= '0';
@@ -457,7 +498,7 @@ begin
             g_USE_TRIG_TX_LINKS  => CFG_USE_TRIG_TX_LINKS,
             g_NUM_TRIG_TX_LINKS  => CFG_NUM_TRIG_TX,
             g_NUM_IPB_SLAVES     => number_of_ipb_slaves - 1,
-            g_DAQ_CLK_FREQ       => 62_500_000
+            g_DAQ_CLK_FREQ       => 25_000_000
         )
         port map(
             -- Resets

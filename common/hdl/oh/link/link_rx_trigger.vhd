@@ -81,9 +81,9 @@ architecture Behavioral of link_rx_trigger is
 
 begin
 
-    process(gt_rx_trig_usrclk_i)
+    process(ttc_clk_i)
     begin
-        if rising_edge(gt_rx_trig_usrclk_i) then
+        if rising_edge(ttc_clk_i) then
             reset <= reset_i;
         end if;
     end process;

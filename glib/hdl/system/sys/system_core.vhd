@@ -334,7 +334,7 @@ signal scl_i_slave_ro                        : std_logic;
 signal rarp_select                            : std_logic;
 --
 constant sys_eth_p0_enable               : boolean  := true;
-constant sys_eth_phy_enable              : boolean  := true;
+constant sys_eth_phy_enable              : boolean  := false;
 
 signal eui48                                    : std_logic_vector(47 downto 0);
 signal eui48_regs                                : array_16x8bit;

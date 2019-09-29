@@ -95,7 +95,7 @@ end gbt;
 
 architecture gbt_arch of gbt is
 
-    signal reset : std_logic;
+    signal reset, cnt_reset : std_logic;
 
     --========--
     -- GBT TX --
@@ -154,10 +154,11 @@ begin                                   --========####   Architecture Body   ###
     tied_to_ground <= '0';
     tied_to_vcc <= '1';
 
-    process(rx_common_word_clk)
+    process(tx_frame_clk_i)
     begin
-        if rising_edge(rx_common_word_clk) then
+        if rising_edge(tx_frame_clk_i) then
             reset <= reset_i;
+				cnt_reset <= cnt_reset_i;
         end if;
     end process;
 
@@ -192,7 +193,7 @@ begin                                   --========####   Architecture Body   ###
         
         i_gbt_rx_sync_ovf_latch : entity work.latch
             port map(
-                reset_i => reset or cnt_reset_i,
+                reset_i => reset or cnt_reset,
                 clk_i   => rx_common_word_clk,
                 input_i => rx_ovf_arr(i),
                 latch_o => link_status_arr_o(i).gbt_rx_sync_status.had_ovf
@@ -200,7 +201,7 @@ begin                                   --========####   Architecture Body   ###
 
         i_gbt_rx_sync_unf_latch : entity work.latch
             port map(
-                reset_i => reset or cnt_reset_i,
+                reset_i => reset or cnt_reset,
                 clk_i   => rx_common_word_clk,
                 input_i => rx_unf_arr(i),
                 latch_o => link_status_arr_o(i).gbt_rx_sync_status.had_unf
@@ -311,7 +312,7 @@ begin                                   --========####   Architecture Body   ###
 			
 			i_gbt_rx_not_ready_latch : entity work.latch
 			    port map(
-			        reset_i => reset or cnt_reset_i,
+			        reset_i => reset or cnt_reset,
 			        clk_i   => rx_frame_clk_i,
 			        input_i => not rx_ready_arr(i),
 			        latch_o => link_status_arr_o(i).gbt_rx_had_not_ready

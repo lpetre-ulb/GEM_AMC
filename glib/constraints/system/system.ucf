@@ -22,40 +22,40 @@ net system/rst/rst_ipb_o        tig;
 #########################
 ## CDCE Lock signal
                                                                            # 1.679ns         # 1.512ns      # 1.375ns
-INST "system/cdce_synch/fsm_sync"                                    LOC = SLICE_X31Y36    ; #SLICE_X33Y36; #SLICE_X35Y36;
-INST "system/cdce_synch/fsm_sync"                                    BEL = AFF             ;
+#INST "system/cdce_synch/fsm_sync"                                    LOC = SLICE_X31Y36    ; #SLICE_X33Y36; #SLICE_X35Y36;
+#INST "system/cdce_synch/fsm_sync"                                    BEL = AFF             ;
 
-NET  "cdce_sync_OBUF"
-ROUTE = "{3;1;6vlx130tff1156;fae76467!-1;-59632;-204800;S!0;-843;-584!1;"
-         "2698;-393!2;8592;0!3;7354;1033!4;0;-8!5;-886;-82!6;-2552;-174!7;-80;16!8;"
-         "-883;352;L!}"                                                                    ;
+#NET  "cdce_sync_OBUF"
+#ROUTE = "{3;1;6vlx130tff1156;fae76467!-1;-59632;-204800;S!0;-843;-584!1;"
+#         "2698;-393!2;8592;0!3;7354;1033!4;0;-8!5;-886;-82!6;-2552;-174!7;-80;16!8;"
+#         "-883;352;L!}"                                                                    ;
 
 ## PLL
-INST "system/gbt_phase_monitoring/ttclk_pll/mmcm_adv_inst"           LOC = MMCM_ADV_X0Y5   ;
-INST "system/gbt_phase_monitoring/ttclk_pll/clkout1_buf"             LOC = BUFHCE_X1Y34    ;
-INST "system/gbt_phase_monitoring/ttclk_pll/clkf_buf"                LOC = BUFHCE_X1Y35    ;
+#INST "system/gbt_phase_monitoring/ttclk_pll/mmcm_adv_inst"           LOC = MMCM_ADV_X0Y5   ;
+#INST "system/gbt_phase_monitoring/ttclk_pll/clkout1_buf"             LOC = BUFHCE_X1Y34    ;
+#INST "system/gbt_phase_monitoring/ttclk_pll/clkf_buf"                LOC = BUFHCE_X1Y35    ;
 
 ## SFP
-INST "system/gbt_phase_monitoring/sfp_ttclk_x6_cdce_bufg"            LOC = BUFGCTRL_X0Y0   ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_ffd"          BEL = AFF             ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_ffd"          LOC = SLICE_X56Y100   ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_cdce_ffd"     BEL = AFF             ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_cdce_ffd"     LOC = SLICE_X56Y101   ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/Mxor_test_xor_xo<0>1"  BEL = A5LUT           ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/Mxor_test_xor_xo<0>1"  LOC = SLICE_X57Y100   ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/xor_ffd"               BEL = AFF             ;
-INST "system/gbt_phase_monitoring/sfp_cdce_pm/xor_ffd"               LOC = SLICE_X57Y100   ;
+#INST "system/gbt_phase_monitoring/sfp_ttclk_x6_cdce_bufg"            LOC = BUFGCTRL_X0Y0   ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_ffd"          BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_ffd"          LOC = SLICE_X56Y100   ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_cdce_ffd"     BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/ttclk_x6_cdce_ffd"     LOC = SLICE_X56Y101   ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/Mxor_test_xor_xo<0>1"  BEL = A5LUT           ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/Mxor_test_xor_xo<0>1"  LOC = SLICE_X57Y100   ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/xor_ffd"               BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/sfp_cdce_pm/xor_ffd"               LOC = SLICE_X57Y100   ;
 
 ## FMC1
-INST "system/gbt_phase_monitoring/fmc1_ttclk_x6_cdce_bufg"           LOC = BUFGCTRL_X0Y23  ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_ffd"         BEL = AFF             ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_ffd"         LOC = SLICE_X58Y100   ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_cdce_ffd"    BEL = AFF             ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_cdce_ffd"    LOC = SLICE_X58Y101   ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/Mxor_test_xor_xo<0>1" BEL = A5LUT           ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/Mxor_test_xor_xo<0>1" LOC = SLICE_X59Y100   ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/xor_ffd"              BEL = AFF             ;
-INST "system/gbt_phase_monitoring/fmc1_cdce_pm/xor_ffd"              LOC = SLICE_X59Y100   ;
+#INST "system/gbt_phase_monitoring/fmc1_ttclk_x6_cdce_bufg"           LOC = BUFGCTRL_X0Y23  ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_ffd"         BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_ffd"         LOC = SLICE_X58Y100   ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_cdce_ffd"    BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/ttclk_x6_cdce_ffd"    LOC = SLICE_X58Y101   ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/Mxor_test_xor_xo<0>1" BEL = A5LUT           ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/Mxor_test_xor_xo<0>1" LOC = SLICE_X59Y100   ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/xor_ffd"              BEL = AFF             ;
+#INST "system/gbt_phase_monitoring/fmc1_cdce_pm/xor_ffd"              LOC = SLICE_X59Y100   ;
 
 ###############################
 ## SYSTEM AREA FLOORPLANNING ##
@@ -93,10 +93,10 @@ NET "amc_port_rx_n[0]"                              LOC = W4    ;    # MGTRXN1_1
 #############
 ## GBE PHY ##
 #############
-NET "gbe_tx_p"                                       LOC = T1        ;    # MGTTXP2_114
-NET "gbe_tx_n"                                       LOC = T2        ;    # MGTTXN2_114
-NET "gbe_rx_p"                                       LOC = U3        ;    # MGTRXP2_114
-NET "gbe_rx_n"                                       LOC = U4        ;    # MGTRXN2_114
+#NET "gbe_tx_p"                                       LOC = T1        ;    # MGTTXP2_114
+#NET "gbe_tx_n"                                       LOC = T2        ;    # MGTTXN2_114
+#NET "gbe_rx_p"                                       LOC = U3        ;    # MGTRXP2_114
+#NET "gbe_rx_n"                                       LOC = U4        ;    # MGTRXN2_114
 NET "gbe_int_n"                                        LOC = AL15    ;    # IO_L3P_32
 NET "gbe_reset_n"                                      LOC = AK16    ;    # IO_L19N_32
 NET "gbe_scl_mdc"                                     LOC = AL16    ;    # IO_L19P_32

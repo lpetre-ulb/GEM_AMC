@@ -20,10 +20,10 @@ TIMESPEC TS_clk125_2_n =               PERIOD "clk125_2_n" TS_clk125_2_p PHASE 4
 # ipbus timing constraints
 
 NET "system/amc_p0_en.amc_p0_eth/clk125_out"             TNM_NET = system/amc_p0_en.amc_p0_eth/clk125_out;
-TIMESPEC TS_system_phy_en_phy_eth_clk125_out =              PERIOD "system/phy_en.phy_eth/clk125_out" 8 ns HIGH 50%;
-
-NET "system/phy_en.phy_eth/clk125_out"                     TNM_NET = system/phy_en.phy_eth/clk125_out;
 TIMESPEC TS_system_amc_p0_en_amc_p0_eth_clk125_out =     PERIOD "system/amc_p0_en.amc_p0_eth/clk125_out" 8 ns HIGH 50%;
+
+#NET "system/phy_en.phy_eth/clk125_out"                     TNM_NET = system/phy_en.phy_eth/clk125_out;
+#TIMESPEC TS_system_phy_en_phy_eth_clk125_out =              PERIOD "system/phy_en.phy_eth/clk125_out" 8 ns HIGH 50%;
 
 
 NET system/rst/rst TIG;
