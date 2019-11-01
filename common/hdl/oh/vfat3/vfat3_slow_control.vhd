@@ -57,6 +57,8 @@ architecture vfat3_slow_control_arch of vfat3_slow_control is
         
     signal state                : state_t;
 
+    signal reset                : std_logic;
+
     signal tx_reset             : std_logic;
     signal rx_reset             : std_logic;
 
@@ -108,6 +110,15 @@ architecture vfat3_slow_control_arch of vfat3_slow_control is
 
 begin
 
+    i_reset_sync: entity work.oneshot_cross_domain
+    port map (
+        reset_i       => '0',
+        input_clk_i   => ttc_clk_i.clk_40,
+        oneshot_clk_i => ipb_clk_i,
+        input_i       => reset_i,
+        oneshot_o     => reset
+    );
+
     tx_oh_idx_o <= tx_oh_idx;
     tx_vfat_idx_o <= tx_vfat_idx;
 
@@ -120,10 +131,10 @@ begin
 
     --== IPbus process ==--
 
-    process(ipb_clk_i)       
-    begin    
-        if (rising_edge(ipb_clk_i)) then      
-            if (reset_i = '1') then    
+    process(ipb_clk_i)
+    begin
+        if (rising_edge(ipb_clk_i)) then
+            if (reset = '1') then
                 ipb_miso_o <= (ipb_err => '0', ipb_ack => '0', ipb_rdata => (others => '0'));
                 tx_is_write <= '0';
                 tx_reg_addr <= (others => '0');
@@ -140,18 +151,18 @@ begin
                 adc_cache_we <= '0';
                 adc_cache_addr <= (others => '0');
                 adc_cache_din <= (others => '0');
-            else         
+            else
                 case state is
-                    when IDLE =>    
-                    
-                    	ipb_miso_o <= (ipb_err => '0', ipb_ack => '0', ipb_rdata => (others => '0'));
-                    	transaction_timer <= (others => '0');
-                    	adc_cache_we <= '0';
-                    	adc_cache_din <= (others => '0');
-                    	
+                    when IDLE =>
+
+                        ipb_miso_o <= (ipb_err => '0', ipb_ack => '0', ipb_rdata => (others => '0'));
+                        transaction_timer <= (others => '0');
+                        adc_cache_we <= '0';
+                        adc_cache_din <= (others => '0');
+
                         -- waiting for a request from IPbus
                         if (ipb_mosi_i.ipb_strobe = '1') then
-                            
+
                             -- check if this is a normal read address or one that goes to ADC cache
                             if (ipb_mosi_i.ipb_addr(9 downto 7) /= "101") then                            
                                 tx_command_en <= '1';
@@ -173,20 +184,20 @@ begin
                                 elsif (ipb_mosi_i.ipb_addr(9 downto 8) = "11") then
                                     tx_reg_addr(19 downto 0) <= x"0ffff";
                                 end if;
-                                
+
                                 tx_is_write  <= ipb_mosi_i.ipb_write;
                                 tx_reg_value <= ipb_mosi_i.ipb_wdata;
                                 transaction_id <= transaction_id + 1;
-                                
+
                                 tx_oh_idx   <= ipb_mosi_i.ipb_addr(19 downto 16);
                                 tx_vfat_idx <= ipb_mosi_i.ipb_addr(15 downto 11);
-                                                            
+
                                 tx_reset <= '0';
                                 rx_reset <= '1';
 
                                 adc_cache_en <= '0';
                                 adc_cache_addr <= (others => '0');
-                                
+
                                 state <= RSPD;
                             else
                                 tx_command_en <= '0';
@@ -194,14 +205,14 @@ begin
                                 rx_reset <= '1';
                                 adc_cache_en <= '1';
                                 adc_cache_addr <= ipb_mosi_i.ipb_addr(19 downto 11) & ipb_mosi_i.ipb_addr(0);
-                                
+
                                 state <= RSPD_CACHE;                                
                             end if;
-                            
+
                         else
-                        	
-                        	tx_command_en <= '0';
-                        	state <= IDLE;
+
+                            tx_command_en <= '0';
+                            state <= IDLE;
                             tx_reset <= '1';
                             rx_reset <= '1';
                             adc_cache_en <= '0';
@@ -210,11 +221,11 @@ begin
                         
                     -- waiting for a VFAT3 response and replying to IPbus
                     when RSPD =>
-                    	
-                    	if (tx_busy = '1') then
-                    		tx_command_en <= '0';
-                    	end if;
-                    	
+
+                        if (tx_busy = '1') then
+                            tx_command_en <= '0';
+                        end if;
+
                         if (ipb_mosi_i.ipb_strobe = '0') then
                             state <= IDLE;     
                             tx_reset <= '1';
@@ -235,11 +246,11 @@ begin
                             state <= RST;
                         end if;
 
-						transaction_timer <= transaction_timer + 1;
+                        transaction_timer <= transaction_timer + 1;
 
                         tx_reset <= '0';
                         rx_reset <= '0';
-                        
+
                         adc_cache_en <= '0';
                         adc_cache_we <= '0';
                         adc_cache_addr <= (others => '0');

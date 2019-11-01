@@ -28,8 +28,9 @@ port(
 
     elink_data_i            : in std_logic_vector(g_ELINK_WIDTH-1 downto 0);
 
-    reg_data_valid_o        : out std_logic;
-    reg_data_o              : out std_logic_vector(31 downto 0);
+    data_valid_o            : out std_logic;
+    data_valid_ack_i        : in  std_logic;
+    data_o                  : out std_logic_vector(31 downto 0);
     error_o                 : out std_logic
 
 );
@@ -95,11 +96,11 @@ begin
 
     process (ttc_clk_40_i) begin
         if (rising_edge(ttc_clk_40_i)) then
-
-            reg_data_valid_o <= reg_data_valid;
-
-            if (reg_data_valid='1') then
-                reg_data_o       <= reg_data (31 downto 0);
+            if (reg_data_valid = '1') then
+                data_valid_o <= '1';
+                data_o       <= reg_data (31 downto 0);
+            elsif (data_valid_ack_i = '1') then
+                data_valid_o <= '0';
             end if;
         end if;
     end process;

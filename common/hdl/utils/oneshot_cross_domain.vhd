@@ -47,7 +47,7 @@ begin
                         oneshot_req <= '1';
                     else
                         oneshot_req <= '0';
-                    end if; 
+                    end if;
                 elsif (oneshot_ack = '1') then
                     oneshot_req <= '0';
                 else
@@ -65,6 +65,8 @@ begin
                 oneshot_ack <= '0';
                 oneshot_req_last <= '0';
             else
+                oneshot_req_last <= oneshot_req;
+
                 if ((oneshot_req_last = '0') and (oneshot_req = '1')) then
                     oneshot_o <= '1';
                 else

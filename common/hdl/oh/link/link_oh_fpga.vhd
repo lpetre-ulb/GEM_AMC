@@ -46,7 +46,7 @@ architecture link_oh_fpga_arch of link_oh_fpga is
     
     constant TRANSACTION_TIMEOUT    : unsigned(11 downto 0) := x"7ff";
     
-    type state_t is (IDLE, RSPD, RST);
+    type state_t is (IDLE, RSPD, ACK, RST);
         
     signal state                : state_t;
 
@@ -63,6 +63,8 @@ architecture link_oh_fpga_arch of link_oh_fpga is
 
     signal rx_valid             : std_logic;
     signal rx_valid_sync        : std_logic;
+    signal rx_valid_ack         : std_logic;
+    signal rx_valid_ack_sync    : std_logic;
     signal rx_error             : std_logic;
     signal rx_error_sync        : std_logic;
     signal rx_reg_value         : std_logic_vector(31 downto 0) := (others => '0');
@@ -73,23 +75,25 @@ begin
 
     process(ipb_clk_i)       
     begin    
-        if (rising_edge(ipb_clk_i)) then      
-            if (reset_i = '1') then    
+        if (rising_edge(ipb_clk_i)) then
+            if (reset_i = '1') then
                 ipb_miso_o <= (ipb_err => '0', ipb_ack => '0', ipb_rdata => (others => '0'));
                 tx_is_write <= '0';
                 tx_reg_addr <= (others => '0');
                 tx_reg_value <= (others => '0');
                 tx_command_en <= '0';
+                rx_valid_ack <= '0';
                 state <= IDLE;
                 transaction_timer <= (others => '0');
                 timeout_err_cnt <= (others => '0');
                 axi_strobe_err_cnt <= (others => '0');
-            else         
+            else
                 case state is
-                    when IDLE =>    
+                    when IDLE =>
                     
                         ipb_miso_o <= (ipb_err => '0', ipb_ack => '0', ipb_rdata => (others => '0'));
                         transaction_timer <= (others => '0');
+                        rx_valid_ack <= '0';
                         
                         -- waiting for a request from IPbus
                         if (ipb_mosi_i.ipb_strobe = '1') then
@@ -106,6 +110,8 @@ begin
                         
                     -- waiting for an OH response and replying to IPbus
                     when RSPD =>
+
+                        rx_valid_ack <= '0';
                         
                         if (tx_busy = '1') then
                             tx_command_en <= '0';
@@ -116,7 +122,8 @@ begin
                             axi_strobe_err_cnt <= axi_strobe_err_cnt + 1;
                         elsif (rx_valid_sync = '1') then
                             ipb_miso_o <= (ipb_ack => '1', ipb_err => '0', ipb_rdata => rx_reg_value);
-                            state <= RST;
+                            rx_valid_ack <= '1';
+                            state <= ACK;
                         elsif (rx_error_sync = '1') then
                             ipb_miso_o <= (ipb_ack => '1', ipb_err => '1', ipb_rdata => rx_reg_value);
                             state <= RST;
@@ -127,15 +134,27 @@ begin
                         end if;
 
                         transaction_timer <= transaction_timer + 1;
-                        
+
+                    when ACK =>
+
+                        if (rx_valid_sync = '0') then
+                            rx_valid_ack <= '0';
+                            state <= RST;
+                        end if;
+
+                        if (ipb_mosi_i.ipb_strobe = '0') then
+                            ipb_miso_o.ipb_ack <= '0';
+                            ipb_miso_o.ipb_err <= '0';
+                        end if;
+
                     -- closing the transaction and returning to idle
                     when RST =>
-                        
+                        rx_valid_ack <= '0';
                         if (ipb_mosi_i.ipb_strobe = '0') then 
                             ipb_miso_o.ipb_ack <= '0';
                             ipb_miso_o.ipb_err <= '0';
                             state <= IDLE;
-                            tx_command_en <= '0';                            
+                            tx_command_en <= '0';
                         end if;
                     
                     -- who knows what might happen :)
@@ -147,6 +166,7 @@ begin
                         tx_reg_addr <= (others => '0');
                         tx_reg_value <= (others => '0');
                         tx_command_en <= '0';
+                        rx_valid_ack <= '0';
                         
                 end case;                      
             end if;        
@@ -171,6 +191,16 @@ begin
             async_i => rx_valid,
             clk_i   => ipb_clk_i,
             sync_o  => rx_valid_sync
+        );
+
+    i_rx_valid_ack_sync : entity work.synchronizer
+        generic map(
+            N_STAGES => 2
+        )
+        port map(
+            async_i => rx_valid_ack,
+            clk_i   => ttc_clk_i.clk_40,
+            sync_o  => rx_valid_ack_sync
         );
 
     i_rx_error_sync : entity work.synchronizer
@@ -201,8 +231,9 @@ begin
             reset_i          => reset_i,
             ttc_clk_40_i     => ttc_clk_i.clk_40,
             elink_data_i     => rx_elink_i,
-            reg_data_valid_o => rx_valid,
-            reg_data_o       => rx_reg_value,
+            data_valid_o     => rx_valid,
+            data_valid_ack_i => rx_valid_ack_sync,
+            data_o           => rx_reg_value,
             error_o          => rx_error
         );
     
