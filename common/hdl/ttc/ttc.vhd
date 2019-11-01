@@ -78,6 +78,8 @@ architecture ttc_arch of ttc is
     signal mmcm_unlock_cnt          : std_logic_vector(15 downto 0);   
 
     -- commands
+    signal inhibit_ttc              : std_logic;
+
     signal ttc_cmd                  : std_logic_vector(7 downto 0);
     signal ttc_l1a                  : std_logic;
 
@@ -230,6 +232,7 @@ begin
     entity work.ttc_cmd
         port map(
             clk_40_i             => ttc_clks_i.clk_40,
+            inhibit_ttc_i        => inhibit_ttc,
             ttc_data_p_i         => ttc_data_p_i,
             ttc_data_n_i         => ttc_data_n_i,
             ttc_cmd_o            => ttc_cmd,
@@ -583,6 +586,7 @@ begin
     -- Connect read signals
     regs_read_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= ttc_ctrl.l1a_enable;
     regs_read_arr(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT) <= ttc_ctrl.calib_mode;
+    regs_read_arr(4)(REG_TTC_CTRL_INHIBIT_TTC_FROM_BACKPLANE_BIT) <= inhibit_ttc;
     regs_read_arr(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB) <= ttc_ctrl.calib_l1a_delay;
     regs_read_arr(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= ttc_conf.cmd_bc0;
     regs_read_arr(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= ttc_conf.cmd_ec0;
@@ -625,6 +629,7 @@ begin
     -- Connect write signals
     ttc_ctrl.l1a_enable <= regs_write_arr(4)(REG_TTC_CTRL_L1A_ENABLE_BIT);
     ttc_ctrl.calib_mode <= regs_write_arr(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT);
+    inhibit_ttc <= regs_write_arr(4)(REG_TTC_CTRL_INHIBIT_TTC_FROM_BACKPLANE_BIT);
     ttc_ctrl.calib_l1a_delay <= regs_write_arr(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB);
     ttc_conf.cmd_bc0 <= regs_write_arr(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB);
     ttc_conf.cmd_ec0 <= regs_write_arr(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB);
@@ -663,6 +668,7 @@ begin
     -- Defaults
     regs_defaults(4)(REG_TTC_CTRL_L1A_ENABLE_BIT) <= REG_TTC_CTRL_L1A_ENABLE_DEFAULT;
     regs_defaults(4)(REG_TTC_CTRL_CALIBRATION_MODE_BIT) <= REG_TTC_CTRL_CALIBRATION_MODE_DEFAULT;
+    regs_defaults(4)(REG_TTC_CTRL_INHIBIT_TTC_FROM_BACKPLANE_BIT) <= REG_TTC_CTRL_INHIBIT_TTC_FROM_BACKPLANE_DEFAULT;
     regs_defaults(4)(REG_TTC_CTRL_CALPULSE_L1A_DELAY_MSB downto REG_TTC_CTRL_CALPULSE_L1A_DELAY_LSB) <= REG_TTC_CTRL_CALPULSE_L1A_DELAY_DEFAULT;
     regs_defaults(5)(REG_TTC_CONFIG_CMD_BC0_MSB downto REG_TTC_CONFIG_CMD_BC0_LSB) <= REG_TTC_CONFIG_CMD_BC0_DEFAULT;
     regs_defaults(5)(REG_TTC_CONFIG_CMD_EC0_MSB downto REG_TTC_CONFIG_CMD_EC0_LSB) <= REG_TTC_CONFIG_CMD_EC0_DEFAULT;

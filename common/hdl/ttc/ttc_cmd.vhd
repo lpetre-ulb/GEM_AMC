@@ -24,6 +24,8 @@ entity ttc_cmd is
   port(
     clk_40_i : in std_logic;            -- Main TTC clock
 
+    inhibit_ttc_i : in std_logic;
+
     ttc_data_p_i : in std_logic;        -- TTC datastream from AMC13
     ttc_data_n_i : in std_logic;
 
@@ -77,7 +79,7 @@ begin
       c  => clk_40_i,
       ce => '1',
       d  => s_ttc_data_ibufds,
-      r  => '0',
+      r  => inhibit_ttc_i,
       s  => '0'
       );
 
