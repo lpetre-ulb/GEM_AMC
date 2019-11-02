@@ -1,6 +1,6 @@
 __author__ = 'evka'
 
-import xml.etree.ElementTree as xml
+from lxml import etree
 import textwrap as tw
 import sys
 import rw_reg
@@ -148,8 +148,12 @@ def main():
             station = sys.argv[3]
             print('GEM station = %s' % station)
 
-    tree = xml.parse(ADDRESS_TABLE_TOP)
-    root = tree.getroot()[0]
+    parser = etree.XMLParser(remove_comments=True)
+    tree = etree.parse(ADDRESS_TABLE_TOP, parser)
+    root = tree.getroot()
+    # Remove the xi:include tags
+    for elem in root.findall(".//*[@fw_skip]"):
+        elem.getparent().remove(elem)
 
     modules = []
     vars = {}
@@ -579,6 +583,7 @@ def writeUHalAddressTable(modules, filename, addrOffset, num_of_oh = None):
 
     rw_reg.parseXML(ADDRESS_TABLE_TOP, num_of_oh)
     top = rw_reg.getNode('GEM_AMC')
+    print(top)
 
     # AMC specific nodes
     f = open("%s_amc.xml"%(filename), 'w')

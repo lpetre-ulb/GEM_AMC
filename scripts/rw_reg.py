@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as xml
+from lxml import etree
 import sys, os, subprocess
 
 DEBUG = True
@@ -50,9 +50,16 @@ def parseXML(filename = None, num_of_oh = None):
     if filename == None:
         filename = ADDRESS_TABLE_TOP
     print 'Parsing',filename,'...'
-    tree = xml.parse(filename)
-    root = tree.getroot()[0]
+
+    parser = etree.XMLParser(remove_comments=True)
+    tree = etree.parse(filename, parser)
+    root = tree.getroot()
+    # Remove the xi:include tags
+    for elem in root.findall(".//*[@fw_skip]"):
+        elem.getparent().remove(elem)
+
     vars = {}
+
     makeTree(root,'',0x0,nodes,None,vars,False,num_of_oh)
 
 def makeTree(node,baseName,baseAddress,nodes,parentNode,vars,isGenerated,num_of_oh=None):

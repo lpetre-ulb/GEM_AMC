@@ -1207,7 +1207,7 @@
             generate="true" generate_size="12" generate_address_step="0x00010000" generate_idx_var="OH_IDX">
 
             <!--Insert here the OH FPGA module -->
-            <xi:include href="optohybrid_registers.xml"/>
+            <xi:include href="optohybrid_registers.xml" fw_skip=""/>
 
         <node id="GEB"  address="0x100000"
               description="VFAT3 registers">
