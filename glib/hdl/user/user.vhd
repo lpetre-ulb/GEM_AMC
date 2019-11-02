@@ -214,9 +214,7 @@ architecture user_logic_arch of user_logic is
     -- Reset
     signal reset_pwrup : std_logic;
 
-    -- TTC
-    signal clk240_ttc : std_logic;
-
+    -- TTC clocks
     signal ttc_clcks : t_ttc_clks;
     signal ttc_clcks_locked : std_logic;
 
@@ -288,23 +286,16 @@ begin
     --== TTC ==--
     --=========--
 
-    i_ibufgds_clk_240_ttc : IBUFDS
-    port map (
-        O  => clk240_ttc,
-        I  => cdce_out4_p,
-        IB => cdce_out4_n
-    );
-
     i_ttc_clocks : entity work.ttc_clocks
     port map (
-        clk240_ttc_i => clk240_ttc,
-        clk40_o      => ttc_clcks.clk_40,
-        clk80_o      => ttc_clcks.clk_80,
-        clk120_o     => open,
-        clk160_o     => ttc_clcks.clk_160,
-        clk240_o     => ttc_clcks.clk_gbt_mgt_usrclk,
-        reset_i      => '0',
-        locked_o     => ttc_clcks_locked
+        clk40_ttc_p => cdce_out4_p,
+        clk40_ttc_n => cdce_out4_n,
+        clk40_o     => ttc_clcks.clk_40,
+        clk80_o     => ttc_clcks.clk_80,
+        clk160_o    => ttc_clcks.clk_160,
+        clk240_o    => ttc_clcks.clk_gbt_mgt_usrclk,
+        reset_i     => '0',
+        locked_o    => ttc_clcks_locked
     );
 
     i_oddr : ODDR
@@ -313,13 +304,13 @@ begin
         INIT => '0',
         SRTYPE => "SYNC")
     port map (
-        Q => fpga_clkout_o,
-        C => ttc_clcks.clk_40,
+        Q  => fpga_clkout_o,
+        C  => ttc_clcks.clk_40,
         CE => '1',
         D1 => '1',
         D2 => '0',
         R => '0',
-        S => '0'
+        S  => '0'
     );
 
     --===============--
