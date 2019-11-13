@@ -1964,9 +1964,7 @@
     </Run>
     <Run Id="vio_lpgbt_loopback_synth_1" Type="Ft3:Synth" SrcSet="vio_lpgbt_loopback" Part="xc7vx690tffg1927-2" ConstrsSet="vio_lpgbt_loopback" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/vio_lpgbt_loopback_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -1975,9 +1973,7 @@
     </Run>
     <Run Id="sync_fifo_gbt_mgt_33_synth_1" Type="Ft3:Synth" SrcSet="sync_fifo_gbt_mgt_33" Part="xc7vx690tffg1927-2" ConstrsSet="sync_fifo_gbt_mgt_33" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/sync_fifo_gbt_mgt_33_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -1986,9 +1982,7 @@
     </Run>
     <Run Id="ila_lpgbt_synth_1" Type="Ft3:Synth" SrcSet="ila_lpgbt" Part="xc7vx690tffg1927-2" ConstrsSet="ila_lpgbt" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/ila_lpgbt_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -2206,9 +2200,7 @@
     </Run>
     <Run Id="vio_lpgbt_loopback_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="vio_lpgbt_loopback" Description="Default settings for Implementation." SynthRun="vio_lpgbt_loopback_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -2224,9 +2216,7 @@
     </Run>
     <Run Id="sync_fifo_gbt_mgt_33_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="sync_fifo_gbt_mgt_33" Description="Default settings for Implementation." SynthRun="sync_fifo_gbt_mgt_33_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -2242,9 +2232,7 @@
     </Run>
     <Run Id="ila_lpgbt_impl_1" Type="Ft2:EntireDesign" Part="xc7vx690tffg1927-2" ConstrsSet="ila_lpgbt" Description="Default settings for Implementation." SynthRun="ila_lpgbt_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
