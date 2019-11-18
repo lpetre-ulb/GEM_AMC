@@ -190,6 +190,7 @@ architecture gem_amc_arch of gem_amc is
     signal oh_fpga_rx_data_arr          : t_std8_array(g_NUM_OF_OHs - 1 downto 0);
     signal vfat3_tx_data_arr            : t_vfat3_elinks_arr(g_NUM_OF_OHs - 1 downto 0);
     signal vfat3_rx_data_arr            : t_vfat3_elinks_arr(g_NUM_OF_OHs - 1 downto 0);
+    signal me0_vfat3_sbits_arr          : t_vfat3_sbits_arr(g_NUM_OF_OHs - 1 downto 0);
     
     --== VFAT3 ==--
     signal vfat3_sc_only_mode           : std_logic;
@@ -431,6 +432,33 @@ begin
             ipb_miso_o         => ipb_miso_arr(C_IPB_SLV.trigger),
             ipb_mosi_i         => ipb_mosi_arr_i(C_IPB_SLV.trigger)
         );
+
+    --================================--
+    -- ME0 Trigger  
+    --================================--
+
+--    i_trigger : entity work.trigger
+--        generic map(
+--            g_NUM_OF_OHs => g_NUM_OF_OHs,
+--            g_NUM_TRIG_TX_LINKS => g_NUM_TRIG_TX_LINKS,
+--            g_USE_TRIG_TX_LINKS => g_USE_TRIG_TX_LINKS
+--        )
+--        port map(
+--            reset_i            => reset or link_reset,
+--            ttc_clk_i          => ttc_clocks_i,
+--            ttc_cmds_i         => ttc_cmd,
+--            sbit_clusters_i    => sbit_clusters_arr,
+--            sbit_link_status_i => sbit_links_status_arr,
+--            trig_led_o         => led_trigger_o,
+--            tx_link_clk_i      => gt_trig_tx_clk_i,
+--            trig_tx_data_arr_o => gt_trig_tx_data_arr_o,      
+--            ipb_reset_i        => ipb_reset,
+--            ipb_clk_i          => ipb_clk_i,
+--            ipb_miso_o         => ipb_miso_arr(C_IPB_SLV.trigger),
+--            ipb_mosi_i         => ipb_mosi_arr_i(C_IPB_SLV.trigger)
+--        );
+--
+--me0_vfat3_sbits_arr
 
     --================================--
     -- DAQ  
@@ -718,6 +746,8 @@ begin
                 gbt_ic_rx_data_arr_o  => gbt_ic_rx_data_arr,
                 vfat3_tx_data_arr_i   => vfat3_tx_data_arr,
                 vfat3_rx_data_arr_o   => vfat3_rx_data_arr,
+                vfat3_sbits_arr_o     => me0_vfat3_sbits_arr,
+
                 gbt_ready_arr_o       => gbt_ready_arr,
                 vfat3_gbt_ready_arr_o => vfat3_gbt_ready_arr
             );

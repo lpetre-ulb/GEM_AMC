@@ -161,6 +161,8 @@ package gem_pkg is
 
     type t_std8_array is array(integer range <>) of std_logic_vector(7 downto 0);
 
+    type t_std6_array is array(integer range <>) of std_logic_vector(5 downto 0);
+
     type t_std4_array is array(integer range <>) of std_logic_vector(3 downto 0);
 
     type t_std3_array is array(integer range <>) of std_logic_vector(2 downto 0);
@@ -199,6 +201,7 @@ package gem_pkg is
     --=============--
     
     type t_vfat3_elinks_arr is array(integer range<>) of t_std8_array(23 downto 0);   
+    type t_vfat3_sbits_arr is array(integer range<>) of t_std64_array(5 downto 0);
 
     --========================--
     --== GTH/GTX link types ==--
@@ -266,6 +269,12 @@ package gem_pkg is
 
     type t_oh_sbit_links is array(1 downto 0) of t_sbit_link_status;    
     type t_oh_sbit_links_arr is array(integer range <>) of t_oh_sbit_links;
+
+    --===================--
+    --==  ME0 trigger  ==--
+    --===================--
+    
+    type t_vfat_trigger_cnt_arr is array(integer range<>) of t_std16_array(5 downto 0);
 
     --====================--
     --==     DAQLink    ==--
